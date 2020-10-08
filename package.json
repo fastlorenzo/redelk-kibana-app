@@ -1,0 +1,24 @@
+{
+  "name": "redelk",
+  "version": "1.0.0",
+  "main": "plugins/redelk",
+  "kibana": {
+    "version": "kibana",
+    "templateVersion": "1.0.0"
+  },
+  "license": "Apache-2.0",
+  "scripts": {
+    "kbn": "node ../../scripts/kbn.js",
+    "build": "node ../../scripts/build --all-platforms",
+    "start": "node ../../scripts/kibana --dev"
+  },
+  "devDependencies": {
+    "kbn-plugin-helpers": "link:../../kibana/packages/kbn-plugin-helpers",
+    "typescript": "4.0.2"
+  },
+  "dependencies": {
+    "@babel/cli": "^7.10.5",
+    "@reduxjs/toolkit": "^1.4.0",
+    "uglify-js": "^3.10.1"
+  }
+}

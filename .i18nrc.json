@@ -1,0 +1,10 @@
+{
+    "prefix": "redelk",
+    "paths": {
+      "redelk": "."
+    },
+    "translations": [
+      "translations/ja-JP.json"
+    ]
+  }
+  
