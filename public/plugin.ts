@@ -11,7 +11,7 @@ export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart
       id: 'redelk',
       label: PLUGIN_NAME,
       order: 1,
-      euiIconType: core.http.basePath.get() + '/plugins/redelk/assets/redelk' + (darkMode ? '-light' : '') + '.png'
+      euiIconType: core.http.basePath.get() + '/plugins/redelk/assets/redelklogo' + (darkMode ? '-light' : '') + '.svg'
     }
     // Register an application into the side navigation menu
     core.application.register({
