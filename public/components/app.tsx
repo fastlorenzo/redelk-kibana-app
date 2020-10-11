@@ -22,13 +22,12 @@ import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Router} from 'react-router-dom';
 
 import {CoreStart} from 'kibana/public';
-import {NavigationPublicPluginStart} from '../../../../src/plugins/navigation/public';
+import {NavigationPublicPluginStart, TopNavMenuData} from '../../../../src/plugins/navigation/public';
 import {IOCPage} from "./iocPage";
 import {SummaryPage} from "./summaryPage";
 import {EuiBreadcrumb, EuiTab, EuiTabs} from '@elastic/eui';
 import {setNavHeader} from "../navHeaderHelper";
-import {RedELKState} from "../types";
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch} from 'react-redux';
 import {PLUGIN_ID, PLUGIN_NAME} from "../../common";
 import {
   connectToQueryState,
@@ -55,6 +54,7 @@ import {
 } from '../../../../src/plugins/kibana_utils/public';
 import {History} from 'history';
 import IOCSlice from "../features/ioc/iocSlice";
+import {useKibana} from '../../../../src/plugins/kibana_react/public';
 
 interface RedelkAppDeps {
   basename: string;
@@ -178,15 +178,32 @@ const useAppStateSyncing = <AppState extends QueryState>(
   }, [query, kbnUrlStateStorage, appStateContainer]);
 };
 
+const tabs: Tabs[] = [
+  {
+    id: 'summary',
+    name: 'Summary',
+    disabled: false,
+  },
+  {
+    id: 'ioc',
+    name: 'IOC',
+    disabled: false,
+  }
+];
+const DEFAULT_TAB = 'summary';
+
 const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlStateStorage}: RedelkAppDeps) => {
   const {notifications, http} = core;
   const appStateContainer = useAppStateContainer();
   const appState = useAppState();
 
-  const [selectedTabId, setSelectedTabId] = useState<string>('summary');
-  const [brdcrmbs, setBrdcrmbs] = useState<EuiBreadcrumb[]>([]);
-  const state: (RedELKState) = useSelector((state: RedELKState) => state);
+  const [selectedTabId, setSelectedTabId] = useState<string>(DEFAULT_TAB);
+  const [brdcrmbs, setBrdcrmbs] = useState<EuiBreadcrumb[]>([{text: tabs.find(t => t.id === DEFAULT_TAB)!.name}]);
+  const [isAddIOCFlyoutVisible, setIsAddIOCFlyoutVisible] = useState(false);
+  const [showTopNav, setShowTopNav] = useState<boolean>(false);
 
+  const kibana = useKibana();
+  console.log('kbn', kibana);
   useGlobalStateSyncing(data.query, kbnUrlStateStorage);
   useAppStateSyncing(appStateContainer, data.query, kbnUrlStateStorage);
 
@@ -202,22 +219,11 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
   breadcrumbs = breadcrumbs.concat(brdcrmbs);
   useEffect(() => {
     setNavHeader(core, breadcrumbs);
-  }, [core, navigation, state, breadcrumbs])
-  const tabs: Tabs[] = [
-    {
-      id: 'summary',
-      name: 'Summary',
-      disabled: false,
-    },
-    {
-      id: 'ioc',
-      name: 'IOC',
-      disabled: false,
-    }
-  ]
+  }, [breadcrumbs])
+
   const onSelectedTabChanged = (id: string) => {
     setSelectedTabId(id);
-    setBrdcrmbs([{text: id}]);
+    setBrdcrmbs([{text: tabs.find(t => t.id === id)!.name}]);
   };
   const renderTabs = () => {
     return tabs.map((tab, index) => (
@@ -247,6 +253,20 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
         tmpFilters.push(trFilter);
       }
     }
+    const iocFilter: Filter = {
+      meta: {
+        alias: "ioc",
+        disabled: false,
+        index: "rtops",
+        negate: false
+      },
+      query: {
+        match_phrase: {
+          "event.type": "ioc"
+        }
+      }
+    }
+    tmpFilters.push(iocFilter);
     const esQueryFilters = esQuery.buildQueryFromFilters(tmpFilters, indexPattern);
     let searchOpts: IEsSearchRequest = {
       params: {
@@ -272,46 +292,57 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
   const indexPattern = useIndexPattern(data);
   if (!indexPattern)
     return <div>No index pattern found. Please create an index patter before loading...</div>;
-
+  let navConfig: TopNavMenuData[] = [];
   switch (selectedTabId) {
     case "ioc":
       displayTab = (
-        <IOCPage basename={basename} notifications={notifications} http={http} navigation={navigation} data={data}/>);
+        <IOCPage basename={basename} notifications={notifications} http={http} navigation={navigation} data={data}
+                 showAddIOCFlyout={isAddIOCFlyoutVisible} setIOCFlyoutVisible={setIsAddIOCFlyoutVisible}
+                 showTopNav={setShowTopNav}/>);
+      navConfig.push({
+        id: "add-ioc",
+        label: "Add IOC",
+        run: () => {
+          setIsAddIOCFlyoutVisible(true)
+        }
+      })
       break;
     case "summary":
     default:
       displayTab = (
-        <SummaryPage basename={basename} notifications={notifications} http={http} navigation={navigation}/>);
+        <SummaryPage basename={basename} notifications={notifications} http={http} navigation={navigation}
+                     showTopNav={setShowTopNav}/>);
       break;
   }
-  console.log('navigation', navigation);
+
+  const topNav = showTopNav ? (
+    <navigation.ui.TopNavMenu
+      appName={PLUGIN_ID}
+      showSearchBar={true}
+      indexPatterns={[indexPattern]}
+      useDefaultBehaviors={true}
+      onQuerySubmit={onQuerySubmit}
+      query={appState.query}
+      showSaveQuery={true}
+      config={navConfig}
+    />
+  ) : '';
+
   return (
     <Router history={history}>
       <>
-        <navigation.ui.TopNavMenu
-          appName={PLUGIN_ID}
-          showSearchBar={true}
-          indexPatterns={[indexPattern]}
-          useDefaultBehaviors={true}
-          onQuerySubmit={onQuerySubmit}
-          query={appState.query}
-          showSaveQuery={true}
-        />
+        <EuiTabs
+          size="s"
+          expand
+        >
+          {renderTabs()}
+        </EuiTabs>
+        {topNav}
+        {displayTab}
       </>
-      <EuiTabs>{renderTabs()}</EuiTabs>
-      {displayTab}
+
     </Router>
   )
-  /*
-  return (
-    <Router basename={basename}>
-      <Switch>
-        <Route path='/' exact default component={SummaryPage} />
-        <Route path='/ioc' exact component={IOCPage} />
-      </Switch>
-    </Router>
-  );
-  */
 };
 
 export const RedelkApp = (props: RedelkAppDeps) => {

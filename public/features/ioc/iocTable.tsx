@@ -1,7 +1,6 @@
-import React, {ReactElement, useEffect, useMemo, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import React, {ReactElement, useMemo, useState} from 'react';
+import {useSelector} from 'react-redux';
 import {at} from 'lodash';
-// import moment from 'moment';
 import {
   EuiDataGrid,
   EuiDataGridCellValueElementProps,
@@ -13,9 +12,6 @@ import {
 
 import {CoreStart} from 'kibana/public';
 import {EsAnswerIOC, KbnCallStatus, RedELKState} from '../../types';
-import {fetchAllIOC} from './iocSlice';
-
-// import { IOCState } from './types';
 
 interface IOCTableDeps {
   http: CoreStart['http'];
@@ -25,52 +21,6 @@ export const IOCTable = ({http}: IOCTableDeps) => {
 
   const ioc: (EsAnswerIOC | undefined) = useSelector((state: RedELKState) => state.ioc.ioc);
   const iocStatus: KbnCallStatus = useSelector((state: RedELKState) => state.ioc.status);
-
-  const dispatch = useDispatch();
-
-  // const sorting: EuiDataGridSorting = {
-  //   sort: {
-  //     field: '_source.@timestamp',
-  //     direction: 'desc',
-  //   },
-  // };
-
-  // const columns = [
-  //   {
-  //     field: '_source.@timestamp',
-  //     name: 'Time',
-  //     sortable: true,
-  //     render: (timestamp: string) => {
-  //       const ts = new moment(timestamp);
-  //       return (ts.toISOString(true))
-  //     }
-  //   },
-  //   {
-  //     field: '_index',
-  //     name: 'Index',
-  //     sortable: true
-  //   },
-  //   {
-  //     field: '_source.ioc.type',
-  //     name: 'IOC Type',
-  //     sortable: true
-  //   },
-  //   {
-  //     field: '_source.file.name',
-  //     name: 'File name',
-  //     sortable: true
-  //   },
-  //   {
-  //     field: '_source.file.hash.md5',
-  //     name: 'File hash',
-  //     sortable: true
-  //   },
-  //   {
-  //     field: '_source.file.size',
-  //     name: 'File size (bytes)',
-  //     sortable: true
-  //   }
-  // ];
 
   const toolbarVisibility: EuiDataGridToolBarVisibilityOptions = {
     showColumnSelector: true,
@@ -144,7 +94,7 @@ export const IOCTable = ({http}: IOCTableDeps) => {
   // Column visibility
   const [visibleColumns, setVisibleColumns] = useState(() =>
     datagrid_columns.map(({id}) => id)
-  ); // initialize to the full set of columns
+  );
 
   const raw_data = ioc === undefined ? [] : ioc.hits.hits;
   const renderCellValue = useMemo(() => {
@@ -169,12 +119,6 @@ export const IOCTable = ({http}: IOCTableDeps) => {
     };
   }, [ioc]);
 
-  useEffect(() => {
-    if (iocStatus === KbnCallStatus.idle) {
-      dispatch(fetchAllIOC({http}));
-    }
-  }, [iocStatus, dispatch])
-
   return iocStatus == KbnCallStatus.pending ? (
     <EuiLoadingSpinner size="xl"/>
   ) : (
@@ -188,14 +132,4 @@ export const IOCTable = ({http}: IOCTableDeps) => {
       gridStyle={gridStyle}
     />
   )
-  // return (
-  //   <EuiInMemoryTable
-  //     items={ioc && ioc.hits && ioc.hits.hits ? ioc.hits.hits : []}
-  //     tableLayout='auto'
-  //     sorting={sorting}
-  //     columns={columns}
-  //     loading={iocStatus !== KbnCallStatus.success}
-  //   />
-  // )
-
 }

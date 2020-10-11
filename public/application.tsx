@@ -15,24 +15,24 @@ import {createKbnUrlStateStorage} from '../../../src/plugins/kibana_utils/public
 
 export const renderApp = (
   core: CoreStart,
-  {navigation, data}: AppPluginStartDependencies,
+  appDeps: AppPluginStartDependencies,
   {appBasePath, element, history}: AppMountParameters
 ) => {
   const {notifications, http} = core;
+  const {navigation, data} = appDeps;
   const store = configureStore({
     reducer: rootReducer,
-    middleware: [thunk, kbnApiMiddleware({notifications, http})]
+    middleware: [thunk, kbnApiMiddleware({notifications, http})],
+    devTools: true
   });
   const kbnUrlStateStorage = createKbnUrlStateStorage({useHash: false, history});
-//    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+
   ReactDOM.render(
     <Provider store={store}>
       <KibanaContextProvider
         services={{
-          uiSettings: core.uiSettings,
-          docLinks: core.docLinks,
-          data: data,
-          navigation: navigation
+          ...core,
+          ...appDeps
         }}
       >
         <RedelkApp

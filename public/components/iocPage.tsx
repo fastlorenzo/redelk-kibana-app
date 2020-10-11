@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect} from 'react';
 import {CoreStart} from "kibana/public";
 import {NavigationPublicPluginStart} from '../../../../src/plugins/navigation/public';
 import {IOCTable} from "../features/ioc/iocTable";
@@ -19,24 +19,25 @@ import {AddIOCForm} from "../features/ioc/addIocForm";
 import {DataPublicPluginStart} from 'src/plugins/data/public';
 
 
-interface RedelkAppDeps {
+interface IOCPageDeps {
   basename: string;
   notifications: CoreStart['notifications'];
   http: CoreStart['http'];
   navigation: NavigationPublicPluginStart;
   data: DataPublicPluginStart;
+  showAddIOCFlyout: boolean | false;
+  setIOCFlyoutVisible: (arg0: boolean) => void;
+  showTopNav: (arg0: boolean) => void;
 }
 
-export const IOCPage = ({basename, notifications, http, navigation, data}: RedelkAppDeps) => {
-
-  const [isAddIOCFlyoutVisible, setIsAddIOCFlyoutVisible] = useState(false);
+export const IOCPage = ({basename, notifications, http, navigation, data, showAddIOCFlyout, setIOCFlyoutVisible, showTopNav}: IOCPageDeps) => {
 
   let addIOCFlyout;
-  if (isAddIOCFlyoutVisible) {
+  if (showAddIOCFlyout) {
     addIOCFlyout = (
       <EuiFlyout
         size="m"
-        onClose={() => setIsAddIOCFlyoutVisible(false)}
+        onClose={() => setIOCFlyoutVisible(false)}
         aria-labelledby="flyoutTitle">
         <EuiFlyoutHeader hasBorder>
           <EuiTitle size="m">
@@ -44,13 +45,14 @@ export const IOCPage = ({basename, notifications, http, navigation, data}: Redel
           </EuiTitle>
         </EuiFlyoutHeader>
         <EuiFlyoutBody>
-          <AddIOCForm http={http} callback={() => setIsAddIOCFlyoutVisible(false)}/>
+          <AddIOCForm http={http} callback={() => setIOCFlyoutVisible(false)}/>
         </EuiFlyoutBody>
       </EuiFlyout>
     );
   }
 
   const topNavMenu = '';
+  useEffect(() => showTopNav(true), []);
 
   return (
     <>
