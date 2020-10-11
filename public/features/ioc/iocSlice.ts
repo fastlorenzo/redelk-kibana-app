@@ -49,7 +49,6 @@ const iocSlice = createSlice({
     builder.addCase(fetchAllIOC.fulfilled, (state: IOCState, action: PayloadAction<EsAnswerIOC>) => {
       state.status = KbnCallStatus.success;
       state.error = '';
-      console.log(action);
       state.ioc = action.payload;
     });
     builder.addCase(fetchAllIOC.rejected, (state: IOCState, action) => {

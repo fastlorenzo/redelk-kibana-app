@@ -54,7 +54,6 @@ import {
 } from '../../../../src/plugins/kibana_utils/public';
 import {History} from 'history';
 import IOCSlice from "../features/ioc/iocSlice";
-import {useKibana} from '../../../../src/plugins/kibana_react/public';
 
 interface RedelkAppDeps {
   basename: string;
@@ -202,8 +201,6 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
   const [isAddIOCFlyoutVisible, setIsAddIOCFlyoutVisible] = useState(false);
   const [showTopNav, setShowTopNav] = useState<boolean>(false);
 
-  const kibana = useKibana();
-  console.log('kbn', kibana);
   useGlobalStateSyncing(data.query, kbnUrlStateStorage);
   useAppStateSyncing(appStateContainer, data.query, kbnUrlStateStorage);
 
@@ -284,7 +281,6 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
       }
     }
     data.search.search(searchOpts).forEach((res) => {
-      console.log('next', res);
       dispatch(IOCSlice.actions.setIOC(res.rawResponse));
     })
   }, [appState]);

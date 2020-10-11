@@ -3,7 +3,6 @@ import {ChromeBadge, ChromeBrand, ChromeHelpExtension, CoreStart} from "kibana/p
 import {PLUGIN_NAME} from "../common";
 
 export const setNavHeader = (core: CoreStart, breadcrumbs: EuiBreadcrumb[]) => {
-  console.log('setNavHeader', breadcrumbs);
   const darkMode: boolean = core.uiSettings.get('theme:darkMode');
   const basePath: string = core.http.basePath.get();
   const iconType = basePath + '/plugins/redelk/assets/redelklogo' + (darkMode ? '-light' : '') + '.svg'
@@ -31,6 +30,5 @@ export const setNavHeader = (core: CoreStart, breadcrumbs: EuiBreadcrumb[]) => {
   core.chrome.setBadge(badge);
   core.chrome.setBrand(brand);
   core.chrome.setBreadcrumbs(breadcrumbs);
-  console.log(core.chrome.navLinks.getAll())
 };
 
