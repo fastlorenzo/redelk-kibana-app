@@ -9,6 +9,10 @@ Currently, working functionalities are:
 
 This application is compatible with Elastic stack v7.9.2+
 
+## Screenshots
+
+![Manual IOC ingestion](/screenshots/manual-ioc-ingestion.png?raw=true "Manual IOC ingestion")
+
 ## Development
 
 See the [kibana contributing guide](https://github.com/elastic/kibana/blob/master/CONTRIBUTING.md) for instructions setting up your development environment.
