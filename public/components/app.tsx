@@ -263,7 +263,9 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
         }
       }
     }
-    tmpFilters.push(iocFilter);
+    if (selectedTabId === 'ioc') {
+      tmpFilters.push(iocFilter);
+    }
     const esQueryFilters = esQuery.buildQueryFromFilters(tmpFilters, indexPattern);
     let searchOpts: IEsSearchRequest = {
       params: {
@@ -274,15 +276,49 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
       searchOpts.params.q = appState.query.query.toString();
     }
     if (appState.filters !== undefined && searchOpts.params !== undefined) {
+
       searchOpts.params.body = {
         query: {
           bool: esQueryFilters
         }
       }
+
+      if (selectedTabId === 'summary') {
+        searchOpts.params.body.aggs = {
+          perEventType: {
+            terms: {
+              field: "event.type",
+              order: {
+                "_count": "desc"
+              }
+            }
+          },
+          perHostName: {
+            terms: {
+              field: "host.name",
+              order: {
+                "_count": "desc"
+              }
+            }
+          },
+          perUserName: {
+            terms: {
+              field: "user.name",
+              order: {
+                "_count": "desc"
+              }
+            }
+          }
+        }
+      }
+
     }
+
+
     data.search.search(searchOpts).forEach((res) => {
       dispatch(IOCSlice.actions.setIOC(res.rawResponse));
-    })
+    });
+
   }, [appState]);
 
   const indexPattern = useIndexPattern(data);

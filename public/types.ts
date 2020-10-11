@@ -159,4 +159,5 @@ export interface EsAnswerIOC {
   _shards: EsShards;
   timed_out: boolean;
   took: number;
+  aggregations: unknown;
 }
