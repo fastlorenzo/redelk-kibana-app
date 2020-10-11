@@ -11,7 +11,9 @@ This application is compatible with Elastic stack v7.9.2+
 
 ## Screenshots
 
-![Manual IOC ingestion](/screenshots/manual-ioc-ingestion.png?raw=true "Manual IOC ingestion")
+![Summary dashboard](/screenshots/redelk-summary-dark.png "Summary dashboard")
+![IOC dashboard](/screenshots/redelk-ioc-dark.png "IOC dashboard")
+![IOC manual ingestion](/screenshots/redelk-ioc-add-dark.png "IOC manual ingestion")
 
 ## Development
 
