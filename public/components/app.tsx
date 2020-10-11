@@ -31,21 +31,29 @@ import {RedELKState} from "../types";
 import {useDispatch, useSelector} from 'react-redux';
 import {PLUGIN_ID, PLUGIN_NAME} from "../../common";
 import {
-  connectToQueryState, DataPublicPluginStart, esFilters, IEsSearchRequest, IIndexPattern,
-  ISearchSource,
-  QueryState, syncQueryStateWithUrl, TimeRange, esQuery, getTime
+  connectToQueryState,
+  DataPublicPluginStart,
+  esFilters,
+  esQuery,
+  Filter,
+  getTime,
+  IEsSearchRequest,
+  IIndexPattern,
+  Query,
+  QueryState,
+  syncQueryStateWithUrl,
+  TimeRange
 } from '../../../../src/plugins/data/public';
 import {
-  BaseState, BaseStateContainer,
+  BaseState,
+  BaseStateContainer,
   createStateContainer,
-  createStateContainerReactHelpers, IKbnUrlStateStorage, ReduxLikeStateContainer, syncState
+  createStateContainerReactHelpers,
+  IKbnUrlStateStorage,
+  ReduxLikeStateContainer,
+  syncState
 } from '../../../../src/plugins/kibana_utils/public';
 import {History} from 'history';
-import {
-  Filter,
-  Query
-} from '../../../../src/plugins/data/public';
-import {SearchOpts} from "../../../../src/core/server/saved_objects/migrations/core/call_cluster";
 import IOCSlice from "../features/ioc/iocSlice";
 
 interface RedelkAppDeps {
@@ -55,20 +63,21 @@ interface RedelkAppDeps {
   data: DataPublicPluginStart;
   history: History;
   kbnUrlStateStorage: IKbnUrlStateStorage;
-};
+}
 
 interface Tabs {
   id: string;
   name: string;
   disabled: boolean;
-};
+}
 
 interface AppState {
   name: string;
   filters: Filter[];
   query?: Query;
   time?: TimeRange;
-};
+}
+
 const defaultAppState: AppState = {
   name: '',
   filters: [],
@@ -231,10 +240,10 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
   );
   const dispatch = useDispatch();
   useEffect(() => {
-    let tmpFilters= [...appState.filters];
-    if(appState.time !== undefined) {
+    let tmpFilters = [...appState.filters];
+    if (appState.time !== undefined) {
       const trFilter = getTime(indexPattern, appState.time);
-      if(trFilter !== undefined) {
+      if (trFilter !== undefined) {
         tmpFilters.push(trFilter);
       }
     }

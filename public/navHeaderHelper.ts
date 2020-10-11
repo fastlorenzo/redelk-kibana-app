@@ -1,4 +1,4 @@
-import { EuiBreadcrumb } from '@elastic/eui';
+import {EuiBreadcrumb} from '@elastic/eui';
 import {ChromeBadge, ChromeBrand, ChromeHelpExtension, CoreStart} from "kibana/public";
 import {PLUGIN_NAME} from "../common";
 
@@ -6,7 +6,7 @@ export const setNavHeader = (core: CoreStart, breadcrumbs: EuiBreadcrumb[]) => {
   console.log('setNavHeader', breadcrumbs);
   const darkMode: boolean = core.uiSettings.get('theme:darkMode');
   const basePath: string = core.http.basePath.get();
-  const iconType =  basePath + '/plugins/redelk/assets/redelklogo' + (darkMode ? '-light' : '') + '.svg'
+  const iconType = basePath + '/plugins/redelk/assets/redelklogo' + (darkMode ? '-light' : '') + '.svg'
 
   const badge: ChromeBadge = {
     iconType: iconType,

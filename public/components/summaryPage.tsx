@@ -4,14 +4,13 @@ import {NavigationPublicPluginStart, TopNavMenu, TopNavMenuData} from '../../../
 import {EuiPage, EuiPageBody, EuiPageContent, EuiPageHeader, EuiTitle} from '@elastic/eui';
 import {Link} from 'react-router-dom';
 import {PLUGIN_ID} from "../../common";
-import { useKibana } from '../../../../src/plugins/kibana_react/public';
 
 interface RedelkAppDeps {
   basename: string;
   notifications: CoreStart['notifications'];
   http: CoreStart['http'];
   navigation: NavigationPublicPluginStart;
-};
+}
 
 export const SummaryPage = ({basename, notifications, http, navigation}: RedelkAppDeps) => {
   const navConfig: TopNavMenuData[] = [{
@@ -33,8 +32,7 @@ export const SummaryPage = ({basename, notifications, http, navigation}: RedelkA
       return 'Nothing to save';
     }
   }];
-  const kibana = useKibana();
-  console.log('kbn',kibana);
+
   return (
     <>
       <TopNavMenu

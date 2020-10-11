@@ -23,7 +23,7 @@ export const renderApp = (
     reducer: rootReducer,
     middleware: [thunk, kbnApiMiddleware({notifications, http})]
   });
-  const kbnUrlStateStorage = createKbnUrlStateStorage({ useHash: false, history });
+  const kbnUrlStateStorage = createKbnUrlStateStorage({useHash: false, history});
 //    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
   ReactDOM.render(
     <Provider store={store}>

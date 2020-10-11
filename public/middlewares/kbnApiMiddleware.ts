@@ -1,4 +1,4 @@
-import {Middleware, Dispatch} from 'redux';
+import {Dispatch, Middleware} from 'redux';
 import {KbnApiMiddlewareDeps, RedELKState} from '../types';
 import {fetchAllIOC} from "../features/ioc/iocSlice";
 import {ThunkDispatch} from 'redux-thunk';
@@ -6,7 +6,7 @@ import {ThunkDispatch} from 'redux-thunk';
 interface MiddlewareArgs {
   dispatch: ThunkDispatch<any, any, any>;
   getState: () => RedELKState;
-};
+}
 
 const kbnApi = (
   {notifications, http}: KbnApiMiddlewareDeps

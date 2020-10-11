@@ -103,7 +103,7 @@ export const AddIOCForm = ({http, callback}: AddIOCFormDeps) => {
 
   const fileForm = type === 'file' ? (
     <>
-       <EuiFormRow
+      <EuiFormRow
         label="Timestamp (required)"
         helpText="When has the IOC been seen?"
       >

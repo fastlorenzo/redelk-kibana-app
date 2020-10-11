@@ -176,7 +176,7 @@ export const IOCTable = ({http}: IOCTableDeps) => {
   }, [iocStatus, dispatch])
 
   return iocStatus == KbnCallStatus.pending ? (
-    <EuiLoadingSpinner size="xl" />
+    <EuiLoadingSpinner size="xl"/>
   ) : (
     <EuiDataGrid
       columns={datagrid_columns}
