@@ -5,7 +5,6 @@ import moment, {Moment} from 'moment';
 import {
   EuiButton,
   EuiDatePicker,
-  EuiDescribedFormGroup,
   EuiFieldNumber,
   EuiFieldText,
   EuiForm,
@@ -21,9 +20,10 @@ import {CreateIOCType} from "./types";
 
 interface AddIOCFormDeps {
   http: CoreStart['http'];
+  callback: () => void;
 }
 
-export const AddIOCForm = ({http}: AddIOCFormDeps) => {
+export const AddIOCForm = ({http, callback}: AddIOCFormDeps) => {
 
   const md5Regexp: RegExp = /^[a-fA-F0-9]{32}$/;
 
@@ -34,6 +34,9 @@ export const AddIOCForm = ({http}: AddIOCFormDeps) => {
   const [fileName, setFileName] = useState<string>('');
   const [fileHash, setFileHash] = useState<string>('');
   const [fileSize, setFileSize] = useState<string>('');
+  const [c2Message, setC2Message] = useState<string>('');
+  const [userName, setUserName] = useState<string>('');
+  const [hostName, setHostName] = useState<string>('');
 
   const fileHashErrors: string[] = ['Invalid file hash'];
   const isFileHashValid: boolean = md5Regexp.test(fileHash);
@@ -53,15 +56,40 @@ export const AddIOCForm = ({http}: AddIOCFormDeps) => {
         hash: {
           md5: fileHash
         }
+      },
+      c2: {
+        message: c2Message
+      },
+      host: {
+        name: hostName
+      },
+      user: {
+        name: userName
       }
     };
     dispatch(createIOC({http, payload}));
     e.preventDefault();
+    callback();
   }
 
   const handleTypeChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setType(e.target.value);
   }
+
+  // Common to all IOC types
+  const handleUserNameChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setUserName(e.target.value);
+  }
+  const handleHostNameChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setHostName(e.target.value);
+  }
+  const handleC2MessageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setC2Message(e.target.value);
+  }
+  const handleTimestampChange = (date: Moment) => {
+    setTimestamp(date);
+  }
+
   // File
   const handleFileNameChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFileName(e.target.value);
@@ -72,74 +100,86 @@ export const AddIOCForm = ({http}: AddIOCFormDeps) => {
   const handleFileSizeChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFileSize(e.target.value);
   }
-  const handleTimestampChange = (date: Moment) => {
-    setTimestamp(date);
-  }
 
   const fileForm = type === 'file' ? (
     <>
-      <EuiDescribedFormGroup
-        title={<h3>Timestamp <em>(required)</em></h3>}
-        description={<>When has the IOC been seen?</>}
+       <EuiFormRow
+        label="Timestamp (required)"
+        helpText="When has the IOC been seen?"
       >
-        <EuiFormRow
-          label="Time select on"
-        >
-          <EuiDatePicker
-            showTimeSelect
-            selected={timestamp}
-            onChange={handleTimestampChange}
-            timeIntervals={1}
-          />
-        </EuiFormRow>
-      </EuiDescribedFormGroup>
-      <EuiDescribedFormGroup
-        title={<h3>File name <em>(required)</em></h3>}
-        description={<>Name of the file related to the IOC.</>}
+        <EuiDatePicker
+          showTimeSelect
+          selected={timestamp}
+          onChange={handleTimestampChange}
+          timeIntervals={1}
+        />
+      </EuiFormRow>
+
+      <EuiFormRow
+        label="File name (required)"
+        helpText="Name of the file related to the IOC."
+        error={fileNameErrors}
+        isInvalid={!isFileNameValid}
       >
-        <EuiFormRow
-          label="File name"
-          error={fileNameErrors}
+        <EuiFieldText
+          name="fileName"
+          onChange={handleFileNameChange}
           isInvalid={!isFileNameValid}
-        >
-          <EuiFieldText
-            name="fileName"
-            onChange={handleFileNameChange}
-            isInvalid={!isFileNameValid}
-          />
-        </EuiFormRow>
-      </EuiDescribedFormGroup>
+        />
+      </EuiFormRow>
 
-      <EuiDescribedFormGroup
-        title={<h3>File hash <em>(required)</em></h3>}
-        description={<>MD5 hash of the file related to the IOC.</>}
+      <EuiFormRow
+        label="File hash (MD5)"
+        helpText="MD5 hash of the file related to the IOC."
+        error={fileHashErrors}
+        isInvalid={!isFileHashValid}
       >
-        <EuiFormRow
-          label="File hash (MD5)"
-          error={fileHashErrors}
+        <EuiFieldText
+          name="fileHash"
+          onChange={handleFileHashChange}
           isInvalid={!isFileHashValid}
-        >
-          <EuiFieldText
-            name="fileHash"
-            onChange={handleFileHashChange}
-            isInvalid={!isFileHashValid}
-          />
-        </EuiFormRow>
-      </EuiDescribedFormGroup>
+        />
+      </EuiFormRow>
 
-      <EuiDescribedFormGroup
-        title={<h3>File size</h3>}
-        description={<>Size of the file related to the IOC (in bytes).</>}
+      <EuiFormRow
+        label="File size"
+        helpText="Size of the file related to the IOC (in bytes)."
       >
-        <EuiFormRow
-          label="File size"
-        >
-          <EuiFieldNumber
-            name="fileSize"
-            onChange={handleFileSizeChange}
-          />
-        </EuiFormRow>
-      </EuiDescribedFormGroup>
+        <EuiFieldNumber
+          name="fileSize"
+          onChange={handleFileSizeChange}
+        />
+      </EuiFormRow>
+
+      <EuiFormRow
+        label="User name"
+        helpText="Optional name of the target user where the IOC occurred."
+      >
+        <EuiFieldText
+          name="userName"
+          onChange={handleUserNameChange}
+        />
+      </EuiFormRow>
+
+      <EuiFormRow
+        label="Host name"
+        helpText="Optional name of the target host where the IOC occurred."
+      >
+        <EuiFieldText
+          name="hostName"
+          onChange={handleHostNameChange}
+        />
+      </EuiFormRow>
+
+      <EuiFormRow
+        label="C2 Message"
+        helpText="Optional message that will be populated in the `c2.message` field."
+      >
+        <EuiFieldText
+          name="c2Message"
+          onChange={handleC2MessageChange}
+        />
+      </EuiFormRow>
     </>
   ) : ''
 
@@ -148,25 +188,22 @@ export const AddIOCForm = ({http}: AddIOCFormDeps) => {
       component="form"
       onSubmit={handleFormSubmit}
     >
-      <EuiDescribedFormGroup
-        title={<h3>IOC type</h3>}
-        description={<>Select the type of IOC to ingest.</>}
+      <EuiFormRow
+        label="IOC Type"
+        helpText="Select the type of IOC to ingest."
       >
-        <EuiFormRow
-          label="IOC Type"
-        >
-          <EuiSelect
-            hasNoInitialSelection
-            onChange={handleTypeChange}
-            options={[
-              {value: 'file', text: 'File'},
-              {value: 'service', text: 'Service'},
-              {value: 'domain', text: 'Domain'},
-              {value: 'ip', text: 'IP address'},
-            ]}
-          />
-        </EuiFormRow>
-      </EuiDescribedFormGroup>
+        <EuiSelect
+          hasNoInitialSelection
+          onChange={handleTypeChange}
+          options={[
+            {value: '', text: ''},
+            {value: 'file', text: 'File'},
+            {value: 'service', text: 'Service'},
+            {value: 'domain', text: 'Domain'},
+            {value: 'ip', text: 'IP address'},
+          ]}
+        />
+      </EuiFormRow>
 
       <EuiSpacer/>
 

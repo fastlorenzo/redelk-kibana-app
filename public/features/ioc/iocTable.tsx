@@ -8,6 +8,7 @@ import {
   EuiDataGridColumn,
   EuiDataGridStyle,
   EuiDataGridToolBarVisibilityOptions,
+  EuiLoadingSpinner,
 } from '@elastic/eui';
 
 import {CoreStart} from 'kibana/public';
@@ -127,6 +128,16 @@ export const IOCTable = ({http}: IOCTableDeps) => {
       displayAsText: 'C2 message',
       display: (<>C2 message</>),
       initialWidth: 300,
+    },
+    {
+      id: '_source.user.name',
+      displayAsText: 'Target user',
+      display: (<>Target user</>)
+    },
+    {
+      id: '_source.host.name',
+      displayAsText: 'Target host',
+      display: (<>Target host</>)
     }
   ];
 
@@ -164,7 +175,9 @@ export const IOCTable = ({http}: IOCTableDeps) => {
     }
   }, [iocStatus, dispatch])
 
-  return (
+  return iocStatus == KbnCallStatus.pending ? (
+    <EuiLoadingSpinner size="xl" />
+  ) : (
     <EuiDataGrid
       columns={datagrid_columns}
       rowCount={raw_data.length}

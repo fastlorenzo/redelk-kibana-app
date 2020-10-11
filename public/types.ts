@@ -1,4 +1,5 @@
 import {NavigationPublicPluginStart} from '../../../src/plugins/navigation/public';
+import {DataPublicPluginStart} from '../../../src/plugins/data/public';
 import {IOCState} from './features/ioc/types';
 import {CoreStart} from 'kibana/public';
 
@@ -12,6 +13,7 @@ export interface RedelkPluginStart {
 
 export interface AppPluginStartDependencies {
   navigation: NavigationPublicPluginStart;
+  data: DataPublicPluginStart;
 }
 
 export interface KbnApiMiddlewareDeps {
@@ -68,7 +70,8 @@ export interface LogData {
 }
 
 export interface HostData {
-  ip_int: string;
+  ip_int?: string;
+  name?: string;
 }
 
 export interface AgentData {
@@ -94,10 +97,14 @@ export interface C2LogData {
 }
 
 export interface C2Data {
-  program: string;
-  message: string | undefined;
-  timestamp: string | undefined;
-  log: C2LogData | undefined;
+  program?: string;
+  message?: string;
+  timestamp?: string;
+  log?: C2LogData;
+}
+
+export interface UserData {
+  name?: string;
 }
 
 export interface IOCDoc {
@@ -107,7 +114,8 @@ export interface IOCDoc {
   c2: C2Data | undefined;
   ecs: ECSData | undefined;
   event: EventData | undefined;
-  host: HostData | undefined;
+  host?: HostData;
+  user?: UserData;
   implant: ImplantData | undefined;
   infra: InfraData | undefined;
   input: InputData | undefined;

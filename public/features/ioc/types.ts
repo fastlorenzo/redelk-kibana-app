@@ -1,4 +1,4 @@
-import {EsAnswerIOC, FileData, KbnCallStatus} from '../../types';
+import {EsAnswerIOC, FileData, KbnCallStatus, C2Data, HostData, UserData} from '../../types';
 
 export interface IOCState {
   status: KbnCallStatus;
@@ -14,4 +14,7 @@ export interface CreateIOCType {
   '@timestamp': string;
   ioc: CreateIOCTypeIOC;
   file: FileData;
+  c2: C2Data;
+  host: HostData;
+  user: UserData;
 };

@@ -18,6 +18,7 @@ const initialState: IOCState = {
 export const fetchAllIOC = createAsyncThunk(
   'ioc/fetchAllIOC',
   async ({http}: AsyncThunkArgs) => {
+    await new Promise(done => setTimeout(() => done(), 3000));
     const response = await http.get('/api/redelk/ioc');
     return response.response
   }
@@ -35,8 +36,8 @@ const iocSlice = createSlice({
   name: 'ioc',
   initialState: initialState,
   reducers: {
-    setIOCs: (state, action) => {
-      return action.payload
+    setIOC: (state, action) => {
+      state.ioc = action.payload
     }
   },
   extraReducers: builder => {

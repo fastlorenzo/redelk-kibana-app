@@ -10,25 +10,40 @@ import {RedelkApp} from './components/app';
 import rootReducer from './reducers';
 
 import kbnApiMiddleware from './middlewares/kbnApiMiddleware';
+import {KibanaContextProvider} from '../../../src/plugins/kibana_react/public';
+import {createKbnUrlStateStorage} from '../../../src/plugins/kibana_utils/public';
 
 export const renderApp = (
-  {notifications, http}: CoreStart,
-  {navigation}: AppPluginStartDependencies,
-  {appBasePath, element}: AppMountParameters
+  core: CoreStart,
+  {navigation, data}: AppPluginStartDependencies,
+  {appBasePath, element, history}: AppMountParameters
 ) => {
+  const {notifications, http} = core;
   const store = configureStore({
     reducer: rootReducer,
     middleware: [thunk, kbnApiMiddleware({notifications, http})]
   });
+  const kbnUrlStateStorage = createKbnUrlStateStorage({ useHash: false, history });
 //    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
   ReactDOM.render(
     <Provider store={store}>
-      <RedelkApp
-        basename={appBasePath}
-        notifications={notifications}
-        http={http}
-        navigation={navigation}
-      />
+      <KibanaContextProvider
+        services={{
+          uiSettings: core.uiSettings,
+          docLinks: core.docLinks,
+          data: data,
+          navigation: navigation
+        }}
+      >
+        <RedelkApp
+          basename={appBasePath}
+          navigation={navigation}
+          core={core}
+          data={data}
+          history={history}
+          kbnUrlStateStorage={kbnUrlStateStorage}
+        />
+      </KibanaContextProvider>
     </Provider>
     ,
     element

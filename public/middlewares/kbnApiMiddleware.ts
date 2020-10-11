@@ -1,18 +1,36 @@
-import {Dispatch, Middleware, MiddlewareAPI} from 'redux';
-import {KbnApiMiddlewareDeps} from '../types';
+import {Middleware, Dispatch} from 'redux';
+import {KbnApiMiddlewareDeps, RedELKState} from '../types';
+import {fetchAllIOC} from "../features/ioc/iocSlice";
+import {ThunkDispatch} from 'redux-thunk';
+
+interface MiddlewareArgs {
+  dispatch: ThunkDispatch<any, any, any>;
+  getState: () => RedELKState;
+};
 
 const kbnApi = (
   {notifications, http}: KbnApiMiddlewareDeps
 ) => {
   const kbnApiMiddleware: Middleware = (
-    {dispatch, getState}: MiddlewareAPI
+    {dispatch, getState}: MiddlewareArgs
   ) => (
     next: Dispatch
   ) => action => {
     //console.log('Called kbnApiMiddleware');
     //console.log(http);
-    //notifications.toasts.addSuccess('test');
-    next(action);
+    switch (action.type) {
+      case "ioc/createIOC/fulfilled":
+        console.log('IOC successfully created');
+        // Wait 3 seconds for the data to be ingested before fetching all IOCs again.
+        //setTimeout(() => dispatch(fetchAllIOC({http})), 3000);
+        dispatch(fetchAllIOC({http}));
+        notifications.toasts.addSuccess('IOC successfully created');
+        return next(action);
+        break;
+      default:
+        console.log(action.type);
+    }
+    return next(action);
   }
   return kbnApiMiddleware;
 }

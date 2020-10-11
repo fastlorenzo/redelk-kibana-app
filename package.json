@@ -3,22 +3,23 @@
   "version": "v0.1-alpha.1",
   "main": "plugins/redelk",
   "kibana": {
-    "version": "kibana",
+    "version": "7.9.2",
     "templateVersion": "1.0.0"
   },
-  "license": "Apache-2.0",
+  "license": "BSD-3-Clause",
   "scripts": {
     "kbn": "node ../../scripts/kbn.js",
-    "build": "node ../../scripts/build --all-platforms",
+    "build": "plugin-helpers build",
     "start": "node ../../scripts/kibana --dev"
   },
   "devDependencies": {
-    "kbn-plugin-helpers": "link:../../kibana/packages/kbn-plugin-helpers",
+    "@kbn/plugin-helpers": "link:../../packages/kbn-plugin-helpers",
     "typescript": "4.0.2"
   },
   "dependencies": {
     "@babel/cli": "^7.10.5",
     "@reduxjs/toolkit": "^1.4.0",
+    "chance": "^1.1.7",
     "uglify-js": "^3.10.1"
   }
 }

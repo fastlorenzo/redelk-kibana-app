@@ -23,11 +23,13 @@ export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart
         const {renderApp} = await import('./application');
         // Get start services as specified in kibana.json
         const [coreStart, depsStart] = await core.getStartServices();
+        //console.log('mounting app', coreStart, depsStart);
+
+        //setNavHeader(coreStart);
         // Render the application
         return renderApp(coreStart, depsStart as AppPluginStartDependencies, params);
       },
     });
-    console.log(core);
 
     core.application.register({
       id: 'redelk:attack-navigator',
@@ -78,7 +80,7 @@ export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart
     };
   }
 
-  public start(core: CoreStart): RedelkPluginStart {
+  public start(core: CoreStart, {data}: AppPluginStartDependencies): RedelkPluginStart {
     return {};
   }
 

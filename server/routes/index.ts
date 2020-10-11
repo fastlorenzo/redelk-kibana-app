@@ -80,6 +80,15 @@ export function defineRoutes(router: IRouter) {
               md5: schema.string()
             })
           }),
+          c2: schema.object({
+            message: schema.string()
+          }),
+          host: schema.object({
+            name: schema.string()
+          }),
+          user: schema.object({
+            name: schema.string()
+          }),
           '@timestamp': schema.string()
         })
       }

@@ -17,107 +17,300 @@
  * under the License.
  */
 
-import React from 'react';
-import {FormattedMessage, I18nProvider} from '@kbn/i18n/react';
-import {BrowserRouter as Router} from 'react-router-dom';
-import {useDispatch} from 'react-redux';
-import {fetchAllIOC} from '../features/ioc/iocSlice';
-import {AddIOCForm} from '../features/ioc/addIocForm';
-import {IOCTable} from '../features/ioc/iocTable';
-
-import {
-  EuiButton,
-  EuiPage,
-  EuiPageBody,
-  EuiPageContent,
-  EuiPageContentBody,
-  EuiPageContentHeader,
-  EuiPageHeader,
-  EuiPanel,
-  EuiSpacer,
-  EuiText,
-  EuiTitle
-} from '@elastic/eui';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+//import {BrowserRouter as Router} from 'react-router-dom';
+import {Router} from 'react-router-dom';
 
 import {CoreStart} from 'kibana/public';
 import {NavigationPublicPluginStart} from '../../../../src/plugins/navigation/public';
-
-import {PLUGIN_ID, PLUGIN_NAME} from '../../common';
+import {IOCPage} from "./iocPage";
+import {SummaryPage} from "./summaryPage";
+import {EuiBreadcrumb, EuiTab, EuiTabs} from '@elastic/eui';
+import {setNavHeader} from "../navHeaderHelper";
+import {RedELKState} from "../types";
+import {useDispatch, useSelector} from 'react-redux';
+import {PLUGIN_ID, PLUGIN_NAME} from "../../common";
+import {
+  connectToQueryState, DataPublicPluginStart, esFilters, IEsSearchRequest, IIndexPattern,
+  ISearchSource,
+  QueryState, syncQueryStateWithUrl, TimeRange, esQuery, getTime
+} from '../../../../src/plugins/data/public';
+import {
+  BaseState, BaseStateContainer,
+  createStateContainer,
+  createStateContainerReactHelpers, IKbnUrlStateStorage, ReduxLikeStateContainer, syncState
+} from '../../../../src/plugins/kibana_utils/public';
+import {History} from 'history';
+import {
+  Filter,
+  Query
+} from '../../../../src/plugins/data/public';
+import {SearchOpts} from "../../../../src/core/server/saved_objects/migrations/core/call_cluster";
+import IOCSlice from "../features/ioc/iocSlice";
 
 interface RedelkAppDeps {
   basename: string;
-  notifications: CoreStart['notifications'];
-  http: CoreStart['http'];
+  core: CoreStart;
   navigation: NavigationPublicPluginStart;
+  data: DataPublicPluginStart;
+  history: History;
+  kbnUrlStateStorage: IKbnUrlStateStorage;
+};
+
+interface Tabs {
+  id: string;
+  name: string;
+  disabled: boolean;
+};
+
+interface AppState {
+  name: string;
+  filters: Filter[];
+  query?: Query;
+  time?: TimeRange;
+};
+const defaultAppState: AppState = {
+  name: '',
+  filters: [],
+  time: {
+    from: 'now-1y',
+    to: 'now'
+  }
+};
+const {
+  Provider: AppStateContainerProvider,
+  useState: useAppState,
+  useContainer: useAppStateContainer,
+} = createStateContainerReactHelpers<ReduxLikeStateContainer<AppState>>();
+
+
+const useIndexPattern = (data: DataPublicPluginStart) => {
+  const [indexPattern, setIndexPattern] = useState<IIndexPattern>();
+  useEffect(() => {
+    const fetchIndexPattern = async () => {
+      const defaultIndexPattern = await data.indexPatterns.getDefault();
+      if (defaultIndexPattern) {
+        setIndexPattern(defaultIndexPattern);
+      }
+    };
+    fetchIndexPattern();
+  }, [data.indexPatterns]);
+
+  return indexPattern;
 }
 
-export const RedelkApp = ({basename, notifications, http, navigation}: RedelkAppDeps) => {
-  // Use React hooks to manage state.
-  const dispatch = useDispatch();
+const useCreateStateContainer = <State extends BaseState>(
+  defaultState: State
+): ReduxLikeStateContainer<State> => {
+  const stateContainerRef = useRef<ReduxLikeStateContainer<State> | null>(null);
+  if (!stateContainerRef.current) {
+    stateContainerRef.current = createStateContainer(defaultState);
+  }
+  return stateContainerRef.current;
+}
 
-  const onClickHandlerIOC = () => {
-    dispatch(fetchAllIOC({http}));
+const useGlobalStateSyncing = (
+  query: DataPublicPluginStart['query'],
+  kbnUrlStateStorage: IKbnUrlStateStorage
+) => {
+  // setup sync state utils
+  useEffect(() => {
+    // sync global filters, time filters, refresh interval from data.query to url '_g'
+    const {stop} = syncQueryStateWithUrl(query, kbnUrlStateStorage);
+    return () => {
+      stop();
+    };
+  }, [query, kbnUrlStateStorage]);
+};
+
+const useAppStateSyncing = <AppState extends QueryState>(
+  appStateContainer: BaseStateContainer<AppState>,
+  query: DataPublicPluginStart['query'],
+  kbnUrlStateStorage: IKbnUrlStateStorage
+) => {
+  // setup sync state utils
+  useEffect(() => {
+    // sync app filters with app state container from data.query to state container
+    const stopSyncingQueryAppStateWithStateContainer = connectToQueryState(
+      query,
+      appStateContainer,
+      {filters: esFilters.FilterStateStore.APP_STATE, time: true}
+    );
+
+    // sets up syncing app state container with url
+    const {start: startSyncingAppStateWithUrl, stop: stopSyncingAppStateWithUrl} = syncState({
+      storageKey: '_a',
+      stateStorage: kbnUrlStateStorage,
+      stateContainer: {
+        ...appStateContainer,
+        // stateSync utils requires explicit handling of default state ("null")
+        set: (state) => state && appStateContainer.set(state),
+      },
+    });
+
+    // merge initial state from app state container and current state in url
+    const initialAppState: AppState = {
+      ...appStateContainer.get(),
+      ...kbnUrlStateStorage.get<AppState>('_a'),
+    };
+    // trigger state update. actually needed in case some data was in url
+    appStateContainer.set(initialAppState);
+
+    // set current url to whatever is in app state container
+    kbnUrlStateStorage.set<AppState>('_a', initialAppState);
+
+    // finally start syncing state containers with url
+    startSyncingAppStateWithUrl();
+
+    return () => {
+      stopSyncingQueryAppStateWithStateContainer();
+      stopSyncingAppStateWithUrl();
+    };
+  }, [query, kbnUrlStateStorage, appStateContainer]);
+};
+
+const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlStateStorage}: RedelkAppDeps) => {
+  const {notifications, http} = core;
+  const appStateContainer = useAppStateContainer();
+  const appState = useAppState();
+
+  const [selectedTabId, setSelectedTabId] = useState<string>('summary');
+  const [brdcrmbs, setBrdcrmbs] = useState<EuiBreadcrumb[]>([]);
+  const state: (RedELKState) = useSelector((state: RedELKState) => state);
+
+  useGlobalStateSyncing(data.query, kbnUrlStateStorage);
+  useAppStateSyncing(appStateContainer, data.query, kbnUrlStateStorage);
+
+  let breadcrumbs: EuiBreadcrumb[] = [];
+  breadcrumbs.push({
+    href: core.application.getUrlForApp(PLUGIN_ID),
+    onClick: (e) => {
+      core.application.navigateToApp(PLUGIN_ID, {path: '/'});
+      e.preventDefault();
+    },
+    text: PLUGIN_NAME
+  });
+  breadcrumbs = breadcrumbs.concat(brdcrmbs);
+  useEffect(() => {
+    setNavHeader(core, breadcrumbs);
+  }, [core, navigation, state, breadcrumbs])
+  const tabs: Tabs[] = [
+    {
+      id: 'summary',
+      name: 'Summary',
+      disabled: false,
+    },
+    {
+      id: 'ioc',
+      name: 'IOC',
+      disabled: false,
+    }
+  ]
+  const onSelectedTabChanged = (id: string) => {
+    setSelectedTabId(id);
+    setBrdcrmbs([{text: id}]);
   };
+  const renderTabs = () => {
+    return tabs.map((tab, index) => (
+      <EuiTab
+        onClick={() => onSelectedTabChanged(tab.id)}
+        isSelected={tab.id === selectedTabId}
+        disabled={tab.disabled}
+        key={index}>
+        {tab.name}
+      </EuiTab>
+    ));
+  };
+  let displayTab = (<></>);
 
-  // Render the application DOM.
-  // Note that `navigation.ui.TopNavMenu` is a stateful component exported on the `navigation` plugin's start contract.
+  const onQuerySubmit = useCallback(
+    ({query}) => {
+      appStateContainer.set({...appState, query});
+    },
+    [appStateContainer, appState]
+  );
+  const dispatch = useDispatch();
+  useEffect(() => {
+    let tmpFilters= [...appState.filters];
+    if(appState.time !== undefined) {
+      const trFilter = getTime(indexPattern, appState.time);
+      if(trFilter !== undefined) {
+        tmpFilters.push(trFilter);
+      }
+    }
+    const esQueryFilters = esQuery.buildQueryFromFilters(tmpFilters, indexPattern);
+    let searchOpts: IEsSearchRequest = {
+      params: {
+        index: 'rtops-*'
+      }
+    };
+    if (appState.query !== undefined && searchOpts.params !== undefined && appState.query.query !== undefined && appState.query.query !== "") {
+      searchOpts.params.q = appState.query.query.toString();
+    }
+    if (appState.filters !== undefined && searchOpts.params !== undefined) {
+      searchOpts.params.body = {
+        query: {
+          bool: esQueryFilters
+        }
+      }
+    }
+    data.search.search(searchOpts).forEach((res) => {
+      console.log('next', res);
+      dispatch(IOCSlice.actions.setIOC(res.rawResponse));
+    })
+  }, [appState]);
+
+  const indexPattern = useIndexPattern(data);
+  if (!indexPattern)
+    return <div>No index pattern found. Please create an index patter before loading...</div>;
+
+  switch (selectedTabId) {
+    case "ioc":
+      displayTab = (
+        <IOCPage basename={basename} notifications={notifications} http={http} navigation={navigation} data={data}/>);
+      break;
+    case "summary":
+    default:
+      displayTab = (
+        <SummaryPage basename={basename} notifications={notifications} http={http} navigation={navigation}/>);
+      break;
+  }
+  console.log('navigation', navigation);
+  return (
+    <Router history={history}>
+      <>
+        <navigation.ui.TopNavMenu
+          appName={PLUGIN_ID}
+          showSearchBar={true}
+          indexPatterns={[indexPattern]}
+          useDefaultBehaviors={true}
+          onQuerySubmit={onQuerySubmit}
+          query={appState.query}
+          showSaveQuery={true}
+        />
+      </>
+      <EuiTabs>{renderTabs()}</EuiTabs>
+      {displayTab}
+    </Router>
+  )
+  /*
   return (
     <Router basename={basename}>
-      <I18nProvider>
-        <>
-          <navigation.ui.TopNavMenu
-            appName={PLUGIN_ID}
-            showSearchBar={false}
-            useDefaultBehaviors={false}
-          />
-          <EuiPage>
-            <EuiPageBody>
-              <EuiPageHeader>
-                <EuiTitle size="l">
-                  <h1>
-                    <FormattedMessage
-                      id="redelk.helloWorldText"
-                      defaultMessage="{name}"
-                      values={{name: PLUGIN_NAME}}
-                    />
-                  </h1>
-                </EuiTitle>
-                <EuiButton type="primary" size="s" onClick={onClickHandlerIOC}>
-                  <FormattedMessage id="redelk.buttonText2" defaultMessage="Refresh IOC list"/>
-                </EuiButton>
-              </EuiPageHeader>
-              <EuiPageContent>
-                <EuiPageContentHeader>
-                  <EuiTitle>
-                    <h2>
-                      <FormattedMessage
-                        id="redelk.congratulationsTitle"
-                        defaultMessage="IOC manual ingestion"
-                      />
-                    </h2>
-                  </EuiTitle>
-                </EuiPageContentHeader>
-                <EuiPageContentBody>
-                  <EuiText>
-                    <p>
-                      <FormattedMessage
-                        id="redelk.content"
-                        defaultMessage="In this page you can manually ingest IOC in RedELK."
-                      />
-                    </p>
-                  </EuiText>
-                  <EuiSpacer/>
-                  <EuiPanel>
-                    <AddIOCForm http={http}/>
-                  </EuiPanel>
-                  <EuiSpacer/>
-                  <IOCTable http={http}/>
-                </EuiPageContentBody>
-              </EuiPageContent>
-            </EuiPageBody>
-          </EuiPage>
-        </>
-      </I18nProvider>
+      <Switch>
+        <Route path='/' exact default component={SummaryPage} />
+        <Route path='/ioc' exact component={IOCPage} />
+      </Switch>
     </Router>
+  );
+  */
+};
+
+export const RedelkApp = (props: RedelkAppDeps) => {
+  const appStateContainer = useCreateStateContainer(defaultAppState);
+
+  return (
+    <AppStateContainerProvider value={appStateContainer}>
+      <RedelkAppInternal {...props} />
+    </AppStateContainerProvider>
   );
 };
