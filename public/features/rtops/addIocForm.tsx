@@ -15,7 +15,7 @@ import {
 
 import {CoreStart} from 'kibana/public';
 
-import {createIOC} from './iocSlice'
+import {createIOC} from './rtopsSlice'
 import {CreateIOCType} from "./types";
 
 interface AddIOCFormDeps {

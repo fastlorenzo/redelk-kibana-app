@@ -1,9 +1,9 @@
-import {C2Data, EsAnswerIOC, FileData, HostData, KbnCallStatus, UserData} from '../../types';
+import {C2Data, EsAnswerRtops, FileData, HostData, KbnCallStatus, UserData} from '../../types';
 
-export interface IOCState {
+export interface RtopsState {
   status: KbnCallStatus;
   error: string | undefined | null;
-  ioc: EsAnswerIOC | undefined;
+  rtops: EsAnswerRtops | undefined;
 }
 
 export interface CreateIOCTypeIOC {

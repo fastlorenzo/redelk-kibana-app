@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {CoreStart} from "kibana/public";
 import {NavigationPublicPluginStart} from '../../../../src/plugins/navigation/public';
-import {IOCTable} from "../features/ioc/iocTable";
+import {IOCTable} from "../features/rtops/iocTable";
 import {
   EuiFlyout,
   EuiFlyoutBody,
@@ -14,7 +14,7 @@ import {
   EuiText,
   EuiTitle
 } from '@elastic/eui';
-import {AddIOCForm} from "../features/ioc/addIocForm";
+import {AddIOCForm} from "../features/rtops/addIocForm";
 import {DataPublicPluginStart} from 'src/plugins/data/public';
 
 

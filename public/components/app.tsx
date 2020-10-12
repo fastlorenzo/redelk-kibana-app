@@ -1,22 +1,3 @@
-/*
- * Licensed to Elasticsearch B.V. under one or more contributor
- * license agreements. See the NOTICE file distributed with
- * this work for additional information regarding copyright
- * ownership. Elasticsearch B.V. licenses this file to you under
- * the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 //import {BrowserRouter as Router} from 'react-router-dom';
 import {Router} from 'react-router-dom';
@@ -53,7 +34,8 @@ import {
   syncState
 } from '../../../../src/plugins/kibana_utils/public';
 import {History} from 'history';
-import IOCSlice from "../features/ioc/iocSlice";
+import IOCSlice from "../features/rtops/rtopsSlice";
+import { useKibana } from '../../../../src/plugins/kibana_react/public';
 
 interface RedelkAppDeps {
   basename: string;
@@ -203,6 +185,7 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
 
   useGlobalStateSyncing(data.query, kbnUrlStateStorage);
   useAppStateSyncing(appStateContainer, data.query, kbnUrlStateStorage);
+  const kibana = useKibana();
 
   let breadcrumbs: EuiBreadcrumb[] = [];
   breadcrumbs.push({

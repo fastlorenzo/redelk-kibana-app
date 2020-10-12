@@ -1,6 +1,6 @@
 import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {EsAnswerIOC, KbnCallStatus} from '../../types'
-import {CreateIOCType, IOCState} from './types'
+import {EsAnswerRtops, KbnCallStatus} from '../../types'
+import {CreateIOCType, RtopsState} from './types'
 
 import {CoreStart} from 'kibana/public';
 
@@ -9,14 +9,14 @@ interface AsyncThunkArgs {
   payload?: CreateIOCType;
 }
 
-const initialState: IOCState = {
+const initialState: RtopsState = {
   status: KbnCallStatus.idle,
   error: null,
-  ioc: undefined
+  rtops: undefined
 }
 
 export const fetchAllIOC = createAsyncThunk(
-  'ioc/fetchAllIOC',
+  'rtops/fetchAllIOC',
   async ({http}: AsyncThunkArgs) => {
     await new Promise(done => setTimeout(() => done(), 3000));
     const response = await http.get('/api/redelk/ioc');
@@ -25,47 +25,47 @@ export const fetchAllIOC = createAsyncThunk(
 )
 
 export const createIOC = createAsyncThunk(
-  'ioc/createIOC',
+  'rtops/createIOC',
   async ({http, payload}: AsyncThunkArgs) => {
     const response = await http.post('/api/redelk/ioc', {body: JSON.stringify(payload)});
     return response.response
   }
 )
 
-const iocSlice = createSlice({
-  name: 'ioc',
+const rtopsSlice = createSlice({
+  name: 'rtops',
   initialState: initialState,
   reducers: {
     setIOC: (state, action) => {
-      state.ioc = action.payload
+      state.rtops = action.payload
     }
   },
   extraReducers: builder => {
     // Fetch all IOCs
-    builder.addCase(fetchAllIOC.pending, (state: IOCState, action) => {
+    builder.addCase(fetchAllIOC.pending, (state: RtopsState, action) => {
       state.status = KbnCallStatus.pending;
       state.error = '';
     });
-    builder.addCase(fetchAllIOC.fulfilled, (state: IOCState, action: PayloadAction<EsAnswerIOC>) => {
+    builder.addCase(fetchAllIOC.fulfilled, (state: RtopsState, action: PayloadAction<EsAnswerRtops>) => {
       state.status = KbnCallStatus.success;
       state.error = '';
-      state.ioc = action.payload;
+      state.rtops = action.payload;
     });
-    builder.addCase(fetchAllIOC.rejected, (state: IOCState, action) => {
+    builder.addCase(fetchAllIOC.rejected, (state: RtopsState, action) => {
       state.status = KbnCallStatus.failure;
       state.error = action.error.message;
     });
     // Create IOC
-    builder.addCase(createIOC.pending, (state: IOCState, action) => {
+    builder.addCase(createIOC.pending, (state: RtopsState, action) => {
       state.status = KbnCallStatus.pending;
       state.error = '';
     });
-    builder.addCase(createIOC.fulfilled, (state: IOCState, action) => {
+    builder.addCase(createIOC.fulfilled, (state: RtopsState, action) => {
       state.status = KbnCallStatus.success;
       state.error = '';
       // state.ioc = action.payload;
     });
-    builder.addCase(createIOC.rejected, (state: IOCState, action) => {
+    builder.addCase(createIOC.rejected, (state: RtopsState, action) => {
       state.status = KbnCallStatus.failure;
       state.error = action.error.message;
       console.log('Error creating IOC:', action);
@@ -73,4 +73,4 @@ const iocSlice = createSlice({
   }
 });
 
-export default iocSlice;
+export default rtopsSlice;

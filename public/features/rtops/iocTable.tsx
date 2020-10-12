@@ -11,7 +11,7 @@ import {
 } from '@elastic/eui';
 
 import {CoreStart} from 'kibana/public';
-import {EsAnswerIOC, KbnCallStatus, RedELKState} from '../../types';
+import {EsAnswerRtops, KbnCallStatus, RedELKState} from '../../types';
 
 interface IOCTableDeps {
   http: CoreStart['http'];
@@ -19,8 +19,8 @@ interface IOCTableDeps {
 
 export const IOCTable = ({http}: IOCTableDeps) => {
 
-  const ioc: (EsAnswerIOC | undefined) = useSelector((state: RedELKState) => state.ioc.ioc);
-  const iocStatus: KbnCallStatus = useSelector((state: RedELKState) => state.ioc.status);
+  const ioc: (EsAnswerRtops | undefined) = useSelector((state: RedELKState) => state.rtops.rtops);
+  const iocStatus: KbnCallStatus = useSelector((state: RedELKState) => state.rtops.status);
 
   const toolbarVisibility: EuiDataGridToolBarVisibilityOptions = {
     showColumnSelector: true,

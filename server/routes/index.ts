@@ -1,6 +1,15 @@
 import {schema} from '@kbn/config-schema';
-import {IRouter} from '../../../../src/core/server';
+import {
+  importSavedObjectsFromStream,
+  IRouter,
+  RequestHandlerContext,
+  SavedObjectsBulkCreateObject,
+  SavedObjectsImportResponse
+} from '../../../../src/core/server';
 import {getRandomString} from '../helpers'
+import fs from 'fs';
+import { createSavedObjectsStreamFromNdJson } from '../../../../src/core/server/saved_objects/routes/utils';
+import path from 'path';
 
 interface Hit {
   health: string;
@@ -15,7 +24,32 @@ interface Hit {
   hidden: boolean;
 }
 
+const INDEX_PATTERN_REGEXP = /^redelk_kibana_index-pattern_(.*)\.ndjson/;
+const importSavedObject = async (filePath: string, context: RequestHandlerContext, objType: string) => {
+  console.log('Importing ' + objType + ' [' + filePath + ']');
+  const ds = fs.createReadStream(filePath);
+
+  const supportedTypes = context.core.savedObjects.typeRegistry
+    .getImportableAndExportableTypes()
+    .map((type) => type.name);
+
+  const result = await importSavedObjectsFromStream({
+    supportedTypes,
+    savedObjectsClient: context.core.savedObjects.client,
+    readStream: createSavedObjectsStreamFromNdJson(ds),
+    objectLimit: 10485760,
+    overwrite: true,
+  });
+
+  return {
+    type: objType,
+    fileName: filePath,
+    result: result
+  };
+}
+
 export function defineRoutes(router: IRouter) {
+
   router.get(
     {
       path: '/api/redelk/indices',
@@ -121,6 +155,41 @@ export function defineRoutes(router: IRouter) {
           response: catHits
         },
       });
+    }
+  );
+  router.get(
+    {
+      path: '/api/redelk/init',
+      validate: false,
+    },
+    async (context, request, response) => {
+      console.log('Called');
+      const results: {type:string, fileName: string, result: SavedObjectsImportResponse}[] = [];
+      try {
+        const templatesDir = path.join(__dirname, '../templates');
+        const templatesFiles = fs.readdirSync(templatesDir);
+        console.log(templatesFiles);
+        for (const tmpl of templatesFiles) {
+          const match = tmpl.match(INDEX_PATTERN_REGEXP);
+          if (match !== null) {
+            results.push(await importSavedObject(path.join(templatesDir, match[0]), context, 'index-pattern'));
+          }
+        }
+        results.push(await importSavedObject(path.join(templatesDir, 'redelk_kibana_search.ndjson'), context, 'search'));
+        results.push(await importSavedObject(path.join(templatesDir, 'redelk_kibana_visualization.ndjson'), context, 'visualization'));
+        results.push(await importSavedObject(path.join(templatesDir, 'redelk_kibana_dashboard.ndjson'), context, 'dashboard'));
+
+        return response.ok({
+          body: {
+            response: results
+          },
+        });
+      } catch (e) {
+        console.error(e);
+        return response.internalError({
+          body: e
+        })
+      }
     }
   );
 }

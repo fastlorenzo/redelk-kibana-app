@@ -1,12 +1,8 @@
-// import currentUser from './currentUser'
-import counterSlice from '../features/counter/counterSlice';
-import iocSlice from '../features/ioc/iocSlice';
+import rtopsSlice from '../features/rtops/rtopsSlice';
 import {combineReducers} from 'redux';
 
 const rootReducer = combineReducers({
-//    currentUser,
-  counter: counterSlice.reducer,
-  ioc: iocSlice.reducer
+  rtops: rtopsSlice.reducer
 });
 
 export default rootReducer;

@@ -1,6 +1,6 @@
 import {NavigationPublicPluginStart} from '../../../src/plugins/navigation/public';
 import {DataPublicPluginStart} from '../../../src/plugins/data/public';
-import {IOCState} from './features/ioc/types';
+import {RtopsState} from './features/rtops/types';
 import {CoreStart} from 'kibana/public';
 
 export interface RedelkPluginSetup {
@@ -107,7 +107,7 @@ export interface UserData {
   name?: string;
 }
 
-export interface IOCDoc {
+export interface RtopsDoc {
   '@timestamp': string | undefined;
   '@version': string | undefined;
   agent: AgentData | undefined;
@@ -133,7 +133,7 @@ export interface EsAnswer {
 }
 
 export interface RedELKState {
-  ioc: IOCState;
+  rtops: RtopsState;
 }
 
 export interface EsHitsTotal {
@@ -141,8 +141,8 @@ export interface EsHitsTotal {
   value: number;
 }
 
-export interface EsHitsIOC {
-  hits: IOCDoc[];
+export interface EsHitsRtops {
+  hits: RtopsDoc[];
   max_score: number;
   total: EsHitsTotal;
 }
@@ -154,16 +154,16 @@ export interface EsShards {
   total: number;
 }
 
-export interface EsAnswerIOCAggs {
+export interface EsAnswerRtopsAggs {
   perEventType?: { buckets: [] };
   perHostName?: { buckets: [] };
   perUserName?: { buckets: [] };
 }
 
-export interface EsAnswerIOC {
-  hits: EsHitsIOC;
+export interface EsAnswerRtops {
+  hits: EsHitsRtops;
   _shards: EsShards;
   timed_out: boolean;
   took: number;
-  aggregations?: EsAnswerIOCAggs;
+  aggregations?: EsAnswerRtopsAggs;
 }

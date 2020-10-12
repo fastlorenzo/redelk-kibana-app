@@ -11,7 +11,7 @@ import {
   euiPaletteColorBlind,
   EuiTitle
 } from '@elastic/eui';
-import {EsAnswerIOC, RedELKState} from "../types";
+import {EsAnswerRtops, RedELKState} from "../types";
 import {useSelector} from 'react-redux';
 import {Axis, BarSeries, Chart, Partition, Settings} from '@elastic/charts';
 import {EUI_CHARTS_THEME_DARK, EUI_CHARTS_THEME_LIGHT} from '@elastic/eui/dist/eui_charts_theme';
@@ -25,7 +25,7 @@ interface RedelkAppDeps {
 }
 
 export const SummaryPage = ({basename, notifications, http, navigation, showTopNav}: RedelkAppDeps) => {
-  const ioc: (EsAnswerIOC | undefined) = useSelector((state: RedELKState) => state.ioc.ioc);
+  const ioc: (EsAnswerRtops | undefined) = useSelector((state: RedELKState) => state.rtops.rtops);
 
   useEffect(() => showTopNav(true), []);
   let perEventTypeChart = (<h4>No data</h4>);
