@@ -154,10 +154,16 @@ export interface EsShards {
   total: number;
 }
 
+export interface EsAnswerIOCAggs {
+  perEventType?: { buckets: [] };
+  perHostName?: { buckets: [] };
+  perUserName?: { buckets: [] };
+}
+
 export interface EsAnswerIOC {
   hits: EsHitsIOC;
   _shards: EsShards;
   timed_out: boolean;
   took: number;
-  aggregations: unknown;
+  aggregations?: EsAnswerIOCAggs;
 }

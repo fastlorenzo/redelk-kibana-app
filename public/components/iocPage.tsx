@@ -10,7 +10,6 @@ import {
   EuiPageBody,
   EuiPageContent,
   EuiPageContentBody,
-  EuiPageContentHeader,
   EuiSpacer,
   EuiText,
   EuiTitle
@@ -51,24 +50,18 @@ export const IOCPage = ({basename, notifications, http, navigation, data, showAd
     );
   }
 
-  const topNavMenu = '';
   useEffect(() => showTopNav(true), []);
 
   return (
     <>
-      {topNavMenu}
       <EuiPage>
         {addIOCFlyout}
         <EuiPageBody>
           <EuiPageContent>
-            <EuiPageContentHeader>
-              <EuiTitle>
-                <h2>IOC manual ingestion</h2>
-              </EuiTitle>
-            </EuiPageContentHeader>
             <EuiPageContentBody>
               <EuiText>
-                <p>In this page you can manually ingest IOC in RedELK.</p>
+                <p>You can find below the list of IOC from RedELK. Use the top menu option "Add IOC" to manually add new
+                  IOC.</p>
               </EuiText>
               <EuiSpacer/>
               <IOCTable http={http}/>

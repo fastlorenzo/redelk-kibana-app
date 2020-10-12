@@ -319,7 +319,7 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
       dispatch(IOCSlice.actions.setIOC(res.rawResponse));
     });
 
-  }, [appState]);
+  }, [appState, selectedTabId]);
 
   const indexPattern = useIndexPattern(data);
   if (!indexPattern)
