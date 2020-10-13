@@ -1,6 +1,9 @@
 import {EuiBreadcrumb} from '@elastic/eui';
 import {ChromeBadge, ChromeBrand, ChromeHelpExtension, CoreStart} from "kibana/public";
+import {useEffect} from 'react';
+import {useDispatch} from 'react-redux';
 import {PLUGIN_NAME} from "../common";
+import ConfigSlice from "./features/config/configSlice";
 
 export const setNavHeader = (core: CoreStart, breadcrumbs: EuiBreadcrumb[]) => {
   const darkMode: boolean = core.uiSettings.get('theme:darkMode');
@@ -30,5 +33,12 @@ export const setNavHeader = (core: CoreStart, breadcrumbs: EuiBreadcrumb[]) => {
   core.chrome.setBadge(badge);
   core.chrome.setBrand(brand);
   core.chrome.setBreadcrumbs(breadcrumbs);
+  console.log('Updating nav headers');
 };
 
+export const useTopNav = (show: boolean) => {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(ConfigSlice.actions.setShowTopNav(show))
+  }, []);
+}

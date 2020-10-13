@@ -1,10 +1,63 @@
 import {i18n} from '@kbn/i18n';
-import {AppCategory, AppMountParameters, CoreSetup, CoreStart, Plugin} from 'kibana/public';
-import {AppPluginStartDependencies, RedelkPluginSetup, RedelkPluginStart} from './types';
+import {
+  AppCategory,
+  AppMountParameters,
+  AppUpdater,
+  CoreSetup,
+  CoreStart,
+  Plugin,
+  PluginInitializerContext,
+  ScopedHistory
+} from 'kibana/public';
+import {
+  RedelkPluginSetup,
+  RedelkPluginSetupDependencies,
+  RedelkPluginStart,
+  RedelkPluginStartDependencies
+} from './types';
 import {PLUGIN_NAME} from '../common';
+import {createKbnUrlTracker} from '../../../src/plugins/kibana_utils/public';
+import {BehaviorSubject} from 'rxjs';
+import {filter, map} from 'rxjs/operators';
+import {esFilters} from '../../../src/plugins/data/public';
 
 export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart> {
-  public setup(core: CoreSetup): RedelkPluginSetup {
+  initializerContext: PluginInitializerContext;
+  private appStateUpdater = new BehaviorSubject<AppUpdater>(() => ({}));
+  private stopUrlTracking: (() => void) | undefined = undefined;
+  private currentHistory: ScopedHistory | undefined = undefined;
+
+  constructor(initializerContext: PluginInitializerContext) {
+    this.initializerContext = initializerContext;
+  }
+
+  public setup(core: CoreSetup, {data}: RedelkPluginSetupDependencies): RedelkPluginSetup {
+    const {appMounted, appUnMounted, stop: stopUrlTracker} = createKbnUrlTracker({
+      baseUrl: core.http.basePath.prepend('/app/timelion'),
+      defaultSubUrl: '#/',
+      storageKey: `lastUrl:${core.http.basePath.get()}:timelion`,
+      navLinkUpdater$: this.appStateUpdater,
+      toastNotifications: core.notifications.toasts,
+      stateParams: [
+        {
+          kbnUrlKey: '_g',
+          stateUpdate$: data.query.state$.pipe(
+            filter(
+              ({changes}) => !!(changes.globalFilters || changes.time || changes.refreshInterval)
+            ),
+            map(({state}) => ({
+              ...state,
+              filters: state.filters?.filter(esFilters.isFilterPinned),
+            }))
+          ),
+        },
+      ],
+      getHistory: () => this.currentHistory!,
+    });
+
+    this.stopUrlTracking = () => {
+      stopUrlTracker();
+    };
 
     const darkMode: boolean = core.uiSettings.get('theme:darkMode');
     const redelkCategory: AppCategory = {
@@ -13,21 +66,33 @@ export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart
       order: 1,
       euiIconType: core.http.basePath.get() + '/plugins/redelk/assets/redelklogo' + (darkMode ? '-light' : '') + '.svg'
     }
+
     // Register an application into the side navigation menu
     core.application.register({
       id: 'redelk',
       title: PLUGIN_NAME,
       category: redelkCategory,
       async mount(params: AppMountParameters) {
-        // Load application bundle
-        const {renderApp} = await import('./application');
         // Get start services as specified in kibana.json
         const [coreStart, depsStart] = await core.getStartServices();
-        //console.log('mounting app', coreStart, depsStart);
+        //this.currentHistory = params.history;
 
-        //setNavHeader(coreStart);
+        appMounted();
+
+        const unlistenParentHistory = params.history.listen(() => {
+          window.dispatchEvent(new HashChangeEvent('hashchange'));
+        });
+
+        // Load application bundle
+        const {renderApp} = await import('./application');
+
         // Render the application
-        return renderApp(coreStart, depsStart as AppPluginStartDependencies, params);
+        const unmount = renderApp(coreStart, depsStart as RedelkPluginStartDependencies, params);
+        return () => {
+          unlistenParentHistory();
+          unmount();
+          appUnMounted();
+        };
       },
     });
 
@@ -80,10 +145,13 @@ export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart
     };
   }
 
-  public start(core: CoreStart, {data}: AppPluginStartDependencies): RedelkPluginStart {
+  public start(core: CoreStart, {data}: RedelkPluginStartDependencies): RedelkPluginStart {
     return {};
   }
 
   public stop() {
+    if (this.stopUrlTracking) {
+      this.stopUrlTracking();
+    }
   }
 }

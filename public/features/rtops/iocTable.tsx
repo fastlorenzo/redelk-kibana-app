@@ -7,17 +7,14 @@ import {
   EuiDataGridColumn,
   EuiDataGridStyle,
   EuiDataGridToolBarVisibilityOptions,
+  EuiFlexGroup,
+  EuiFlexItem,
   EuiLoadingSpinner,
 } from '@elastic/eui';
 
-import {CoreStart} from 'kibana/public';
 import {EsAnswerRtops, KbnCallStatus, RedELKState} from '../../types';
 
-interface IOCTableDeps {
-  http: CoreStart['http'];
-}
-
-export const IOCTable = ({http}: IOCTableDeps) => {
+export const IOCTable = () => {
 
   const ioc: (EsAnswerRtops | undefined) = useSelector((state: RedELKState) => state.rtops.rtops);
   const iocStatus: KbnCallStatus = useSelector((state: RedELKState) => state.rtops.status);
@@ -122,14 +119,19 @@ export const IOCTable = ({http}: IOCTableDeps) => {
   return iocStatus == KbnCallStatus.pending ? (
     <EuiLoadingSpinner size="xl"/>
   ) : (
-    <EuiDataGrid
-      columns={datagrid_columns}
-      rowCount={raw_data.length}
-      renderCellValue={renderCellValue}
-      toolbarVisibility={toolbarVisibility}
-      columnVisibility={{visibleColumns, setVisibleColumns}}
-      aria-labelledby={'ioc-grid'}
-      gridStyle={gridStyle}
-    />
-  )
+    <EuiFlexGroup>
+      <EuiFlexItem>
+        <EuiDataGrid
+          columns={datagrid_columns}
+          rowCount={raw_data.length}
+          renderCellValue={renderCellValue}
+          toolbarVisibility={toolbarVisibility}
+          columnVisibility={{visibleColumns, setVisibleColumns}}
+          aria-labelledby={'ioc-grid'}
+          gridStyle={gridStyle}
+        />
+      </EuiFlexItem>
+    </EuiFlexGroup>
+
+  );
 }

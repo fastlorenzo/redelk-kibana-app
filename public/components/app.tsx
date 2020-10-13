@@ -1,14 +1,22 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-//import {BrowserRouter as Router} from 'react-router-dom';
-import {Router} from 'react-router-dom';
+import {Redirect, Route, Router} from 'react-router-dom';
 
 import {CoreStart} from 'kibana/public';
 import {NavigationPublicPluginStart, TopNavMenuData} from '../../../../src/plugins/navigation/public';
 import {IOCPage} from "./iocPage";
 import {SummaryPage} from "./summaryPage";
-import {EuiBreadcrumb, EuiTab, EuiTabs} from '@elastic/eui';
+import {
+  EuiBreadcrumb,
+  EuiButtonEmpty,
+  EuiContextMenuItem,
+  EuiContextMenuPanel,
+  EuiPage,
+  EuiPageBody,
+  EuiPageContent,
+  EuiPopover
+} from '@elastic/eui';
 import {setNavHeader} from "../navHeaderHelper";
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {PLUGIN_ID, PLUGIN_NAME} from "../../common";
 import {
   connectToQueryState,
@@ -35,7 +43,11 @@ import {
 } from '../../../../src/plugins/kibana_utils/public';
 import {History} from 'history';
 import IOCSlice from "../features/rtops/rtopsSlice";
-import { useKibana } from '../../../../src/plugins/kibana_react/public';
+import RtopsSlice from "../features/rtops/rtopsSlice";
+import {DEFAULT_ROUTE_ID, routes} from "../routes";
+import {RedelkURLGenerator} from "../url_generator";
+import {KbnCallStatus, RedELKState} from "../types";
+import ConfigSlice from '../features/config/configSlice';
 
 interface RedelkAppDeps {
   basename: string;
@@ -44,12 +56,6 @@ interface RedelkAppDeps {
   data: DataPublicPluginStart;
   history: History;
   kbnUrlStateStorage: IKbnUrlStateStorage;
-}
-
-interface Tabs {
-  id: string;
-  name: string;
-  disabled: boolean;
 }
 
 interface AppState {
@@ -72,7 +78,6 @@ const {
   useState: useAppState,
   useContainer: useAppStateContainer,
 } = createStateContainerReactHelpers<ReduxLikeStateContainer<AppState>>();
-
 
 const useIndexPattern = (data: DataPublicPluginStart) => {
   const [indexPattern, setIndexPattern] = useState<IIndexPattern>();
@@ -159,95 +164,128 @@ const useAppStateSyncing = <AppState extends QueryState>(
   }, [query, kbnUrlStateStorage, appStateContainer]);
 };
 
-const tabs: Tabs[] = [
-  {
-    id: 'summary',
-    name: 'Summary',
-    disabled: false,
-  },
-  {
-    id: 'ioc',
-    name: 'IOC',
-    disabled: false,
-  }
-];
-const DEFAULT_TAB = 'summary';
-
 const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlStateStorage}: RedelkAppDeps) => {
   const {notifications, http} = core;
   const appStateContainer = useAppStateContainer();
   const appState = useAppState();
 
-  const [selectedTabId, setSelectedTabId] = useState<string>(DEFAULT_TAB);
-  const [brdcrmbs, setBrdcrmbs] = useState<EuiBreadcrumb[]>([{text: tabs.find(t => t.id === DEFAULT_TAB)!.name}]);
-  const [isAddIOCFlyoutVisible, setIsAddIOCFlyoutVisible] = useState(false);
-  const [showTopNav, setShowTopNav] = useState<boolean>(false);
+  const showTopNav = useSelector((state: RedELKState) => state.config.showTopNav);
+  const currentRoute = useSelector((state: RedELKState) => state.config.currentRoute);
+  const rtopsStatus = useSelector((state: RedELKState) => state.rtops.status);
+  const rtopsHiddenFilters = useSelector((state: RedELKState) => state.rtops.hiddenFilters);
+
+  const [topNavMenu, setTopNavMenu] = useState<TopNavMenuData[]>([]);
+  const [currentPageTitle, setCurrentPageTitle] = useState<string>(routes.find(r => r.id === DEFAULT_ROUTE_ID)!.name);
+  const [isPopoverOpen, setPopover] = useState(false);
+
+  const onButtonClick = () => {
+    setPopover(!isPopoverOpen);
+  };
+  const closePopover = () => {
+    setPopover(false);
+  };
 
   useGlobalStateSyncing(data.query, kbnUrlStateStorage);
   useAppStateSyncing(appStateContainer, data.query, kbnUrlStateStorage);
-  const kibana = useKibana();
+  useEffect(() => {
+    if (location.pathname !== currentRoute) {
+      dispatch(ConfigSlice.actions.setCurrentRoute(location.pathname));
+    }
+  })
+  // BEGIN top drop-down menu
+  const button = (
+    <EuiButtonEmpty
+      size="s"
+      iconType="arrowDown"
+      iconSide="right"
+      onClick={onButtonClick}>
+      {currentPageTitle}
+    </EuiButtonEmpty>
+  );
 
-  let breadcrumbs: EuiBreadcrumb[] = [];
-  breadcrumbs.push({
-    href: core.application.getUrlForApp(PLUGIN_ID),
-    onClick: (e) => {
-      core.application.navigateToApp(PLUGIN_ID, {path: '/'});
-      e.preventDefault();
-    },
-    text: PLUGIN_NAME
+  const items = routes.map(r => {
+    const generator = new RedelkURLGenerator({appBasePath: r.path, useHash: false});
+    let path = generator.createUrl(appState);
+    console.log('url', path, appState, appStateContainer);
+    return (
+      <EuiContextMenuItem
+        key={r.id}
+        icon={r.icon}
+        onClick={() => {
+          closePopover();
+          setCurrentPageTitle(r.name);
+          history.push(path);
+        }}>
+        {r.name}
+      </EuiContextMenuItem>
+    )
   });
-  breadcrumbs = breadcrumbs.concat(brdcrmbs);
+
+  const breadcrumbs: EuiBreadcrumb[] = [
+    {
+      href: core.application.getUrlForApp(PLUGIN_ID),
+      onClick: (e) => {
+        core.application.navigateToApp(PLUGIN_ID, {
+          path: routes.find(r => r.id === DEFAULT_ROUTE_ID)!.path || "/",
+          state: appState
+        });
+        e.preventDefault();
+      },
+      text: PLUGIN_NAME
+    },
+    {
+      onClick: (e) => {
+      },
+      text: (
+        <EuiPopover
+          id="singlePanel"
+          button={button}
+          isOpen={isPopoverOpen}
+          closePopover={closePopover}
+          panelPaddingSize="none"
+          anchorPosition="downLeft">
+          <EuiContextMenuPanel items={items}/>
+        </EuiPopover>
+      )
+    }
+  ];
+
   useEffect(() => {
     setNavHeader(core, breadcrumbs);
-  }, [breadcrumbs])
-
-  const onSelectedTabChanged = (id: string) => {
-    setSelectedTabId(id);
-    setBrdcrmbs([{text: tabs.find(t => t.id === id)!.name}]);
-  };
-  const renderTabs = () => {
-    return tabs.map((tab, index) => (
-      <EuiTab
-        onClick={() => onSelectedTabChanged(tab.id)}
-        isSelected={tab.id === selectedTabId}
-        disabled={tab.disabled}
-        key={index}>
-        {tab.name}
-      </EuiTab>
-    ));
-  };
-  let displayTab = (<></>);
+  }, [breadcrumbs]);
+  // END top drop-down menu
 
   const onQuerySubmit = useCallback(
     ({query}) => {
       appStateContainer.set({...appState, query});
     },
-    [appStateContainer, appState]
+    [appStateContainer]
   );
   const dispatch = useDispatch();
+
+  // Build ES query and fetch data
   useEffect(() => {
-    let tmpFilters = [...appState.filters];
+    if(rtopsStatus === KbnCallStatus.pending) return;
+    dispatch(RtopsSlice.actions.setStatus(KbnCallStatus.pending));
+    let tmpFilters = appState.filters ? [...appState.filters] : [];
     if (appState.time !== undefined) {
       const trFilter = getTime(indexPattern, appState.time);
       if (trFilter !== undefined) {
         tmpFilters.push(trFilter);
       }
     }
-    const iocFilter: Filter = {
-      meta: {
-        alias: "ioc",
-        disabled: false,
-        index: "rtops",
-        negate: false
-      },
-      query: {
-        match_phrase: {
-          "event.type": "ioc"
+    console.log('before', tmpFilters);
+
+    tmpFilters = tmpFilters.concat(rtopsHiddenFilters);
+    console.log('after', tmpFilters);
+    if (history.location.pathname === '/ioc') {
+      setTopNavMenu([{
+        id: "add-ioc",
+        label: "Add IOC",
+        run: () => {
+          dispatch(IOCSlice.actions.setShowAddIOCForm(true))
         }
-      }
-    }
-    if (selectedTabId === 'ioc') {
-      tmpFilters.push(iocFilter);
+      }])
     }
     const esQueryFilters = esQuery.buildQueryFromFilters(tmpFilters, indexPattern);
     let searchOpts: IEsSearchRequest = {
@@ -266,7 +304,7 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
         }
       }
 
-      if (selectedTabId === 'summary') {
+      if (history.location.pathname === '/home') {
         searchOpts.params.body.aggs = {
           perEventType: {
             terms: {
@@ -291,44 +329,27 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
                 "_count": "desc"
               }
             }
+          },
+          perImplant: {
+            terms: {
+              field: "implant.id",
+              order: {
+                "_count": "desc"
+              }
+            }
           }
         }
       }
-
     }
-
-
     data.search.search(searchOpts).forEach((res) => {
       dispatch(IOCSlice.actions.setIOC(res.rawResponse));
     });
 
-  }, [appState, selectedTabId]);
+  }, [appState.filters, appState.query, currentRoute]);
 
   const indexPattern = useIndexPattern(data);
   if (!indexPattern)
     return <div>No index pattern found. Please create an index patter before loading...</div>;
-  let navConfig: TopNavMenuData[] = [];
-  switch (selectedTabId) {
-    case "ioc":
-      displayTab = (
-        <IOCPage basename={basename} notifications={notifications} http={http} navigation={navigation} data={data}
-                 showAddIOCFlyout={isAddIOCFlyoutVisible} setIOCFlyoutVisible={setIsAddIOCFlyoutVisible}
-                 showTopNav={setShowTopNav}/>);
-      navConfig.push({
-        id: "add-ioc",
-        label: "Add IOC",
-        run: () => {
-          setIsAddIOCFlyoutVisible(true)
-        }
-      })
-      break;
-    case "summary":
-    default:
-      displayTab = (
-        <SummaryPage basename={basename} notifications={notifications} http={http} navigation={navigation}
-                     showTopNav={setShowTopNav}/>);
-      break;
-  }
 
   const topNav = showTopNav ? (
     <navigation.ui.TopNavMenu
@@ -339,21 +360,30 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
       onQuerySubmit={onQuerySubmit}
       query={appState.query}
       showSaveQuery={true}
-      config={navConfig}
+      config={topNavMenu}
+      dateRangeFrom={appState?.time?.from || "now-1y"}
+      dateRangeTo={appState?.time?.to || "now"}
     />
   ) : '';
 
   return (
     <Router history={history}>
       <>
-        <EuiTabs
-          size="s"
-          expand
-        >
-          {renderTabs()}
-        </EuiTabs>
         {topNav}
-        {displayTab}
+        <EuiPage>
+          <EuiPageBody>
+            <EuiPageContent>
+              <Route path="/" exact render={() => <Redirect to="/home"/>}/>
+              <Route path="/home" exact
+                     render={() => <SummaryPage basename={basename} notifications={notifications} http={http}
+                                                navigation={navigation}
+                     />}/>
+              <Route path="/ioc" render={() => <IOCPage basename={basename} notifications={notifications} http={http}
+                                                        navigation={navigation} data={data}
+              />}/>
+            </EuiPageContent>
+          </EuiPageBody>
+        </EuiPage>
       </>
 
     </Router>

@@ -15,15 +15,14 @@ import {
 
 import {CoreStart} from 'kibana/public';
 
-import {createIOC} from './rtopsSlice'
+import IOCSlice, {createIOC} from './rtopsSlice'
 import {CreateIOCType} from "./types";
 
 interface AddIOCFormDeps {
   http: CoreStart['http'];
-  callback: () => void;
 }
 
-export const AddIOCForm = ({http, callback}: AddIOCFormDeps) => {
+export const AddIOCForm = ({http}: AddIOCFormDeps) => {
 
   const md5Regexp: RegExp = /^[a-fA-F0-9]{32}$/;
 
@@ -69,37 +68,37 @@ export const AddIOCForm = ({http, callback}: AddIOCFormDeps) => {
     };
     dispatch(createIOC({http, payload}));
     e.preventDefault();
-    callback();
-  }
+    dispatch(IOCSlice.actions.setShowAddIOCForm(false));
+  };
 
   const handleTypeChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setType(e.target.value);
-  }
+  };
 
   // Common to all IOC types
   const handleUserNameChange = (e: ChangeEvent<HTMLInputElement>) => {
     setUserName(e.target.value);
-  }
+  };
   const handleHostNameChange = (e: ChangeEvent<HTMLInputElement>) => {
     setHostName(e.target.value);
-  }
+  };
   const handleC2MessageChange = (e: ChangeEvent<HTMLInputElement>) => {
     setC2Message(e.target.value);
-  }
+  };
   const handleTimestampChange = (date: Moment) => {
     setTimestamp(date);
-  }
+  };
 
   // File
   const handleFileNameChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFileName(e.target.value);
-  }
+  };
   const handleFileHashChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFileHash(e.target.value);
-  }
+  };
   const handleFileSizeChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFileSize(e.target.value);
-  }
+  };
 
   const fileForm = type === 'file' ? (
     <>
@@ -181,7 +180,7 @@ export const AddIOCForm = ({http, callback}: AddIOCFormDeps) => {
         />
       </EuiFormRow>
     </>
-  ) : ''
+  ) : '';
 
   return (
     <EuiForm

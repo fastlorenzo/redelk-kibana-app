@@ -5,7 +5,7 @@ import thunk from 'redux-thunk'
 import {configureStore} from "@reduxjs/toolkit";
 
 import {AppMountParameters, CoreStart} from 'kibana/public';
-import {AppPluginStartDependencies} from './types';
+import {RedelkPluginStartDependencies} from './types';
 import {RedelkApp} from './components/app';
 import rootReducer from './reducers';
 
@@ -15,7 +15,7 @@ import {createKbnUrlStateStorage} from '../../../src/plugins/kibana_utils/public
 
 export const renderApp = (
   core: CoreStart,
-  appDeps: AppPluginStartDependencies,
+  appDeps: RedelkPluginStartDependencies,
   {appBasePath, element, history}: AppMountParameters
 ) => {
   const {notifications, http} = core;

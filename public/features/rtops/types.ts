@@ -1,9 +1,12 @@
+import { Filter } from '../../../../../src/plugins/data/public';
 import {C2Data, EsAnswerRtops, FileData, HostData, KbnCallStatus, UserData} from '../../types';
 
 export interface RtopsState {
   status: KbnCallStatus;
   error: string | undefined | null;
   rtops: EsAnswerRtops | undefined;
+  showAddIOCForm: boolean;
+  hiddenFilters: Filter[]
 }
 
 export interface CreateIOCTypeIOC {

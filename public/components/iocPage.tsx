@@ -1,21 +1,14 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import {CoreStart} from "kibana/public";
 import {NavigationPublicPluginStart} from '../../../../src/plugins/navigation/public';
 import {IOCTable} from "../features/rtops/iocTable";
-import {
-  EuiFlyout,
-  EuiFlyoutBody,
-  EuiFlyoutHeader,
-  EuiPage,
-  EuiPageBody,
-  EuiPageContent,
-  EuiPageContentBody,
-  EuiSpacer,
-  EuiText,
-  EuiTitle
-} from '@elastic/eui';
+import {EuiFlyout, EuiFlyoutBody, EuiFlyoutHeader, EuiSpacer, EuiText, EuiTitle} from '@elastic/eui';
 import {AddIOCForm} from "../features/rtops/addIocForm";
-import {DataPublicPluginStart} from 'src/plugins/data/public';
+import {DataPublicPluginStart, Filter} from '../../../../src/plugins/data/public';
+import {RedELKState} from "../types";
+import {useDispatch, useSelector} from 'react-redux';
+import IOCSlice from "../features/rtops/rtopsSlice";
+import {useTopNav} from "../navHeaderHelper";
 
 
 interface IOCPageDeps {
@@ -24,19 +17,37 @@ interface IOCPageDeps {
   http: CoreStart['http'];
   navigation: NavigationPublicPluginStart;
   data: DataPublicPluginStart;
-  showAddIOCFlyout: boolean | false;
-  setIOCFlyoutVisible: (arg0: boolean) => void;
-  showTopNav: (arg0: boolean) => void;
 }
+const iocFilter: Filter = {
+  meta: {
+    alias: "ioc",
+    disabled: false,
+    index: "rtops",
+    negate: false
+  },
+  query: {
+    match_phrase: {
+      "event.type": "ioc"
+    }
+  }
+};
+export const IOCPage = ({basename, notifications, http, navigation, data}: IOCPageDeps) => {
 
-export const IOCPage = ({basename, notifications, http, navigation, data, showAddIOCFlyout, setIOCFlyoutVisible, showTopNav}: IOCPageDeps) => {
+  const showAddIOCForm: boolean = useSelector((state: RedELKState) => state.rtops.showAddIOCForm);
+  const rtops = useSelector((state: RedELKState) => state.rtops.rtops);
+
+  const dispatch = useDispatch();
+  useTopNav(true);
+  useEffect(() => {
+    dispatch(IOCSlice.actions.setHiddenFilters([iocFilter]));
+  }, []);
 
   let addIOCFlyout;
-  if (showAddIOCFlyout) {
+  if (showAddIOCForm) {
     addIOCFlyout = (
       <EuiFlyout
         size="m"
-        onClose={() => setIOCFlyoutVisible(false)}
+        onClose={() => dispatch(IOCSlice.actions.setShowAddIOCForm(false))}
         aria-labelledby="flyoutTitle">
         <EuiFlyoutHeader hasBorder>
           <EuiTitle size="m">
@@ -44,31 +55,21 @@ export const IOCPage = ({basename, notifications, http, navigation, data, showAd
           </EuiTitle>
         </EuiFlyoutHeader>
         <EuiFlyoutBody>
-          <AddIOCForm http={http} callback={() => setIOCFlyoutVisible(false)}/>
+          <AddIOCForm http={http}/>
         </EuiFlyoutBody>
       </EuiFlyout>
     );
   }
 
-  useEffect(() => showTopNav(true), []);
-
   return (
     <>
-      <EuiPage>
-        {addIOCFlyout}
-        <EuiPageBody>
-          <EuiPageContent>
-            <EuiPageContentBody>
-              <EuiText>
-                <p>You can find below the list of IOC from RedELK. Use the top menu option "Add IOC" to manually add new
-                  IOC.</p>
-              </EuiText>
-              <EuiSpacer/>
-              <IOCTable http={http}/>
-            </EuiPageContentBody>
-          </EuiPageContent>
-        </EuiPageBody>
-      </EuiPage>
+      {addIOCFlyout}
+      <EuiText>
+        <p>You can find below the list of IOC from RedELK. Use the top menu option "Add IOC" to manually add new
+          IOC.</p>
+      </EuiText>
+      <EuiSpacer/>
+      <IOCTable/>
     </>
   )
 };

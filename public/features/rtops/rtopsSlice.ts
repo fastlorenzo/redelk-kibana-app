@@ -12,7 +12,9 @@ interface AsyncThunkArgs {
 const initialState: RtopsState = {
   status: KbnCallStatus.idle,
   error: null,
-  rtops: undefined
+  rtops: undefined,
+  showAddIOCForm: false,
+  hiddenFilters: []
 }
 
 export const fetchAllIOC = createAsyncThunk(
@@ -37,7 +39,17 @@ const rtopsSlice = createSlice({
   initialState: initialState,
   reducers: {
     setIOC: (state, action) => {
-      state.rtops = action.payload
+      state.rtops = action.payload;
+      state.status = KbnCallStatus.success;
+    },
+    setShowAddIOCForm: (state, action) => {
+      state.rtops = action.payload;
+    },
+    setStatus: (state, action) => {
+      state.status = action.payload;
+    },
+    setHiddenFilters: (state, action) => {
+      state.hiddenFilters = action.payload;
     }
   },
   extraReducers: builder => {

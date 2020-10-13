@@ -1,19 +1,34 @@
 import {NavigationPublicPluginStart} from '../../../src/plugins/navigation/public';
-import {DataPublicPluginStart} from '../../../src/plugins/data/public';
+import {DataPublicPluginSetup, DataPublicPluginStart} from '../../../src/plugins/data/public';
 import {RtopsState} from './features/rtops/types';
 import {CoreStart} from 'kibana/public';
+import {DashboardStart} from '../../../src/plugins/dashboard/public';
+import {EmbeddableStart} from '../../../src/plugins/embeddable/public';
+import {SavedObjectsStart} from '../../../src/plugins/saved_objects/public';
+import {VisualizationsStart} from '../../../src/plugins/visualizations/public';
+import {SharePluginSetup} from '../../../src/plugins/share/public';
+import {ConfigState} from "./features/config/types";
 
 export interface RedelkPluginSetup {
-  getGreeting: () => string;
+  currentHistory: unknown;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface RedelkPluginStart {
 }
 
-export interface AppPluginStartDependencies {
+export interface RedelkPluginStartDependencies {
   navigation: NavigationPublicPluginStart;
   data: DataPublicPluginStart;
+  dashboard: DashboardStart;
+  embeddable: EmbeddableStart;
+  visualizations: VisualizationsStart;
+  savedObjects: SavedObjectsStart;
+}
+
+export interface RedelkPluginSetupDependencies {
+  data: DataPublicPluginSetup;
+  share?: SharePluginSetup;
 }
 
 export interface KbnApiMiddlewareDeps {
@@ -134,6 +149,7 @@ export interface EsAnswer {
 
 export interface RedELKState {
   rtops: RtopsState;
+  config: ConfigState;
 }
 
 export interface EsHitsTotal {
@@ -154,10 +170,16 @@ export interface EsShards {
   total: number;
 }
 
+export interface EsAnswerRtopsAggsSimple {
+  key: string;
+  doc_count: number;
+}
+
 export interface EsAnswerRtopsAggs {
-  perEventType?: { buckets: [] };
-  perHostName?: { buckets: [] };
-  perUserName?: { buckets: [] };
+  perEventType?: { buckets: EsAnswerRtopsAggsSimple[] };
+  perHostName?: { buckets: EsAnswerRtopsAggsSimple[] };
+  perUserName?: { buckets: EsAnswerRtopsAggsSimple[] };
+  perImplant?: { buckets: EsAnswerRtopsAggsSimple[] };
 }
 
 export interface EsAnswerRtops {
