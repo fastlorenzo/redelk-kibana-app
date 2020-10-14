@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {ReactElement, useCallback, useEffect, useRef, useState} from 'react';
 import {Redirect, Route, Router} from 'react-router-dom';
 
 import {CoreStart} from 'kibana/public';
@@ -46,8 +46,9 @@ import IOCSlice from "../features/rtops/rtopsSlice";
 import RtopsSlice from "../features/rtops/rtopsSlice";
 import {DEFAULT_ROUTE_ID, routes} from "../routes";
 import {RedelkURLGenerator} from "../url_generator";
-import {KbnCallStatus, RedELKState} from "../types";
+import {KbnCallStatus} from "../types";
 import ConfigSlice from '../features/config/configSlice';
+import {getCurrentRoute, getRtopsStatus, getShowTopNav} from "../selectors";
 
 interface RedelkAppDeps {
   basename: string;
@@ -169,10 +170,9 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
   const appStateContainer = useAppStateContainer();
   const appState = useAppState();
 
-  const showTopNav = useSelector((state: RedELKState) => state.config.showTopNav);
-  const currentRoute = useSelector((state: RedELKState) => state.config.currentRoute);
-  const rtopsStatus = useSelector((state: RedELKState) => state.rtops.status);
-  const rtopsHiddenFilters = useSelector((state: RedELKState) => state.rtops.hiddenFilters);
+  const showTopNav = useSelector(getShowTopNav);
+  const currentRoute = useSelector(getCurrentRoute);
+  const rtopsStatus = useSelector(getRtopsStatus);
 
   const [topNavMenu, setTopNavMenu] = useState<TopNavMenuData[]>([]);
   const [currentPageTitle, setCurrentPageTitle] = useState<string>(routes.find(r => r.id === DEFAULT_ROUTE_ID)!.name);
@@ -191,81 +191,87 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
     if (location.pathname !== currentRoute) {
       dispatch(ConfigSlice.actions.setCurrentRoute(location.pathname));
     }
-  })
+  });
+
   // BEGIN top drop-down menu
   const button = (
     <EuiButtonEmpty
       size="s"
       iconType="arrowDown"
       iconSide="right"
-      onClick={onButtonClick}>
+      onClick={onButtonClick}
+      >
       {currentPageTitle}
     </EuiButtonEmpty>
   );
 
-  const items = routes.map(r => {
-    const generator = new RedelkURLGenerator({appBasePath: r.path, useHash: false});
-    let path = generator.createUrl(appState);
-    console.log('url', path, appState, appStateContainer);
-    return (
-      <EuiContextMenuItem
-        key={r.id}
-        icon={r.icon}
-        onClick={() => {
-          closePopover();
-          setCurrentPageTitle(r.name);
-          history.push(path);
-        }}>
-        {r.name}
-      </EuiContextMenuItem>
-    )
-  });
-
-  const breadcrumbs: EuiBreadcrumb[] = [
-    {
-      href: core.application.getUrlForApp(PLUGIN_ID),
-      onClick: (e) => {
-        core.application.navigateToApp(PLUGIN_ID, {
-          path: routes.find(r => r.id === DEFAULT_ROUTE_ID)!.path || "/",
-          state: appState
-        });
-        e.preventDefault();
-      },
-      text: PLUGIN_NAME
-    },
-    {
-      onClick: (e) => {
-      },
-      text: (
-        <EuiPopover
-          id="singlePanel"
-          button={button}
-          isOpen={isPopoverOpen}
-          closePopover={closePopover}
-          panelPaddingSize="none"
-          anchorPosition="downLeft">
-          <EuiContextMenuPanel items={items}/>
-        </EuiPopover>
-      )
-    }
-  ];
-
+  // Listen to the appState and update menu links
   useEffect(() => {
+    let items: ReactElement[] = [];
+    items = routes.map(r => {
+      const generator = new RedelkURLGenerator({appBasePath: r.path, useHash: false});
+      let path = generator.createUrl(appState);
+      //console.log('url', path, appState, appStateContainer);
+      return (
+        <EuiContextMenuItem
+          key={r.id}
+          icon={r.icon}
+          onClick={() => {
+            closePopover();
+            setCurrentPageTitle(r.name);
+            history.push(path);
+          }}
+        >
+          {r.name}
+        </EuiContextMenuItem>
+      )
+    });
+
+
+    const breadcrumbs: EuiBreadcrumb[] = [
+      {
+        href: core.application.getUrlForApp(PLUGIN_ID),
+        onClick: (e) => {
+          core.application.navigateToApp(PLUGIN_ID, {
+            path: routes.find(r => r.id === DEFAULT_ROUTE_ID)!.path || "/",
+            state: appState
+          });
+          e.preventDefault();
+        },
+        text: PLUGIN_NAME
+      },
+      {
+        onClick: (e) => {
+        },
+        text: (
+          <EuiPopover
+            id="singlePanel"
+            button={button}
+            isOpen={isPopoverOpen}
+            closePopover={closePopover}
+            panelPaddingSize="none"
+            anchorPosition="downLeft"
+          >
+            <EuiContextMenuPanel items={items}/>
+          </EuiPopover>
+        )
+      }
+    ];
+
     setNavHeader(core, breadcrumbs);
-  }, [breadcrumbs]);
-  // END top drop-down menu
+  }, [appState.time, appState.query, appState.filters, history.location, data.query]);
 
   const onQuerySubmit = useCallback(
     ({query}) => {
       appStateContainer.set({...appState, query});
     },
-    [appStateContainer]
+    [appStateContainer, appState]
   );
   const dispatch = useDispatch();
 
   // Build ES query and fetch data
   useEffect(() => {
-    if(rtopsStatus === KbnCallStatus.pending) return;
+    if (rtopsStatus === KbnCallStatus.pending) return;
     dispatch(RtopsSlice.actions.setStatus(KbnCallStatus.pending));
     let tmpFilters = appState.filters ? [...appState.filters] : [];
     if (appState.time !== undefined) {
@@ -274,10 +280,7 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
         tmpFilters.push(trFilter);
       }
     }
-    console.log('before', tmpFilters);
 
-    tmpFilters = tmpFilters.concat(rtopsHiddenFilters);
-    console.log('after', tmpFilters);
     if (history.location.pathname === '/ioc') {
       setTopNavMenu([{
         id: "add-ioc",
@@ -290,54 +293,55 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
     const esQueryFilters = esQuery.buildQueryFromFilters(tmpFilters, indexPattern);
     let searchOpts: IEsSearchRequest = {
       params: {
-        index: 'rtops-*'
-      }
-    };
-    if (appState.query !== undefined && searchOpts.params !== undefined && appState.query.query !== undefined && appState.query.query !== "") {
-      searchOpts.params.q = appState.query.query.toString();
-    }
-    if (appState.filters !== undefined && searchOpts.params !== undefined) {
-
-      searchOpts.params.body = {
-        query: {
-          bool: esQueryFilters
-        }
-      }
-
-      if (history.location.pathname === '/home') {
-        searchOpts.params.body.aggs = {
-          perEventType: {
-            terms: {
-              field: "event.type",
-              order: {
-                "_count": "desc"
+        index: 'rtops-*',
+        size: 10000,
+        body: {
+          aggs: {
+            perEventType: {
+              terms: {
+                field: "event.type",
+                order: {
+                  "_count": "desc"
+                }
               }
-            }
-          },
-          perHostName: {
-            terms: {
-              field: "host.name",
-              order: {
-                "_count": "desc"
+            },
+            perHostName: {
+              terms: {
+                field: "host.name",
+                order: {
+                  "_count": "desc"
+                }
               }
-            }
-          },
-          perUserName: {
-            terms: {
-              field: "user.name",
-              order: {
-                "_count": "desc"
+            },
+            perUserName: {
+              terms: {
+                field: "user.name",
+                order: {
+                  "_count": "desc"
+                }
               }
-            }
-          },
-          perImplant: {
-            terms: {
-              field: "implant.id",
-              order: {
-                "_count": "desc"
+            },
+            perImplant: {
+              terms: {
+                field: "implant.id",
+                order: {
+                  "_count": "desc"
+                }
               }
             }
           }
+        }
+      }
+    };
+    if (searchOpts.params !== undefined) {
+      // If a query was entered
+      if (appState.query !== undefined && appState.query.query !== undefined && appState.query.query !== "") {
+        searchOpts.params.q = appState.query.query.toString();
+      }
+      // If the state contains a filter
+      if (appState.filters !== undefined) {
+        searchOpts.params.body.query = {
+          bool: esQueryFilters
         }
       }
     }
@@ -345,7 +349,7 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
       dispatch(IOCSlice.actions.setIOC(res.rawResponse));
     });
 
-  }, [appState.filters, appState.query, currentRoute]);
+  }, [appState.filters, appState.query, appState.time, currentRoute]);
 
   const indexPattern = useIndexPattern(data);
   if (!indexPattern)
@@ -361,8 +365,7 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
       query={appState.query}
       showSaveQuery={true}
       config={topNavMenu}
-      dateRangeFrom={appState?.time?.from || "now-1y"}
-      dateRangeTo={appState?.time?.to || "now"}
+
     />
   ) : '';
 

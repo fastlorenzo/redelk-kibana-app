@@ -33,7 +33,6 @@ export const setNavHeader = (core: CoreStart, breadcrumbs: EuiBreadcrumb[]) => {
   core.chrome.setBadge(badge);
   core.chrome.setBrand(brand);
   core.chrome.setBreadcrumbs(breadcrumbs);
-  console.log('Updating nav headers');
 };
 
 export const useTopNav = (show: boolean) => {

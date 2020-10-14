@@ -1,14 +1,14 @@
-import React, { useEffect } from 'react';
+import React, {useEffect} from 'react';
 import {CoreStart} from "kibana/public";
 import {NavigationPublicPluginStart} from '../../../../src/plugins/navigation/public';
 import {IOCTable} from "../features/rtops/iocTable";
 import {EuiFlyout, EuiFlyoutBody, EuiFlyoutHeader, EuiSpacer, EuiText, EuiTitle} from '@elastic/eui';
 import {AddIOCForm} from "../features/rtops/addIocForm";
 import {DataPublicPluginStart, Filter} from '../../../../src/plugins/data/public';
-import {RedELKState} from "../types";
 import {useDispatch, useSelector} from 'react-redux';
 import IOCSlice from "../features/rtops/rtopsSlice";
 import {useTopNav} from "../navHeaderHelper";
+import {getRtopsShowAddIOCForm} from "../selectors";
 
 
 interface IOCPageDeps {
@@ -18,6 +18,7 @@ interface IOCPageDeps {
   navigation: NavigationPublicPluginStart;
   data: DataPublicPluginStart;
 }
+
 const iocFilter: Filter = {
   meta: {
     alias: "ioc",
@@ -33,8 +34,7 @@ const iocFilter: Filter = {
 };
 export const IOCPage = ({basename, notifications, http, navigation, data}: IOCPageDeps) => {
 
-  const showAddIOCForm: boolean = useSelector((state: RedELKState) => state.rtops.showAddIOCForm);
-  const rtops = useSelector((state: RedELKState) => state.rtops.rtops);
+  const showAddIOCForm = useSelector(getRtopsShowAddIOCForm);
 
   const dispatch = useDispatch();
   useTopNav(true);

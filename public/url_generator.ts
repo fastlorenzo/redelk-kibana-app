@@ -67,6 +67,7 @@ export class RedelkURLGenerator {
     const appState: {
       query?: Query;
       filters?: Filter[];
+      time?: TimeRange;
       index?: string;
     } = {};
     const queryState: QueryState = {};
@@ -76,7 +77,10 @@ export class RedelkURLGenerator {
       appState.filters = filters?.filter((f) => !esFilters.isFilterPinned(f));
     if (indexPatternId) appState.index = indexPatternId;
 
-    if (time) queryState.time = time;
+    if (time) {
+      queryState.time = time;
+      appState.time = time;
+    }
     if (filters && filters.length)
       queryState.filters = filters?.filter((f) => esFilters.isFilterPinned(f));
     if (refreshInterval) queryState.refreshInterval = refreshInterval;

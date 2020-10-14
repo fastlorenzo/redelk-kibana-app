@@ -26,7 +26,8 @@ const kbnApi = (
         return next(action);
         break;
       default:
-        console.log(action.type);
+        break;
+      //console.log(action.type);
     }
     return next(action);
   }

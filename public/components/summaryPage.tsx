@@ -10,11 +10,12 @@ import {
   EuiStat,
   EuiTitle
 } from '@elastic/eui';
-import {EsAnswerRtops, KbnCallStatus, RedELKState} from "../types";
+import {KbnCallStatus} from "../types";
 import {useSelector} from 'react-redux';
 import {Axis, BarSeries, Chart, Partition, Settings} from '@elastic/charts';
 import {EUI_CHARTS_THEME_DARK, EUI_CHARTS_THEME_LIGHT} from '@elastic/eui/dist/eui_charts_theme';
 import {useTopNav} from "../navHeaderHelper";
+import {getRtopsAggs, getRtopsStatus} from "../selectors";
 
 interface RedelkAppDeps {
   basename: string;
@@ -24,16 +25,18 @@ interface RedelkAppDeps {
 }
 
 export const SummaryPage = ({basename, notifications, http, navigation}: RedelkAppDeps) => {
-  const ioc: (EsAnswerRtops | undefined) = useSelector((state: RedELKState) => state.rtops.rtops);
-  const rtopsStatus = useSelector((state: RedELKState) => state.rtops.status);
+
+  //const rtops = useSelector(getRtopsHits);
+  const rtopsStatus = useSelector(getRtopsStatus);
+  const rtopsAggs = useSelector(getRtopsAggs);
 
   // const [dashboardDef, setDashboardDef] = useState<SimpleSavedObject<SavedObjectDashboard>>();
   useTopNav(true);
   let perEventTypeChart = (<h4>No data</h4>);
   let perHostNameChart = (<h4>No data</h4>);
-  if (ioc?.aggregations?.perEventType && ioc?.aggregations?.perHostName && ioc?.aggregations?.perUserName) {
-    const perEventTypeData = ioc.aggregations.perEventType.buckets;
-    const perHostNameData = ioc.aggregations.perHostName.buckets;
+  if (rtopsAggs.perEventType && rtopsAggs.perHostName && rtopsAggs.perUserName) {
+    const perEventTypeData = rtopsAggs.perEventType.buckets;
+    const perHostNameData = rtopsAggs.perHostName.buckets;
     const isDarkMode = true;
     perEventTypeChart = (rtopsStatus !== KbnCallStatus.pending) ?
       (
@@ -182,15 +185,14 @@ export const SummaryPage = ({basename, notifications, http, navigation}: RedelkA
   //   </EuiFlexGroup>
   // );
 
-  const totalHosts = ioc?.aggregations?.perHostName?.buckets?.length || 0;
-  const totalUsers = ioc?.aggregations?.perUserName?.buckets?.length || 0;
-  const totalIOC = ioc?.aggregations?.perEventType?.buckets?.filter(v => v.key === "ioc")[0]?.doc_count || 0;
-  const totalDownloads = ioc?.aggregations?.perEventType?.buckets?.filter(v => v.key === "downloads")[0]?.doc_count || 0;
-  const totalImplants = ioc?.aggregations?.perImplant?.buckets?.length || 0;
+  const totalHosts = rtopsAggs?.perHostName?.buckets?.length || 0;
+  const totalUsers = rtopsAggs?.perUserName?.buckets?.length || 0;
+  const totalIOC = rtopsAggs?.perEventType?.buckets?.filter(v => v.key === "ioc")[0]?.doc_count || 0;
+  const totalDownloads = rtopsAggs?.perEventType?.buckets?.filter(v => v.key === "downloads")[0]?.doc_count || 0;
+  const totalImplants = rtopsAggs?.perImplant?.buckets?.length || 0;
 
   return (
     <>
-
       <EuiFlexGroup>
         <EuiFlexItem>
           <EuiStat

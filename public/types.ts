@@ -10,7 +10,7 @@ import {SharePluginSetup} from '../../../src/plugins/share/public';
 import {ConfigState} from "./features/config/types";
 
 export interface RedelkPluginSetup {
-  currentHistory: unknown;
+  currentHistory?: unknown;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -123,28 +123,28 @@ export interface UserData {
 }
 
 export interface RtopsDoc {
-  '@timestamp': string | undefined;
-  '@version': string | undefined;
-  agent: AgentData | undefined;
-  c2: C2Data | undefined;
-  ecs: ECSData | undefined;
-  event: EventData | undefined;
+  '@timestamp': string;
+  '@version': string;
+  agent?: AgentData;
+  c2?: C2Data;
+  ecs?: ECSData;
+  event?: EventData;
   host?: HostData;
   user?: UserData;
-  implant: ImplantData | undefined;
-  infra: InfraData | undefined;
-  input: InputData | undefined;
-  log: LogData | undefined;
-  message: string | undefined;
-  tags: string[] | undefined;
+  implant?: ImplantData;
+  infra?: InfraData;
+  input?: InputData;
+  log?: LogData;
+  message: string;
+  tags?: string[];
 }
 
-export interface EsAnswer {
+export interface EsAnswer<T> {
   _index: string;
   _type: string;
   _id: string;
   _score: number;
-  _source: object;
+  _source: T;
 }
 
 export interface RedELKState {
@@ -158,7 +158,7 @@ export interface EsHitsTotal {
 }
 
 export interface EsHitsRtops {
-  hits: RtopsDoc[];
+  hits: EsAnswer<RtopsDoc>[];
   max_score: number;
   total: EsHitsTotal;
 }

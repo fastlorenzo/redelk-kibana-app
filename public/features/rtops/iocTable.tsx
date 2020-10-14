@@ -12,12 +12,13 @@ import {
   EuiLoadingSpinner,
 } from '@elastic/eui';
 
-import {EsAnswerRtops, KbnCallStatus, RedELKState} from '../../types';
+import {KbnCallStatus} from '../../types';
+import {getRtopsFilteredIOC, getRtopsStatus} from "../../selectors";
 
 export const IOCTable = () => {
 
-  const ioc: (EsAnswerRtops | undefined) = useSelector((state: RedELKState) => state.rtops.rtops);
-  const iocStatus: KbnCallStatus = useSelector((state: RedELKState) => state.rtops.status);
+  const ioc = useSelector(getRtopsFilteredIOC);
+  const rtopsStatus = useSelector(getRtopsStatus);
 
   const toolbarVisibility: EuiDataGridToolBarVisibilityOptions = {
     showColumnSelector: true,
@@ -93,7 +94,6 @@ export const IOCTable = () => {
     datagrid_columns.map(({id}) => id)
   );
 
-  const raw_data = ioc === undefined ? [] : ioc.hits.hits;
   const renderCellValue = useMemo(() => {
     return ({rowIndex, columnId, setCellProps}: EuiDataGridCellValueElementProps): ReactElement => {
       // useEffect(() => {
@@ -112,18 +112,18 @@ export const IOCTable = () => {
       //   // }
       // }, [rowIndex, columnId, setCellProps]);
       // @ts-ignore
-      return raw_data.hasOwnProperty(rowIndex) ? at(raw_data[rowIndex], columnId) : '';
+      return ioc.hasOwnProperty(rowIndex) ? at(ioc[rowIndex], columnId) : '';
     };
   }, [ioc]);
 
-  return iocStatus == KbnCallStatus.pending ? (
+  return rtopsStatus == KbnCallStatus.pending ? (
     <EuiLoadingSpinner size="xl"/>
   ) : (
     <EuiFlexGroup>
       <EuiFlexItem>
         <EuiDataGrid
           columns={datagrid_columns}
-          rowCount={raw_data.length}
+          rowCount={ioc.length}
           renderCellValue={renderCellValue}
           toolbarVisibility={toolbarVisibility}
           columnVisibility={{visibleColumns, setVisibleColumns}}

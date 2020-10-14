@@ -1,4 +1,3 @@
-import {i18n} from '@kbn/i18n';
 import {
   AppCategory,
   AppMountParameters,
@@ -134,14 +133,14 @@ export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart
 
     // Return methods that should be available to other plugins
     return {
-      getGreeting() {
-        return i18n.translate('redelk.greetingText', {
-          defaultMessage: 'Hello from {name}!',
-          values: {
-            name: PLUGIN_NAME,
-          },
-        });
-      },
+      // getGreeting() {
+      //   return i18n.translate('redelk.greetingText', {
+      //     defaultMessage: 'Hello from {name}!',
+      //     values: {
+      //       name: PLUGIN_NAME,
+      //     },
+      //   });
+      // },
     };
   }
 
