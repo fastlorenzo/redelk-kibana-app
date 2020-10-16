@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {CoreStart} from "kibana/public";
 import {NavigationPublicPluginStart} from '../../../../src/plugins/navigation/public';
 import {IOCTable} from "../features/rtops/iocTable";
@@ -14,9 +14,8 @@ import {
   EuiTitle
 } from '@elastic/eui';
 import {AddIOCForm} from "../features/rtops/addIocForm";
-import {DataPublicPluginStart, Filter} from '../../../../src/plugins/data/public';
+import {DataPublicPluginStart} from '../../../../src/plugins/data/public';
 import {useDispatch, useSelector} from 'react-redux';
-import IOCSlice from "../features/rtops/rtopsSlice";
 import {useTopNav} from "../navHeaderHelper";
 import {getRtopsShowAddIOCForm} from "../selectors";
 import {ActionCreators} from "../redux/rootActions";
@@ -30,28 +29,12 @@ interface IOCPageDeps {
   data: DataPublicPluginStart;
 }
 
-const iocFilter: Filter = {
-  meta: {
-    alias: "ioc",
-    disabled: false,
-    index: "rtops",
-    negate: false
-  },
-  query: {
-    match_phrase: {
-      "event.type": "ioc"
-    }
-  }
-};
 export const IOCPage = ({basename, notifications, http, navigation, data}: IOCPageDeps) => {
 
   const showAddIOCForm = useSelector(getRtopsShowAddIOCForm);
 
   const dispatch = useDispatch();
   useTopNav(true);
-  useEffect(() => {
-    dispatch(IOCSlice.actions.setHiddenFilters([iocFilter]));
-  }, []);
 
   let addIOCFlyout;
   if (showAddIOCForm) {

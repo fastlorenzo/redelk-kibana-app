@@ -36,7 +36,6 @@ export const SummaryPage = ({basename, notifications, http, navigation}: RedelkA
   const rtopsAggs = useSelector(getRtopsAggs);
   const kibana = useKibana();
   const isDarkMode = kibana.services.uiSettings?.get("theme:darkMode") && true;
-  console.log(kibana);
   // const [dashboardDef, setDashboardDef] = useState<SimpleSavedObject<SavedObjectDashboard>>();
   useTopNav(true);
   let perEventTypeChart = (<h4>No data</h4>);
