@@ -15,8 +15,8 @@ import {
 
 import {CoreStart} from 'kibana/public';
 
-import IOCSlice, {createIOC} from './rtopsSlice'
-import {CreateIOCType} from "./types";
+import {CreateIOCType} from "../../redux/types";
+import {ActionCreators} from "../../redux/rootActions";
 
 interface AddIOCFormDeps {
   http: CoreStart['http'];
@@ -66,9 +66,9 @@ export const AddIOCForm = ({http}: AddIOCFormDeps) => {
         name: userName
       }
     };
-    dispatch(createIOC({http, payload}));
+    dispatch(ActionCreators.createIOC({http, payload}));
     e.preventDefault();
-    dispatch(IOCSlice.actions.setShowAddIOCForm(false));
+    dispatch(ActionCreators.setShowAddIOCForm(false));
   };
 
   const handleTypeChange = (e: ChangeEvent<HTMLSelectElement>) => {

@@ -10,9 +10,7 @@ import {
   EuiButtonEmpty,
   EuiContextMenuItem,
   EuiContextMenuPanel,
-  EuiPage,
-  EuiPageBody,
-  EuiPageContent,
+  EuiLoadingSpinner,
   EuiPopover
 } from '@elastic/eui';
 import {setNavHeader} from "../navHeaderHelper";
@@ -42,13 +40,13 @@ import {
   syncState
 } from '../../../../src/plugins/kibana_utils/public';
 import {History} from 'history';
-import IOCSlice from "../features/rtops/rtopsSlice";
-import RtopsSlice from "../features/rtops/rtopsSlice";
+import {ActionCreators} from "../redux/rootActions";
 import {DEFAULT_ROUTE_ID, routes} from "../routes";
 import {RedelkURLGenerator} from "../url_generator";
-import {KbnCallStatus} from "../types";
-import ConfigSlice from '../features/config/configSlice';
-import {getCurrentRoute, getRtopsStatus, getShowTopNav} from "../selectors";
+import {KbnCallStatus, RedelkInitStatus} from "../types";
+import {getCurrentRoute, getInitStatus, getShowTopNav} from "../selectors";
+import {checkInit} from "../redux/config/configActions";
+import {InitPage} from './initPage';
 
 interface RedelkAppDeps {
   basename: string;
@@ -84,9 +82,22 @@ const useIndexPattern = (data: DataPublicPluginStart) => {
   const [indexPattern, setIndexPattern] = useState<IIndexPattern>();
   useEffect(() => {
     const fetchIndexPattern = async () => {
-      const defaultIndexPattern = await data.indexPatterns.getDefault();
-      if (defaultIndexPattern) {
-        setIndexPattern(defaultIndexPattern);
+      try {
+        const defaultIndexPattern = await data.indexPatterns.getDefault();
+        if (defaultIndexPattern) {
+          setIndexPattern(defaultIndexPattern);
+        } else {
+          try {
+            const rtopsIndexPattern = await data.indexPatterns.get("rtops");
+            if (rtopsIndexPattern) {
+              setIndexPattern(rtopsIndexPattern);
+            }
+          } catch (e) {
+            console.log("Error getting rtops index pattern:", e);
+          }
+        }
+      } catch (e) {
+        console.log('Error getting default index pattern:', e);
       }
     };
     fetchIndexPattern();
@@ -172,7 +183,7 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
 
   const showTopNav = useSelector(getShowTopNav);
   const currentRoute = useSelector(getCurrentRoute);
-  const rtopsStatus = useSelector(getRtopsStatus);
+  const initStatus = useSelector(getInitStatus);
 
   const [topNavMenu, setTopNavMenu] = useState<TopNavMenuData[]>([]);
   const [currentPageTitle, setCurrentPageTitle] = useState<string>(routes.find(r => r.id === DEFAULT_ROUTE_ID)!.name);
@@ -189,7 +200,7 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
   useAppStateSyncing(appStateContainer, data.query, kbnUrlStateStorage);
   useEffect(() => {
     if (location.pathname !== currentRoute) {
-      dispatch(ConfigSlice.actions.setCurrentRoute(location.pathname));
+      dispatch(ActionCreators.setCurrentRoute(location.pathname));
     }
   });
 
@@ -200,14 +211,14 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
       iconType="arrowDown"
       iconSide="right"
       onClick={onButtonClick}
-      >
+    >
       {currentPageTitle}
     </EuiButtonEmpty>
   );
 
   // Listen to the appState and update menu links
   useEffect(() => {
-    let items: ReactElement[] = [];
+    let items: ReactElement[];
     items = routes.map(r => {
       const generator = new RedelkURLGenerator({appBasePath: r.path, useHash: false});
       let path = generator.createUrl(appState);
@@ -262,17 +273,17 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
   }, [appState.time, appState.query, appState.filters, history.location, data.query]);
 
   const onQuerySubmit = useCallback(
-    ({query}) => {
-      appStateContainer.set({...appState, query});
+    ({query, dateRange}) => {
+      appStateContainer.set({...appState, query, time: dateRange});
     },
     [appStateContainer, appState]
   );
+
   const dispatch = useDispatch();
 
   // Build ES query and fetch data
   useEffect(() => {
-    if (rtopsStatus === KbnCallStatus.pending) return;
-    dispatch(RtopsSlice.actions.setStatus(KbnCallStatus.pending));
+    dispatch(ActionCreators.setStatus(KbnCallStatus.pending));
     let tmpFilters = appState.filters ? [...appState.filters] : [];
     if (appState.time !== undefined) {
       const trFilter = getTime(indexPattern, appState.time);
@@ -286,7 +297,7 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
         id: "add-ioc",
         label: "Add IOC",
         run: () => {
-          dispatch(IOCSlice.actions.setShowAddIOCForm(true))
+          dispatch(ActionCreators.setShowAddIOCForm(true))
         }
       }])
     }
@@ -339,21 +350,67 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
         searchOpts.params.q = appState.query.query.toString();
       }
       // If the state contains a filter
-      if (appState.filters !== undefined) {
+      if (appState.filters !== undefined || appState.time !== undefined) {
         searchOpts.params.body.query = {
           bool: esQueryFilters
         }
       }
     }
-    data.search.search(searchOpts).forEach((res) => {
-      dispatch(IOCSlice.actions.setIOC(res.rawResponse));
-    });
+    dispatch(ActionCreators.fetchAllRtops({data, searchOpts}));
 
   }, [appState.filters, appState.query, appState.time, currentRoute]);
 
   const indexPattern = useIndexPattern(data);
-  if (!indexPattern)
-    return <div>No index pattern found. Please create an index patter before loading...</div>;
+
+  if (initStatus === RedelkInitStatus.idle) {
+    dispatch(checkInit(http));
+    return (
+      <InitPage
+        title={(
+          <h2>Loading {PLUGIN_NAME}</h2>
+        )}
+        content={(
+          <p><EuiLoadingSpinner size="xl"/> Waiting for {PLUGIN_NAME} initialization to start.</p>
+        )}
+      />
+    );
+  }
+  if (initStatus === RedelkInitStatus.pending) {
+    return (
+      <InitPage
+        title={(
+          <h2>Loading {PLUGIN_NAME}</h2>
+        )}
+        content={(
+          <p><EuiLoadingSpinner size="xl"/> Waiting for {PLUGIN_NAME} initialization to complete.</p>
+        )}
+      />
+    );
+  }
+  if (initStatus === RedelkInitStatus.failure) {
+    return (
+      <InitPage
+        title={(
+          <h2>Error loading {PLUGIN_NAME}</h2>
+        )}
+        content={(
+          <p>ERROR: --</p>
+        )}
+      />
+    );
+  }
+  if (!indexPattern) {
+    return (
+      <InitPage
+        title={(
+          <h2>Error loading {PLUGIN_NAME}</h2>
+        )}
+        content={(
+          <p>No default index pattern found. Please set the default index pattern to "rtops-*".</p>
+        )}
+      />
+    );
+  }
 
   const topNav = showTopNav ? (
     <navigation.ui.TopNavMenu
@@ -365,29 +422,38 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
       query={appState.query}
       showSaveQuery={true}
       config={topNavMenu}
-
     />
   ) : '';
 
   return (
     <Router history={history}>
-      <>
-        {topNav}
-        <EuiPage>
-          <EuiPageBody>
-            <EuiPageContent>
-              <Route path="/" exact render={() => <Redirect to="/home"/>}/>
-              <Route path="/home" exact
-                     render={() => <SummaryPage basename={basename} notifications={notifications} http={http}
-                                                navigation={navigation}
-                     />}/>
-              <Route path="/ioc" render={() => <IOCPage basename={basename} notifications={notifications} http={http}
-                                                        navigation={navigation} data={data}
-              />}/>
-            </EuiPageContent>
-          </EuiPageBody>
-        </EuiPage>
-      </>
+      {topNav}
+
+      <Route path="/" exact render={() => <Redirect to="/summary"/>}/>
+      {/*<Route path="/home" exact*/}
+      {/*       render={() =>*/}
+      {/*         <HomePage/>*/}
+      {/*       }*/}
+      {/*/>*/}
+      <Route path="/summary" exact
+             render={() =>
+               <SummaryPage
+                 basename={basename}
+                 notifications={notifications}
+                 http={http}
+                 navigation={navigation}
+               />}
+      />
+      <Route path="/ioc"
+             render={() =>
+               <IOCPage
+                 basename={basename}
+                 notifications={notifications}
+                 http={http}
+                 navigation={navigation}
+                 data={data}
+               />}
+      />
 
     </Router>
   )

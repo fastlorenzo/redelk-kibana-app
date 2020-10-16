@@ -3,13 +3,15 @@ import {
   importSavedObjectsFromStream,
   IRouter,
   RequestHandlerContext,
-  SavedObjectsBulkCreateObject,
+  SavedObject,
+  SavedObjectsClient,
   SavedObjectsImportResponse
 } from '../../../../src/core/server';
 import {getRandomString} from '../helpers'
 import fs from 'fs';
-import { createSavedObjectsStreamFromNdJson } from '../../../../src/core/server/saved_objects/routes/utils';
+import {createSavedObjectsStreamFromNdJson} from '../../../../src/core/server/saved_objects/routes/utils';
 import path from 'path';
+import {IndexPattern} from 'src/plugins/data/public';
 
 interface Hit {
   health: string;
@@ -46,6 +48,14 @@ const importSavedObject = async (filePath: string, context: RequestHandlerContex
     fileName: filePath,
     result: result
   };
+}
+const checkRtops = async (client: Pick<SavedObjectsClient, "get" | "delete" | "errors" | "create" | "bulkCreate" | "find" | "bulkGet" | "update" | "addToNamespaces" | "deleteFromNamespaces" | "bulkUpdate">) => {
+  try {
+    const rtops_ip: SavedObject<IndexPattern> = await client.get("index-pattern", "rtops");
+    return rtops_ip !== undefined;
+  } catch (e) {
+    return false;
+  }
 }
 
 export function defineRoutes(router: IRouter) {
@@ -163,21 +173,24 @@ export function defineRoutes(router: IRouter) {
       validate: false,
     },
     async (context, request, response) => {
-      console.log('Called');
-      const results: {type:string, fileName: string, result: SavedObjectsImportResponse}[] = [];
+      console.log('Checking RedELK initialization');
+      const results: { type: string, fileName: string, result: SavedObjectsImportResponse }[] = [];
       try {
-        const templatesDir = path.join(__dirname, '../templates');
-        const templatesFiles = fs.readdirSync(templatesDir);
-        console.log(templatesFiles);
-        for (const tmpl of templatesFiles) {
-          const match = tmpl.match(INDEX_PATTERN_REGEXP);
-          if (match !== null) {
-            results.push(await importSavedObject(path.join(templatesDir, match[0]), context, 'index-pattern'));
+        const rtops_ip_exists = await checkRtops(context.core.savedObjects.client);
+        // rtops-* index-pattern not found, initializing
+        if (!rtops_ip_exists) {
+          const templatesDir = path.join(__dirname, '../templates');
+          const templatesFiles = fs.readdirSync(templatesDir);
+          for (const tmpl of templatesFiles) {
+            const match = tmpl.match(INDEX_PATTERN_REGEXP);
+            if (match !== null) {
+              results.push(await importSavedObject(path.join(templatesDir, match[0]), context, 'index-pattern'));
+            }
           }
+          results.push(await importSavedObject(path.join(templatesDir, 'redelk_kibana_search.ndjson'), context, 'search'));
+          results.push(await importSavedObject(path.join(templatesDir, 'redelk_kibana_visualization.ndjson'), context, 'visualization'));
+          results.push(await importSavedObject(path.join(templatesDir, 'redelk_kibana_dashboard.ndjson'), context, 'dashboard'));
         }
-        results.push(await importSavedObject(path.join(templatesDir, 'redelk_kibana_search.ndjson'), context, 'search'));
-        results.push(await importSavedObject(path.join(templatesDir, 'redelk_kibana_visualization.ndjson'), context, 'visualization'));
-        results.push(await importSavedObject(path.join(templatesDir, 'redelk_kibana_dashboard.ndjson'), context, 'dashboard'));
 
         return response.ok({
           body: {

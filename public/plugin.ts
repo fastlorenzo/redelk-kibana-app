@@ -1,13 +1,4 @@
-import {
-  AppCategory,
-  AppMountParameters,
-  AppUpdater,
-  CoreSetup,
-  CoreStart,
-  Plugin,
-  PluginInitializerContext,
-  ScopedHistory
-} from 'kibana/public';
+import {AppCategory, AppMountParameters, CoreSetup, CoreStart, Plugin, PluginInitializerContext} from 'kibana/public';
 import {
   RedelkPluginSetup,
   RedelkPluginSetupDependencies,
@@ -15,48 +6,44 @@ import {
   RedelkPluginStartDependencies
 } from './types';
 import {PLUGIN_NAME} from '../common';
-import {createKbnUrlTracker} from '../../../src/plugins/kibana_utils/public';
-import {BehaviorSubject} from 'rxjs';
-import {filter, map} from 'rxjs/operators';
-import {esFilters} from '../../../src/plugins/data/public';
 
 export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart> {
   initializerContext: PluginInitializerContext;
-  private appStateUpdater = new BehaviorSubject<AppUpdater>(() => ({}));
-  private stopUrlTracking: (() => void) | undefined = undefined;
-  private currentHistory: ScopedHistory | undefined = undefined;
+  // private appStateUpdater = new BehaviorSubject<AppUpdater>(() => ({}));
+  // private stopUrlTracking: (() => void) | undefined = undefined;
+  // private currentHistory: ScopedHistory | undefined = undefined;
 
   constructor(initializerContext: PluginInitializerContext) {
     this.initializerContext = initializerContext;
   }
 
   public setup(core: CoreSetup, {data}: RedelkPluginSetupDependencies): RedelkPluginSetup {
-    const {appMounted, appUnMounted, stop: stopUrlTracker} = createKbnUrlTracker({
-      baseUrl: core.http.basePath.prepend('/app/timelion'),
-      defaultSubUrl: '#/',
-      storageKey: `lastUrl:${core.http.basePath.get()}:timelion`,
-      navLinkUpdater$: this.appStateUpdater,
-      toastNotifications: core.notifications.toasts,
-      stateParams: [
-        {
-          kbnUrlKey: '_g',
-          stateUpdate$: data.query.state$.pipe(
-            filter(
-              ({changes}) => !!(changes.globalFilters || changes.time || changes.refreshInterval)
-            ),
-            map(({state}) => ({
-              ...state,
-              filters: state.filters?.filter(esFilters.isFilterPinned),
-            }))
-          ),
-        },
-      ],
-      getHistory: () => this.currentHistory!,
-    });
-
-    this.stopUrlTracking = () => {
-      stopUrlTracker();
-    };
+    // const {appMounted, appUnMounted, stop: stopUrlTracker} = createKbnUrlTracker({
+    //   baseUrl: core.http.basePath.prepend('/app/timelion'),
+    //   defaultSubUrl: '#/',
+    //   storageKey: `lastUrl:${core.http.basePath.get()}:timelion`,
+    //   navLinkUpdater$: this.appStateUpdater,
+    //   toastNotifications: core.notifications.toasts,
+    //   stateParams: [
+    //     {
+    //       kbnUrlKey: '_g',
+    //       stateUpdate$: data.query.state$.pipe(
+    //         filter(
+    //           ({changes}) => !!(changes.globalFilters || changes.time || changes.refreshInterval)
+    //         ),
+    //         map(({state}) => ({
+    //           ...state,
+    //           filters: state.filters?.filter(esFilters.isFilterPinned),
+    //         }))
+    //       ),
+    //     },
+    //   ],
+    //   getHistory: () => this.currentHistory!,
+    // });
+    //
+    // this.stopUrlTracking = () => {
+    //   stopUrlTracker();
+    // };
 
     const darkMode: boolean = core.uiSettings.get('theme:darkMode');
     const redelkCategory: AppCategory = {
@@ -76,11 +63,11 @@ export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart
         const [coreStart, depsStart] = await core.getStartServices();
         //this.currentHistory = params.history;
 
-        appMounted();
+        // appMounted();
 
-        const unlistenParentHistory = params.history.listen(() => {
-          window.dispatchEvent(new HashChangeEvent('hashchange'));
-        });
+        // const unlistenParentHistory = params.history.listen(() => {
+        //   window.dispatchEvent(new HashChangeEvent('hashchange'));
+        // });
 
         // Load application bundle
         const {renderApp} = await import('./application');
@@ -88,9 +75,9 @@ export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart
         // Render the application
         const unmount = renderApp(coreStart, depsStart as RedelkPluginStartDependencies, params);
         return () => {
-          unlistenParentHistory();
+          // unlistenParentHistory();
           unmount();
-          appUnMounted();
+          // appUnMounted();
         };
       },
     });
@@ -149,8 +136,8 @@ export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart
   }
 
   public stop() {
-    if (this.stopUrlTracking) {
-      this.stopUrlTracking();
-    }
+    // if (this.stopUrlTracking) {
+    //   this.stopUrlTracking();
+    // }
   }
 }

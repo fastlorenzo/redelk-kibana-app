@@ -40,19 +40,23 @@ export const IOCTable = () => {
       isSortable: true,
       displayAsText: 'Time',
       display: (<>Time</>),
-      initialWidth: 180,
     },
     {
       id: '_index',
       displayAsText: 'Index',
       display: (<>Index</>),
-      initialWidth: 120,
+      initialWidth: 110
     },
     {
       id: '_source.ioc.type',
       displayAsText: 'IOC Type',
       display: (<>IOC Type</>),
-      initialWidth: 80,
+      initialWidth: 80
+    },
+    {
+      id: '_source.c2.message',
+      displayAsText: 'C2 message',
+      display: (<>C2 message</>),
     },
     {
       id: '_source.file.name',
@@ -63,19 +67,11 @@ export const IOCTable = () => {
       id: '_source.file.hash.md5',
       displayAsText: 'File hash',
       display: (<>File hash</>),
-      initialWidth: 250,
     },
     {
       id: '_source.file.size',
       displayAsText: 'File size',
       display: (<>File size</>),
-      initialWidth: 80,
-    },
-    {
-      id: '_source.c2.message',
-      displayAsText: 'C2 message',
-      display: (<>C2 message</>),
-      initialWidth: 300,
     },
     {
       id: '_source.user.name',

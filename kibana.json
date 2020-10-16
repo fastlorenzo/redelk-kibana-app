@@ -3,7 +3,7 @@
   "version": "7.9.2",
   "server": true,
   "ui": true,
-  "requiredPlugins": ["navigation", "data", "dashboard", "embeddable", "visualizations", "savedObjects", "visualize"],
+  "requiredPlugins": ["navigation", "data", "dashboard", "embeddable", "visualizations", "savedObjects", "visualize", "share"],
   "optionalPlugins": [],
   "requiredBundles": ["kibanaUtils", "kibanaReact"]
 }

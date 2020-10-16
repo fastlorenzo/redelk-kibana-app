@@ -1,13 +1,13 @@
 import {NavigationPublicPluginStart} from '../../../src/plugins/navigation/public';
 import {DataPublicPluginSetup, DataPublicPluginStart} from '../../../src/plugins/data/public';
-import {RtopsState} from './features/rtops/types';
 import {CoreStart} from 'kibana/public';
 import {DashboardStart} from '../../../src/plugins/dashboard/public';
 import {EmbeddableStart} from '../../../src/plugins/embeddable/public';
 import {SavedObjectsStart} from '../../../src/plugins/saved_objects/public';
 import {VisualizationsStart} from '../../../src/plugins/visualizations/public';
-import {SharePluginSetup} from '../../../src/plugins/share/public';
-import {ConfigState} from "./features/config/types";
+import {SharePluginSetup, SharePluginStart} from '../../../src/plugins/share/public';
+import {ConfigState, RtopsState} from "./redux/types";
+import {UiSettingsServiceStart} from "kibana/server";
 
 export interface RedelkPluginSetup {
   currentHistory?: unknown;
@@ -24,6 +24,8 @@ export interface RedelkPluginStartDependencies {
   embeddable: EmbeddableStart;
   visualizations: VisualizationsStart;
   savedObjects: SavedObjectsStart;
+  share: SharePluginStart;
+  uiSettings: UiSettingsServiceStart;
 }
 
 export interface RedelkPluginSetupDependencies {
@@ -37,6 +39,13 @@ export interface KbnApiMiddlewareDeps {
 }
 
 export enum KbnCallStatus {
+  idle = 'idle',
+  pending = 'pending',
+  success = 'success',
+  failure = 'failure'
+}
+
+export enum RedelkInitStatus {
   idle = 'idle',
   pending = 'pending',
   success = 'success',

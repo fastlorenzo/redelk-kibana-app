@@ -5,7 +5,11 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiIcon,
+  EuiKeyPadMenuItem,
   EuiLoadingSpinner,
+  EuiPage,
+  EuiPageBody,
+  EuiPageContent,
   euiPaletteColorBlind,
   EuiStat,
   EuiTitle
@@ -16,6 +20,7 @@ import {Axis, BarSeries, Chart, Partition, Settings} from '@elastic/charts';
 import {EUI_CHARTS_THEME_DARK, EUI_CHARTS_THEME_LIGHT} from '@elastic/eui/dist/eui_charts_theme';
 import {useTopNav} from "../navHeaderHelper";
 import {getRtopsAggs, getRtopsStatus} from "../selectors";
+import {useKibana} from '../../../../src/plugins/kibana_react/public';
 
 interface RedelkAppDeps {
   basename: string;
@@ -29,7 +34,9 @@ export const SummaryPage = ({basename, notifications, http, navigation}: RedelkA
   //const rtops = useSelector(getRtopsHits);
   const rtopsStatus = useSelector(getRtopsStatus);
   const rtopsAggs = useSelector(getRtopsAggs);
-
+  const kibana = useKibana();
+  const isDarkMode = kibana.services.uiSettings?.get("theme:darkMode") && true;
+  console.log(kibana);
   // const [dashboardDef, setDashboardDef] = useState<SimpleSavedObject<SavedObjectDashboard>>();
   useTopNav(true);
   let perEventTypeChart = (<h4>No data</h4>);
@@ -37,7 +44,6 @@ export const SummaryPage = ({basename, notifications, http, navigation}: RedelkA
   if (rtopsAggs.perEventType && rtopsAggs.perHostName && rtopsAggs.perUserName) {
     const perEventTypeData = rtopsAggs.perEventType.buckets;
     const perHostNameData = rtopsAggs.perHostName.buckets;
-    const isDarkMode = true;
     perEventTypeChart = (rtopsStatus !== KbnCallStatus.pending) ?
       (
         <Chart size={{height: 300}}>
@@ -191,64 +197,146 @@ export const SummaryPage = ({basename, notifications, http, navigation}: RedelkA
   const totalDownloads = rtopsAggs?.perEventType?.buckets?.filter(v => v.key === "downloads")[0]?.doc_count || 0;
   const totalImplants = rtopsAggs?.perImplant?.buckets?.length || 0;
 
+
   return (
-    <>
-      <EuiFlexGroup>
-        <EuiFlexItem>
-          <EuiStat
-            title={totalHosts}
-            description={(<><EuiIcon type="grid"/> Unique hosts</>)}
-            textAlign="left"
-            isLoading={rtopsStatus === KbnCallStatus.pending}
-          >
-          </EuiStat>
-        </EuiFlexItem>
-        <EuiFlexItem>
-          <EuiStat
-            title={totalUsers}
-            description={(<><EuiIcon type="users"/> Unique users</>)}
-            textAlign="left"
-            isLoading={rtopsStatus === KbnCallStatus.pending}
-          >
-          </EuiStat>
-        </EuiFlexItem>
-        <EuiFlexItem>
-          <EuiStat
-            title={totalIOC}
-            description={(<><EuiIcon type="securitySignal"/> IOC</>)}
-            textAlign="left"
-            isLoading={rtopsStatus === KbnCallStatus.pending}
-          >
-          </EuiStat>
-        </EuiFlexItem>
-        <EuiFlexItem>
-          <EuiStat
-            title={totalDownloads}
-            description={(<><EuiIcon type="download"/> Downloads</>)}
-            textAlign="left"
-            isLoading={rtopsStatus === KbnCallStatus.pending}
-          >
-          </EuiStat>
-        </EuiFlexItem>
-        <EuiFlexItem>
-          <EuiStat
-            title={totalImplants}
-            description={(<><EuiIcon type="bug"/> Unique implants</>)}
-            textAlign="left"
-            isLoading={rtopsStatus === KbnCallStatus.pending}
-          />
-        </EuiFlexItem>
-      </EuiFlexGroup>
-      <EuiFlexGroup>
-        <EuiFlexItem>
-          <EuiTitle size="s"><p>Event type</p></EuiTitle>
-          {perEventTypeChart}
-        </EuiFlexItem>
-        <EuiFlexItem>
-          <EuiTitle size="s"><p>Hostnames</p></EuiTitle>
-          {perHostNameChart}
-        </EuiFlexItem>
-      </EuiFlexGroup>
-    </>
+    <EuiPage>
+      <EuiPageBody>
+        <EuiPageContent>
+          <EuiFlexGroup>
+
+            {/* Alarms */}
+            <EuiFlexItem>
+              <EuiKeyPadMenuItem
+                label=""
+                className="redelk-stat-menu-item"
+                betaBadgeLabel="Alarms"
+                betaBadgeTooltipContent="Go to Alarms dashboard."
+                betaBadgeIconType="popout"
+                onClick={() => kibana.services.application?.navigateToApp('dashboards', {path: "#/view/53b69200-d4e3-11ea-9301-a30a04251ae9"})}
+              >
+                <EuiStat
+                  title="--"
+                  description={(<><EuiIcon type="alert"/> Alarms</>)}
+                  textAlign="left"
+                  reverse
+                  isLoading={rtopsStatus === KbnCallStatus.pending}
+                />
+              </EuiKeyPadMenuItem>
+            </EuiFlexItem>
+
+            {/* Implants */}
+            <EuiFlexItem>
+              <EuiKeyPadMenuItem
+                label=""
+                className="redelk-stat-menu-item"
+                betaBadgeLabel="Implants"
+                betaBadgeTooltipContent="Go to Implants dashboard."
+                betaBadgeIconType="popout"
+                onClick={() => kibana.services.application?.navigateToApp('dashboards', {path: "#/view/117dbba0-c6f5-11e8-a9c6-cd307b96b1ba"})}
+              >
+                <EuiStat
+                  title={totalImplants}
+                  description={(<><EuiIcon type="bug"/> Implants</>)}
+                  textAlign="left"
+                  reverse
+                  isLoading={rtopsStatus === KbnCallStatus.pending}
+                />
+              </EuiKeyPadMenuItem>
+            </EuiFlexItem>
+
+            {/* IOC */}
+            <EuiFlexItem>
+              <EuiKeyPadMenuItem
+                label=""
+                className="redelk-stat-menu-item"
+                betaBadgeLabel="IOC"
+                betaBadgeTooltipContent="Go to IOC dashboard."
+                betaBadgeIconType="popout"
+                onClick={() => kibana.services.application?.navigateToApp('dashboards', {path: "#/view/86643e90-d4e4-11ea-9301-a30a04251ae9"})}
+              >
+                <EuiStat
+                  title={totalIOC}
+                  description={(<><EuiIcon type="securitySignal"/> IOC</>)}
+                  textAlign="left"
+                  reverse
+                  isLoading={rtopsStatus === KbnCallStatus.pending}
+                />
+              </EuiKeyPadMenuItem>
+            </EuiFlexItem>
+
+            {/* Downloads */}
+            <EuiFlexItem>
+              <EuiKeyPadMenuItem
+                label=""
+                className="redelk-stat-menu-item"
+                betaBadgeLabel="Downloads"
+                betaBadgeTooltipContent="Go to Downloads dashboard."
+                betaBadgeIconType="popout"
+                onClick={() => kibana.services.application?.navigateToApp('dashboards', {path: "#/view/643de010-d04c-11ea-9301-a30a04251ae9"})}
+              >
+                <EuiStat
+                  title={totalDownloads}
+                  description={(<><EuiIcon type="download"/> Downloads</>)}
+                  textAlign="left"
+                  reverse
+                  isLoading={rtopsStatus === KbnCallStatus.pending}
+                />
+              </EuiKeyPadMenuItem>
+            </EuiFlexItem>
+
+            {/* Hosts */}
+            <EuiFlexItem>
+              <EuiKeyPadMenuItem
+                label=""
+                className="redelk-stat-menu-item"
+                betaBadgeLabel="Red Team Operations"
+                betaBadgeTooltipContent="Go to Red Team Operations dashboard."
+                betaBadgeIconType="popout"
+                onClick={() => kibana.services.application?.navigateToApp('dashboards', {path: "#/view/04b87c50-d028-11ea-9301-a30a04251ae9"})}
+              >
+                <EuiStat
+                  title={totalHosts}
+                  description={(<><EuiIcon type="grid"/> Hosts</>)}
+                  textAlign="left"
+                  reverse
+                  isLoading={rtopsStatus === KbnCallStatus.pending}
+                />
+              </EuiKeyPadMenuItem>
+            </EuiFlexItem>
+
+            {/* Users */}
+            <EuiFlexItem>
+              <EuiKeyPadMenuItem
+                label=""
+                className="redelk-stat-menu-item"
+                betaBadgeLabel="Red Team Operations"
+                betaBadgeTooltipContent="Go to Red Team Operations dashboard."
+                betaBadgeIconType="popout"
+                onClick={() => kibana.services.application?.navigateToApp('dashboards', {path: "#/view/04b87c50-d028-11ea-9301-a30a04251ae9"})}
+              >
+                <EuiStat
+                  title={totalUsers}
+                  description={(<><EuiIcon type="users"/> Users</>)}
+                  textAlign="left"
+                  reverse
+                  isLoading={rtopsStatus === KbnCallStatus.pending}
+                />
+              </EuiKeyPadMenuItem>
+            </EuiFlexItem>
+
+          </EuiFlexGroup>
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              <EuiTitle size="s"><p>Event type</p></EuiTitle>
+              {perEventTypeChart}
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <EuiTitle size="s"><p>Hostnames</p></EuiTitle>
+              {perHostNameChart}
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiPageContent>
+      </EuiPageBody>
+    </EuiPage>
   );
 };

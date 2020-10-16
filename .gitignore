@@ -4,3 +4,4 @@ node_modules/
 build/
 server/templates/diff/
 server/templates/*.json
+yarn-error.log

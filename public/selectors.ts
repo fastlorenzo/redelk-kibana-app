@@ -11,6 +11,9 @@ export const getCurrentRoute = createSelector(
 export const getShowTopNav = createSelector(
   [getConfigState], (configState) => configState.showTopNav
 )
+export const getInitStatus = createSelector(
+  [getConfigState], (configState) => configState.initStatus
+)
 
 export const getRtopsEsAnswer = createSelector(
   [getRtopsState],

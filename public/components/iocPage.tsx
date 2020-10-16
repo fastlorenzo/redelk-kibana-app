@@ -2,13 +2,24 @@ import React, {useEffect} from 'react';
 import {CoreStart} from "kibana/public";
 import {NavigationPublicPluginStart} from '../../../../src/plugins/navigation/public';
 import {IOCTable} from "../features/rtops/iocTable";
-import {EuiFlyout, EuiFlyoutBody, EuiFlyoutHeader, EuiSpacer, EuiText, EuiTitle} from '@elastic/eui';
+import {
+  EuiFlyout,
+  EuiFlyoutBody,
+  EuiFlyoutHeader,
+  EuiPage,
+  EuiPageBody,
+  EuiPageContent,
+  EuiSpacer,
+  EuiText,
+  EuiTitle
+} from '@elastic/eui';
 import {AddIOCForm} from "../features/rtops/addIocForm";
 import {DataPublicPluginStart, Filter} from '../../../../src/plugins/data/public';
 import {useDispatch, useSelector} from 'react-redux';
 import IOCSlice from "../features/rtops/rtopsSlice";
 import {useTopNav} from "../navHeaderHelper";
 import {getRtopsShowAddIOCForm} from "../selectors";
+import {ActionCreators} from "../redux/rootActions";
 
 
 interface IOCPageDeps {
@@ -47,7 +58,7 @@ export const IOCPage = ({basename, notifications, http, navigation, data}: IOCPa
     addIOCFlyout = (
       <EuiFlyout
         size="m"
-        onClose={() => dispatch(IOCSlice.actions.setShowAddIOCForm(false))}
+        onClose={() => dispatch(ActionCreators.setShowAddIOCForm(false))}
         aria-labelledby="flyoutTitle">
         <EuiFlyoutHeader hasBorder>
           <EuiTitle size="m">
@@ -62,14 +73,18 @@ export const IOCPage = ({basename, notifications, http, navigation, data}: IOCPa
   }
 
   return (
-    <>
-      {addIOCFlyout}
-      <EuiText>
-        <p>You can find below the list of IOC from RedELK. Use the top menu option "Add IOC" to manually add new
-          IOC.</p>
-      </EuiText>
-      <EuiSpacer/>
-      <IOCTable/>
-    </>
+    <EuiPage>
+      <EuiPageBody>
+        <EuiPageContent>
+          {addIOCFlyout}
+          <EuiText>
+            <p>You can find below the list of IOC from RedELK. Use the top menu option "Add IOC" to manually add new
+              IOC.</p>
+          </EuiText>
+          <EuiSpacer/>
+          <IOCTable/>
+        </EuiPageContent>
+      </EuiPageBody>
+    </EuiPage>
   )
 };

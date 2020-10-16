@@ -34,6 +34,13 @@ export const createIOC = createAsyncThunk(
   }
 )
 
+export const fetchRtops = createAsyncThunk(
+  'rtops/fetchRtops',
+  async () => {
+
+  }
+);
+
 const rtopsSlice = createSlice({
   name: 'rtops',
   initialState: initialState,

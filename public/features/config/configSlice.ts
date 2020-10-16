@@ -4,7 +4,7 @@ import {ConfigState} from './types';
 
 const initialState: ConfigState = {
   showTopNav: false,
-  currentRoute: null
+  currentRoute: ""
 }
 
 const configSlice = createSlice({

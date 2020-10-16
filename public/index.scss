@@ -1,3 +1,14 @@
 .summary-embedded-viz > .visualize {
   height: 150px;
 }
+
+.redelk-stat-menu-item.euiKeyPadMenuItem {
+  width: auto;
+}
+
+.redelk-stat-menu-item.euiKeyPadMenuItem {
+  .euiKeyPadMenuItem__icon {
+    width: 100%;
+    margin-left: 1em;
+  }
+}

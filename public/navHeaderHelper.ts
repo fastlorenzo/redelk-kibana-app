@@ -3,7 +3,7 @@ import {ChromeBadge, ChromeBrand, ChromeHelpExtension, CoreStart} from "kibana/p
 import {useEffect} from 'react';
 import {useDispatch} from 'react-redux';
 import {PLUGIN_NAME} from "../common";
-import ConfigSlice from "./features/config/configSlice";
+import {ActionCreators} from "./redux/rootActions";
 
 export const setNavHeader = (core: CoreStart, breadcrumbs: EuiBreadcrumb[]) => {
   const darkMode: boolean = core.uiSettings.get('theme:darkMode');
@@ -38,6 +38,6 @@ export const setNavHeader = (core: CoreStart, breadcrumbs: EuiBreadcrumb[]) => {
 export const useTopNav = (show: boolean) => {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(ConfigSlice.actions.setShowTopNav(show))
-  }, []);
+    dispatch(ActionCreators.setShowTopNav(show))
+  });
 }
