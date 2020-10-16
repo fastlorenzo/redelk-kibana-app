@@ -6,6 +6,7 @@ The objective is to add manual actions to ingest data.
 
 Currently, working functionalities are:
 - Manual ingestion of IOC (file type only)
+- Display stats on summary page + link to RedELK dashboards
 
 This application is compatible with Elastic stack v7.9.2+
 
@@ -14,6 +15,7 @@ This application is compatible with Elastic stack v7.9.2+
 ![Summary dashboard](/screenshots/redelk-summary-dark.png "Summary dashboard")
 ![IOC dashboard](/screenshots/redelk-ioc-dark.png "IOC dashboard")
 ![IOC manual ingestion](/screenshots/redelk-ioc-add-dark.png "IOC manual ingestion")
+![Navigation](/screenshots/redelk-navigation.png "Navigation")
 
 ## Development
 
