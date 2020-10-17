@@ -3,7 +3,6 @@ import {DataPublicPluginSetup, DataPublicPluginStart} from '../../../src/plugins
 import {CoreStart} from 'kibana/public';
 import {DashboardStart} from '../../../src/plugins/dashboard/public';
 import {EmbeddableStart} from '../../../src/plugins/embeddable/public';
-import {SavedObjectsStart} from '../../../src/plugins/saved_objects/public';
 import {VisualizationsStart} from '../../../src/plugins/visualizations/public';
 import {SharePluginSetup, SharePluginStart} from '../../../src/plugins/share/public';
 import {ConfigState, RtopsState} from "./redux/types";
@@ -23,7 +22,7 @@ export interface RedelkPluginStartDependencies {
   dashboard: DashboardStart;
   embeddable: EmbeddableStart;
   visualizations: VisualizationsStart;
-  savedObjects: SavedObjectsStart;
+  // savedObjects: SavedObjectsStart;
   share: SharePluginStart;
   uiSettings: UiSettingsServiceStart;
 }

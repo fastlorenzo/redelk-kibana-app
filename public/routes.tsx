@@ -10,13 +10,13 @@ export interface RedelkAppRoute {
 
 export const DEFAULT_ROUTE_ID = 'summary';
 export const routes: RedelkAppRoute[] = [
-  // {
-  //   id: 'home',
-  //   name: 'Home',
-  //   disabled: false,
-  //   path: '/home',
-  //   icon: "dashboardApp"
-  // },
+  {
+    id: 'home',
+    name: 'Home',
+    disabled: false,
+    path: '/home',
+    icon: "dashboardApp"
+  },
   {
     id: 'summary',
     name: 'Summary',

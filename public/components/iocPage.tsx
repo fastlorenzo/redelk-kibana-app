@@ -1,24 +1,14 @@
 import React from 'react';
 import {CoreStart} from "kibana/public";
 import {NavigationPublicPluginStart} from '../../../../src/plugins/navigation/public';
-import {IOCTable} from "../features/rtops/iocTable";
-import {
-  EuiFlyout,
-  EuiFlyoutBody,
-  EuiFlyoutHeader,
-  EuiPage,
-  EuiPageBody,
-  EuiPageContent,
-  EuiSpacer,
-  EuiText,
-  EuiTitle
-} from '@elastic/eui';
+import {EuiFlyout, EuiFlyoutBody, EuiFlyoutHeader, EuiTitle} from '@elastic/eui';
 import {AddIOCForm} from "../features/rtops/addIocForm";
 import {DataPublicPluginStart} from '../../../../src/plugins/data/public';
 import {useDispatch, useSelector} from 'react-redux';
 import {useTopNav} from "../navHeaderHelper";
 import {getRtopsShowAddIOCForm} from "../selectors";
 import {ActionCreators} from "../redux/rootActions";
+import {EmbeddedDashboard} from "./embeddedDashboard";
 
 
 interface IOCPageDeps {
@@ -33,8 +23,9 @@ export const IOCPage = ({basename, notifications, http, navigation, data}: IOCPa
 
   const showAddIOCForm = useSelector(getRtopsShowAddIOCForm);
 
-  const dispatch = useDispatch();
   useTopNav(true);
+
+  const dispatch = useDispatch();
 
   let addIOCFlyout;
   if (showAddIOCForm) {
@@ -55,19 +46,18 @@ export const IOCPage = ({basename, notifications, http, navigation, data}: IOCPa
     );
   }
 
+  const addIOCNavMenu = {
+    id: "add-ioc",
+    label: "Add IOC",
+    run: () => {
+      dispatch(ActionCreators.setShowAddIOCForm(true))
+    }
+  };
+
   return (
-    <EuiPage>
-      <EuiPageBody>
-        <EuiPageContent>
-          {addIOCFlyout}
-          <EuiText>
-            <p>You can find below the list of IOC from RedELK. Use the top menu option "Add IOC" to manually add new
-              IOC.</p>
-          </EuiText>
-          <EuiSpacer/>
-          <IOCTable/>
-        </EuiPageContent>
-      </EuiPageBody>
-    </EuiPage>
+    <>
+      {addIOCFlyout}
+      <EmbeddedDashboard dashboardId="86643e90-d4e4-11ea-9301-a30a04251ae9" extraTopNavMenu={[addIOCNavMenu]}/>
+    </>
   )
 };

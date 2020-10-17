@@ -1,4 +1,5 @@
-import {Filter} from '../../../../src/plugins/data/public';
+import {TopNavMenuData} from '../../../../src/plugins/navigation/public';
+import {Filter, Query, TimeRange} from '../../../../src/plugins/data/public';
 import {C2Data, EsAnswerRtops, FileData, HostData, KbnCallStatus, RedelkInitStatus, UserData} from '../types';
 
 export enum ActionType {
@@ -6,6 +7,8 @@ export enum ActionType {
   CONFIG_SHOW_TOP_NAV = "config/CONFIG_SHOW_TOP_NAV",
   CONFIG_SET_CURRENT_ROUTE = "config/CONFIG_SET_CURRENT_ROUTE",
   CONFIG_SET_IS_INITIALIZED = "config/CONFIG_SET_IS_INITIALIZED",
+  CONFIG_SET_APPSTATE = "config/CONFIG_SET_APPSTATE",
+  CONFIG_SET_TOPNAVMENU = "config/CONFIG_SET_TOPNAVMENU",
 
   CONFIG_REDELK_INIT_CHECK = "config/CONFIG_REDELK_INIT_CHECK",
   CONFIG_REDELK_INIT_CHECK_SUCCESS = "config/CONFIG_REDELK_INIT_CHECK_SUCCESS",
@@ -39,8 +42,25 @@ export interface ConfigState {
   initStatus: RedelkInitStatus;
   showTopNav: boolean;
   currentRoute: string;
+  appState: AppState;
+  topNavMenu: TopNavMenuData[];
 }
 
+export interface AppState {
+  name: string;
+  filters: Filter[];
+  query?: Query;
+  time?: TimeRange;
+}
+
+export const defaultAppState: AppState = {
+  name: '',
+  filters: [],
+  time: {
+    from: 'now-1y',
+    to: 'now'
+  }
+};
 
 /**
  * Rtops types

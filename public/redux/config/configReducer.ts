@@ -1,11 +1,14 @@
 import createReducer from '../createReducer';
-import {Action, ActionType, ConfigState, RtopsState} from "../types";
+import {Action, ActionType, AppState, ConfigState, defaultAppState, RtopsState} from "../types";
 import {RedelkInitStatus} from "../../types";
+import {TopNavMenuData} from '../../../../../src/plugins/navigation/public';
 
 const initialState: ConfigState = {
   showTopNav: false,
   currentRoute: "",
-  initStatus: RedelkInitStatus.idle
+  initStatus: RedelkInitStatus.idle,
+  appState: defaultAppState,
+  topNavMenu: []
 };
 
 export const configReducer = createReducer<ConfigState>(initialState, {
@@ -48,6 +51,20 @@ export const configReducer = createReducer<ConfigState>(initialState, {
     return {
       ...state,
       isInitialized: action.payload
+    };
+  },
+
+  [ActionType.CONFIG_SET_APPSTATE](state: ConfigState, action: Action<AppState>) {
+    return {
+      ...state,
+      appState: action.payload
+    };
+  },
+
+  [ActionType.CONFIG_SET_TOPNAVMENU](state: ConfigState, action: Action<TopNavMenuData[]>) {
+    return {
+      ...state,
+      topNavMenu: action.payload
     };
   },
 });

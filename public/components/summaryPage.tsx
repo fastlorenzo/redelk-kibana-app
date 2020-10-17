@@ -31,12 +31,11 @@ interface RedelkAppDeps {
 
 export const SummaryPage = ({basename, notifications, http, navigation}: RedelkAppDeps) => {
 
-  //const rtops = useSelector(getRtopsHits);
   const rtopsStatus = useSelector(getRtopsStatus);
   const rtopsAggs = useSelector(getRtopsAggs);
   const kibana = useKibana();
   const isDarkMode = kibana.services.uiSettings?.get("theme:darkMode") && true;
-  // const [dashboardDef, setDashboardDef] = useState<SimpleSavedObject<SavedObjectDashboard>>();
+
   useTopNav(true);
   let perEventTypeChart = (<h4>No data</h4>);
   let perHostNameChart = (<h4>No data</h4>);
@@ -137,41 +136,6 @@ export const SummaryPage = ({basename, notifications, http, navigation}: RedelkA
   //   })
   // }, [ioc]);
 
-  // console.log('dashboardDef', dashboardDef);
-  // let dashboard = (<p>Loading dashboard</p>);
-  // if(dashboardDef !== undefined) {
-  //   const dashboardOptions = JSON.parse(dashboardDef.attributes.optionsJSON || "") as {useMargins:boolean, hidePanelTitles: boolean};
-  //   const dashboardConfig: DashboardContainerInput = {
-  //     viewMode: ViewMode.VIEW,
-  //     panels: JSON.parse(dashboardDef.attributes.panelsJSON) as {
-  //       [panelId: string]: DashboardPanelState<EmbeddableInput & { [k: string]: unknown }>;
-  //     },
-  //     filters: [],
-  //     title: dashboardDef.attributes.title,
-  //     useMargins: dashboardOptions.useMargins,
-  //     query: {
-  //       language: "kuery",
-  //       query: ""
-  //     },
-  //     timeRange: {
-  //       from: dashboardDef.attributes.timeFrom || "",
-  //       to: dashboardDef.attributes.timeTo || ""
-  //     },
-  //     isFullScreenMode: false,
-  //     id: dashboardDef.id
-  //   }
-  //   console.log(dashboardConfig);
-  //   dashboard = (
-  //     <kibana.services.dashboard.DashboardContainerByValueRenderer input={dashboardConfig}/>
-  //   );
-  // }
-
-  // useEffect(() => {
-  //   kibana.services.savedObjects?.client.get("dashboard","02486040-d355-11ea-9301-a30a04251ae9").then(res => {
-  //     console.log("found dashboard", res);
-  //     setDashboardDef(res);
-  //   })
-  // }, [])
 
   // const embeddedViz = (
   //   <EuiFlexGroup>

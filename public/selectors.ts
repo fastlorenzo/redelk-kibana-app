@@ -14,6 +14,12 @@ export const getShowTopNav = createSelector(
 export const getInitStatus = createSelector(
   [getConfigState], (configState) => configState.initStatus
 )
+export const getAppState = createSelector(
+  [getConfigState], (configState) => configState.appState
+)
+export const getTopNavMenu = createSelector(
+  [getConfigState], (configState) => configState.topNavMenu
+)
 
 export const getRtopsEsAnswer = createSelector(
   [getRtopsState],

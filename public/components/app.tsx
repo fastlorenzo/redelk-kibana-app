@@ -2,7 +2,7 @@ import React, {ReactElement, useCallback, useEffect, useRef, useState} from 'rea
 import {Redirect, Route, Router} from 'react-router-dom';
 
 import {CoreStart} from 'kibana/public';
-import {NavigationPublicPluginStart, TopNavMenuData} from '../../../../src/plugins/navigation/public';
+import {NavigationPublicPluginStart} from '../../../../src/plugins/navigation/public';
 import {IOCPage} from "./iocPage";
 import {SummaryPage} from "./summaryPage";
 import {
@@ -21,14 +21,11 @@ import {
   DataPublicPluginStart,
   esFilters,
   esQuery,
-  Filter,
   getTime,
   IEsSearchRequest,
   IIndexPattern,
-  Query,
   QueryState,
-  syncQueryStateWithUrl,
-  TimeRange
+  syncQueryStateWithUrl
 } from '../../../../src/plugins/data/public';
 import {
   BaseState,
@@ -44,9 +41,11 @@ import {ActionCreators} from "../redux/rootActions";
 import {DEFAULT_ROUTE_ID, routes} from "../routes";
 import {RedelkURLGenerator} from "../url_generator";
 import {KbnCallStatus, RedelkInitStatus} from "../types";
-import {getCurrentRoute, getInitStatus, getShowTopNav} from "../selectors";
+import {getCurrentRoute, getInitStatus, getShowTopNav, getTopNavMenu} from "../selectors";
 import {checkInit} from "../redux/config/configActions";
+import {AppState, defaultAppState} from '../redux/types';
 import {InitPage} from './initPage';
+import {HomePage} from './homePage';
 
 interface RedelkAppDeps {
   basename: string;
@@ -57,21 +56,6 @@ interface RedelkAppDeps {
   kbnUrlStateStorage: IKbnUrlStateStorage;
 }
 
-interface AppState {
-  name: string;
-  filters: Filter[];
-  query?: Query;
-  time?: TimeRange;
-}
-
-const defaultAppState: AppState = {
-  name: '',
-  filters: [],
-  time: {
-    from: 'now-1y',
-    to: 'now'
-  }
-};
 const {
   Provider: AppStateContainerProvider,
   useState: useAppState,
@@ -181,11 +165,12 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
   const appStateContainer = useAppStateContainer();
   const appState = useAppState();
 
+
   const showTopNav = useSelector(getShowTopNav);
   const currentRoute = useSelector(getCurrentRoute);
   const initStatus = useSelector(getInitStatus);
+  const topNavMenu = useSelector(getTopNavMenu);
 
-  const [topNavMenu, setTopNavMenu] = useState<TopNavMenuData[]>([]);
   const [currentPageTitle, setCurrentPageTitle] = useState<string>(routes.find(r => r.id === DEFAULT_ROUTE_ID)!.name);
   const [isPopoverOpen, setPopover] = useState(false);
 
@@ -275,6 +260,7 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
   const onQuerySubmit = useCallback(
     ({query, dateRange}) => {
       appStateContainer.set({...appState, query, time: dateRange});
+      dispatch(ActionCreators.setAppState({...appState, query, time: dateRange}));
     },
     [appStateContainer, appState]
   );
@@ -292,15 +278,6 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
       }
     }
 
-    if (history.location.pathname === '/ioc') {
-      setTopNavMenu([{
-        id: "add-ioc",
-        label: "Add IOC",
-        run: () => {
-          dispatch(ActionCreators.setShowAddIOCForm(true))
-        }
-      }])
-    }
     const esQueryFilters = esQuery.buildQueryFromFilters(tmpFilters, indexPattern);
     let searchOpts: IEsSearchRequest = {
       params: {
@@ -430,11 +407,11 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
       {topNav}
 
       <Route path="/" exact render={() => <Redirect to="/summary"/>}/>
-      {/*<Route path="/home" exact*/}
-      {/*       render={() =>*/}
-      {/*         <HomePage/>*/}
-      {/*       }*/}
-      {/*/>*/}
+      <Route path="/home" exact
+             render={() =>
+               <HomePage/>
+             }
+      />
       <Route path="/summary" exact
              render={() =>
                <SummaryPage
