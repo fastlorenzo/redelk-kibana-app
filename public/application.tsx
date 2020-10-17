@@ -32,7 +32,7 @@ export const renderApp = (
 
   sagaMiddleware.run(rootSaga);
   const kbnUrlStateStorage = createKbnUrlStateStorage({useHash: false, history});
-  console.log(core, appDeps);
+
   ReactDOM.render(
     <Provider store={store}>
       <KibanaContextProvider

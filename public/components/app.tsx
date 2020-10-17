@@ -46,6 +46,15 @@ import {checkInit} from "../redux/config/configActions";
 import {AppState, defaultAppState} from '../redux/types';
 import {InitPage} from './initPage';
 import {HomePage} from './homePage';
+import {AlarmsPage} from "./alarmsPage";
+import {CredentialsPage} from "./credentialsPage";
+import { DownloadsPage } from './downloadsPage';
+import {ImplantsPage} from "./implantsPage";
+import {RtopsPage} from "./rtopsPage";
+import {ScreenshotsPage} from "./screenshotsPage";
+import {TasksPage} from "./tasksPage";
+import {TrafficPage} from "./trafficPage";
+import {TTPPage} from "./ttpPage";
 
 interface RedelkAppDeps {
   basename: string;
@@ -203,6 +212,11 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
 
   // Listen to the appState and update menu links
   useEffect(() => {
+    // Quick and dirty... TODO: prepend basePath to r.path
+    const tmp = routes.find(r => location.pathname.includes(r.path))?.name || "Loading";
+    setCurrentPageTitle(tmp);
+  }, [currentRoute]);
+  useEffect(() => {
     let items: ReactElement[];
     items = routes.map(r => {
       const generator = new RedelkURLGenerator({appBasePath: r.path, useHash: false});
@@ -222,7 +236,6 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
         </EuiContextMenuItem>
       )
     });
-
 
     const breadcrumbs: EuiBreadcrumb[] = [
       {
@@ -255,7 +268,7 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
     ];
 
     setNavHeader(core, breadcrumbs);
-  }, [appState.time, appState.query, appState.filters, history.location, data.query]);
+  }, [appState.time, appState.query, appState.filters, history.location, data.query, currentRoute]);
 
   const onQuerySubmit = useCallback(
     ({query, dateRange}) => {
@@ -406,12 +419,18 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
     <Router history={history}>
       {topNav}
 
-      <Route path="/" exact render={() => <Redirect to="/summary"/>}/>
-      <Route path="/home" exact
-             render={() =>
-               <HomePage/>
-             }
-      />
+      <Route path="/" exact render={() => <Redirect to={routes.find(r => r.id === DEFAULT_ROUTE_ID)?.path || "/home"}/>}/>
+      <Route path="/home" exact component={HomePage} />
+      <Route path="/alarms" exact component={AlarmsPage} />
+      <Route path="/credentials" exact component={CredentialsPage} />
+      <Route path="/downloads" exact component={DownloadsPage} />
+      <Route path="/implants" exact component={ImplantsPage} />
+      <Route path="/rtops" exact component={RtopsPage} />
+      <Route path="/screenshots" exact component={ScreenshotsPage} />
+      <Route path="/tasks" exact component={TasksPage} />
+      <Route path="/traffic" exact component={TrafficPage} />
+      <Route path="/ttp" exact component={TTPPage} />
+
       <Route path="/summary" exact
              render={() =>
                <SummaryPage
