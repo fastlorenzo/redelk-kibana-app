@@ -1,6 +1,7 @@
 import {Dispatch, Middleware} from 'redux';
 import {KbnApiMiddlewareDeps, RedELKState} from '../types';
 import {ThunkDispatch} from 'redux-thunk';
+import {ActionType} from "../redux/types";
 
 interface MiddlewareArgs {
   dispatch: ThunkDispatch<any, any, any>;
@@ -18,11 +19,11 @@ const kbnApi = (
     //console.log('Called kbnApiMiddleware');
     //console.log(http);
     switch (action.type) {
-      case "ioc/createIOC/fulfilled":
+      case ActionType.RTOPS_CREATE_IOC_REQUEST_SUCCESS:
         // Wait 3 seconds for the data to be ingested before fetching all IOCs again.
         //setTimeout(() => dispatch(fetchAllIOC({http})), 3000);
         //dispatch(fetchAllIOC({http}));
-        notifications.toasts.addSuccess('IOC successfully created');
+        notifications.toasts.addSuccess('IOC successfully created. Please wait for Elasticsearch to ingest the data then hit "Refresh".');
         return next(action);
         break;
       default:

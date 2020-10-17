@@ -33,6 +33,6 @@ export const getRtopsShowAddIOCForm = createSelector(
 )
 export const getRtopsFilteredIOC = createSelector(
   [getRtopsHits],
-  (rtops) => filter(rtops, r => r._source?.event?.type === 'ioc')
+  (rtops) => filter(rtops, r => r._source?.c2?.log?.type === 'ioc')
 )
 

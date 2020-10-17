@@ -42,7 +42,6 @@ export const rtopsReducer = createReducer<RtopsState>(initialState, {
   [ActionType.RTOPS_CREATE_IOC_REQUEST_SUCCESS](state: RtopsState, action: Action<EsAnswer<EsAnswerRtops>>) {
     return {
       ...state,
-      rtops: action.payload,
       status: KbnCallStatus.success,
       error: null
     };

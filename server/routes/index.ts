@@ -12,6 +12,7 @@ import fs from 'fs';
 import {createSavedObjectsStreamFromNdJson} from '../../../../src/core/server/saved_objects/routes/utils';
 import path from 'path';
 import {IndexPattern} from 'src/plugins/data/public';
+import {merge} from 'lodash';
 
 interface Hit {
   health: string;
@@ -151,12 +152,17 @@ export function defineRoutes(router: IRouter) {
           dataset: "c2",
           action: "ioc",
           type: "ioc"
+        },
+        c2: {
+          log: {
+            type: "ioc"
+          }
         }
       }
       const query = {
         index: 'rtops-manual',
         id: getRandomString(),
-        body: Object.assign(data, request.body),
+        body: merge(data, request.body),
         format: 'json'
       };
       const catHits = await callAsCurrentUser('create', query);
