@@ -1,5 +1,5 @@
-import {setStateToKbnUrl} from '../../../src/plugins/kibana_utils/public';
-import {esFilters, Filter, Query, QueryState, RefreshInterval, TimeRange} from '../../../src/plugins/data/public';
+import {setStateToKbnUrl} from '../../../../src/plugins/kibana_utils/public';
+import {esFilters, Filter, Query, QueryState, RefreshInterval, TimeRange} from '../../../../src/plugins/data/public';
 
 export const REDELK_APP_URL_GENERATOR = 'REDELK_APP_URL_GENERATOR';
 

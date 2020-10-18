@@ -13,7 +13,7 @@ import {
   EuiLoadingSpinner,
   EuiPopover
 } from '@elastic/eui';
-import {setNavHeader} from "../navHeaderHelper";
+import {setNavHeader} from "../helpers/nav_header_helper";
 import {useDispatch, useSelector} from 'react-redux';
 import {PLUGIN_ID, PLUGIN_NAME} from "../../common";
 import {
@@ -39,16 +39,16 @@ import {
 import {History} from 'history';
 import {ActionCreators} from "../redux/rootActions";
 import {DEFAULT_ROUTE_ID, routes} from "../routes";
-import {RedelkURLGenerator} from "../url_generator";
+import {RedelkURLGenerator} from "../helpers/url_generator";
 import {KbnCallStatus, RedelkInitStatus} from "../types";
-import {getCurrentRoute, getInitStatus, getShowTopNav, getTopNavMenu} from "../selectors";
+import {getCurrentRoute, getInitStatus, getShowTopNav, getTopNavMenu} from "../redux/selectors";
 import {checkInit} from "../redux/config/configActions";
 import {AppState, defaultAppState} from '../redux/types';
 import {InitPage} from './initPage';
 import {HomePage} from './homePage';
 import {AlarmsPage} from "./alarmsPage";
 import {CredentialsPage} from "./credentialsPage";
-import { DownloadsPage } from './downloadsPage';
+import {DownloadsPage} from './downloadsPage';
 import {ImplantsPage} from "./implantsPage";
 import {RtopsPage} from "./rtopsPage";
 import {ScreenshotsPage} from "./screenshotsPage";
@@ -56,6 +56,7 @@ import {TasksPage} from "./tasksPage";
 import {TrafficPage} from "./trafficPage";
 import {TTPPage} from "./ttpPage";
 import {IframePage} from "./iframePage";
+import {initSettings} from "../helpers/settings_helper";
 
 interface RedelkAppDeps {
   basename: string;
@@ -197,6 +198,7 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
     if (location.pathname !== currentRoute) {
       dispatch(ActionCreators.setCurrentRoute(location.pathname));
     }
+    initSettings(core);
   });
 
   // BEGIN top drop-down menu
@@ -420,18 +422,20 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
     <Router history={history}>
       {topNav}
 
-      <Route path="/" exact render={() => <Redirect to={routes.find(r => r.id === DEFAULT_ROUTE_ID)?.path || "/home"}/>}/>
-      <Route path="/home" exact component={HomePage} />
-      <Route path="/alarms" exact component={AlarmsPage} />
-      <Route path="/credentials" exact component={CredentialsPage} />
-      <Route path="/downloads" exact component={DownloadsPage} />
-      <Route path="/implants" exact component={ImplantsPage} />
-      <Route path="/rtops" exact component={RtopsPage} />
-      <Route path="/screenshots" exact component={ScreenshotsPage} />
-      <Route path="/tasks" exact component={TasksPage} />
-      <Route path="/traffic" exact component={TrafficPage} />
-      <Route path="/ttp" exact component={TTPPage} />
-      <Route path="/attack-navigator" exact component={() => IframePage({url:"/plugins/redelk/assets/attack-navigator/"})} />
+      <Route path="/" exact
+             render={() => <Redirect to={routes.find(r => r.id === DEFAULT_ROUTE_ID)?.path || "/home"}/>}/>
+      <Route path="/home" exact component={HomePage}/>
+      <Route path="/alarms" exact component={AlarmsPage}/>
+      <Route path="/credentials" exact component={CredentialsPage}/>
+      <Route path="/downloads" exact component={DownloadsPage}/>
+      <Route path="/implants" exact component={ImplantsPage}/>
+      <Route path="/rtops" exact component={RtopsPage}/>
+      <Route path="/screenshots" exact component={ScreenshotsPage}/>
+      <Route path="/tasks" exact component={TasksPage}/>
+      <Route path="/traffic" exact component={TrafficPage}/>
+      <Route path="/ttp" exact component={TTPPage}/>
+      <Route path="/attack-navigator" exact
+             component={() => IframePage({url: "/plugins/redelk/assets/attack-navigator/"})}/>
 
       <Route path="/summary" exact
              render={() =>

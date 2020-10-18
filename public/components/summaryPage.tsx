@@ -18,8 +18,8 @@ import {KbnCallStatus} from "../types";
 import {useSelector} from 'react-redux';
 import {Axis, BarSeries, Chart, Partition, Settings} from '@elastic/charts';
 import {EUI_CHARTS_THEME_DARK, EUI_CHARTS_THEME_LIGHT} from '@elastic/eui/dist/eui_charts_theme';
-import {useTopNav} from "../navHeaderHelper";
-import {getRtopsAggs, getRtopsStatus} from "../selectors";
+import {useTopNav} from "../helpers/nav_header_helper";
+import {getRtopsAggs, getRtopsStatus} from "../redux/selectors";
 import {useKibana} from '../../../../src/plugins/kibana_react/public';
 
 interface RedelkAppDeps {

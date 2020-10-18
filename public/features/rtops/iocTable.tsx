@@ -13,7 +13,7 @@ import {
 } from '@elastic/eui';
 
 import {KbnCallStatus} from '../../types';
-import {getRtopsFilteredIOC, getRtopsStatus} from "../../selectors";
+import {getRtopsFilteredIOC, getRtopsStatus} from "../../redux/selectors";
 
 export const IOCTable = () => {
 

@@ -1,4 +1,4 @@
-import {RedELKState} from "./types";
+import {RedELKState} from "../types";
 import {createSelector} from 'reselect';
 import {filter} from 'lodash';
 

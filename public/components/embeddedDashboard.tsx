@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {SimpleSavedObject} from "kibana/public";
 import {DashboardContainerInput, SavedObjectDashboard} from '../../../../src/plugins/dashboard/public';
-import {getAppState, getRtopsLastRefreshDate} from "../selectors";
+import {getAppState, getRtopsLastRefreshDate} from "../redux/selectors";
 import {useDispatch, useSelector} from 'react-redux';
-import {savedObjectToDashboardContainerInput} from '../dashboard_helper';
+import {savedObjectToDashboardContainerInput} from '../helpers/dashboard_helper';
 import {useKibana} from '../../../../src/plugins/kibana_react/public';
 import {ActionCreators} from "../redux/rootActions";
 import {TopNavMenuData} from '../../../../src/plugins/navigation/public';
@@ -18,7 +18,7 @@ export const EmbeddedDashboard = ({dashboardId, extraTopNavMenu}: { dashboardId:
   // const [dashboard, setDashboard] = useState<ReactElement>(<p>Loading dashboard</p>);
 
   const dispatch = useDispatch();
-  const {services}: {services: RedelkKibanaService} = useKibana();
+  const {services}: { services: RedelkKibanaService } = useKibana();
 
   const appState = useSelector(getAppState);
   const rtopsLastRefreshDate = useSelector(getRtopsLastRefreshDate);
@@ -49,7 +49,8 @@ export const EmbeddedDashboard = ({dashboardId, extraTopNavMenu}: { dashboardId:
 
   if (dashboardConfig) {
     dashboard = (
-      <services.dashboard.DashboardContainerByValueRenderer input={dashboardConfig} onInputUpdated={setDashboardConfig} />
+      <services.dashboard.DashboardContainerByValueRenderer input={dashboardConfig}
+                                                            onInputUpdated={setDashboardConfig}/>
     );
   }
 

@@ -1,13 +1,13 @@
 import {SimpleSavedObject} from "kibana/public";
-import {GridData} from '../../../src/plugins/dashboard/common';
-import {DashboardContainerInput, SavedObjectDashboard} from '../../../src/plugins/dashboard/public';
-import {DashboardPanelState} from '../../../src/plugins/dashboard/public/application';
-import {EmbeddableInput, ViewMode} from '../../../src/plugins/embeddable/public';
-import {AppState} from "./redux/types";
+import {GridData} from '../../../../src/plugins/dashboard/common';
+import {DashboardContainerInput, SavedObjectDashboard} from '../../../../src/plugins/dashboard/public';
+import {DashboardPanelState} from '../../../../src/plugins/dashboard/public/application';
+import {EmbeddableInput, ViewMode} from '../../../../src/plugins/embeddable/public';
+import {AppState} from "../redux/types";
 import {find} from "lodash";
 
 const uuidv4 = (): string => {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
     return v.toString(16);
   });

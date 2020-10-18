@@ -5,8 +5,8 @@ import {EuiFlyout, EuiFlyoutBody, EuiFlyoutHeader, EuiTitle} from '@elastic/eui'
 import {AddIOCForm} from "../features/rtops/addIocForm";
 import {DataPublicPluginStart} from '../../../../src/plugins/data/public';
 import {useDispatch, useSelector} from 'react-redux';
-import {useTopNav} from "../navHeaderHelper";
-import {getRtopsShowAddIOCForm} from "../selectors";
+import {useTopNav} from "../helpers/nav_header_helper";
+import {getRtopsShowAddIOCForm} from "../redux/selectors";
 import {ActionCreators} from "../redux/rootActions";
 import {EmbeddedDashboard} from "./embeddedDashboard";
 

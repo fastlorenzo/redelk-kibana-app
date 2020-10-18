@@ -2,8 +2,8 @@ import {EuiBreadcrumb} from '@elastic/eui';
 import {ChromeBadge, ChromeBrand, ChromeHelpExtension, CoreStart} from "kibana/public";
 import {useEffect} from 'react';
 import {useDispatch} from 'react-redux';
-import {PLUGIN_NAME} from "../common";
-import {ActionCreators} from "./redux/rootActions";
+import {PLUGIN_NAME} from "../../common";
+import {ActionCreators} from "../redux/rootActions";
 
 export const setNavHeader = (core: CoreStart, breadcrumbs: EuiBreadcrumb[]) => {
   const darkMode: boolean = core.uiSettings.get('theme:darkMode');

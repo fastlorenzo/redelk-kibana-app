@@ -1,5 +1,5 @@
 import React from 'react';
-import {useTopNav} from "../navHeaderHelper";
+import {useTopNav} from "../helpers/nav_header_helper";
 import {EmbeddedDashboard} from "./embeddedDashboard";
 
 export const TTPPage = () => {

@@ -1,7 +1,7 @@
 import React from 'react';
-import {useTopNav} from "../navHeaderHelper";
+import {useTopNav} from "../helpers/nav_header_helper";
 
-export const IframePage = ({url}: {url: string}) => {
+export const IframePage = ({url}: { url: string }) => {
 
   useTopNav(false);
 

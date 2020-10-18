@@ -82,17 +82,17 @@ export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart
       },
     });
 
-    core.application.register({
-      id: 'redelk:attack-navigator',
-      title: 'MITRE ATT&CK Navigator',
-      category: redelkCategory,
-      async mount() {
-        window.open(window.location.protocol + '//' + window.location.host + '/attack-navigator', '_blank');
-        window.history.back();
-        return () => {
-        }
-      }
-    });
+    // core.application.register({
+    //   id: 'redelk:attack-navigator',
+    //   title: 'MITRE ATT&CK Navigator',
+    //   category: redelkCategory,
+    //   async mount() {
+    //     window.open(window.location.protocol + '//' + window.location.host + '/attack-navigator', '_blank');
+    //     window.history.back();
+    //     return () => {
+    //     }
+    //   }
+    // });
 
     core.application.register({
       id: 'redelk:jupyter-notebook',

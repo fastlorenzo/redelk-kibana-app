@@ -26,6 +26,7 @@ export interface RedelkPluginStartDependencies {
   share: SharePluginStart;
   uiSettings: UiSettingsServiceStart;
 }
+
 export type RedelkKibanaService = RedelkPluginStartDependencies & CoreStart;
 
 export interface RedelkPluginSetupDependencies {
