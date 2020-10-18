@@ -94,5 +94,12 @@ export const routes: RedelkAppRoute[] = [
     path: '/ttp',
     icon: 'aggregate'
   },
+  {
+    id: 'attack-navigator',
+    name: 'MITRE ATT&CK Navigator',
+    disabled: false,
+    path: '/attack-navigator',
+    icon: 'branch'
+  },
 ];
 
