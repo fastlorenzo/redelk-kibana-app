@@ -12,10 +12,10 @@ This application is compatible with Elastic stack v7.9.2+
 
 ## Screenshots
 
-![Summary dashboard](/screenshots/redelk-summary-dark.png "Summary dashboard")
-![IOC dashboard](/screenshots/redelk-ioc-dark.png "IOC dashboard")
-![IOC manual ingestion](/screenshots/redelk-ioc-add-dark.png "IOC manual ingestion")
-![Navigation](/screenshots/redelk-navigation.png "Navigation")
+![Summary dashboard](screenshots/redelk-summary-dark.png "Summary dashboard")
+![IOC dashboard](screenshots/redelk-ioc-dark.png "IOC dashboard")
+![IOC manual ingestion](screenshots/redelk-ioc-add-dark.png "IOC manual ingestion")
+![Navigation](screenshots/redelk-navigation.png "Navigation")
 
 ## Development
 
@@ -33,3 +33,6 @@ Thanks to the following persons for bringing RedELK to life:
 - Mark Bergman (@xychix on Github and Twitter)
 
 Do not hesitate to bring up ideas by opening an issue or contributing via pull requests.
+
+## Known bugs / limitations
+

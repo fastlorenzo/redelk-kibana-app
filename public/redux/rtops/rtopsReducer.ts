@@ -7,7 +7,8 @@ const initialState: RtopsState = {
   status: KbnCallStatus.idle,
   error: null,
   rtops: undefined,
-  showAddIOCForm: false
+  showAddIOCForm: false,
+  lastRefresh: undefined
 };
 
 export const rtopsReducer = createReducer<RtopsState>(initialState, {
@@ -23,7 +24,8 @@ export const rtopsReducer = createReducer<RtopsState>(initialState, {
       ...state,
       rtops: action.payload,
       status: KbnCallStatus.success,
-      error: null
+      error: null,
+      lastRefresh: new Date()
     };
   },
   [ActionType.RTOPS_FETCH_ALL_REQUEST_FAILURE](state: RtopsState, action: Action<any>) {

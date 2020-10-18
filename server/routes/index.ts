@@ -116,7 +116,8 @@ export function defineRoutes(router: IRouter) {
       validate: {
         body: schema.object({
           ioc: schema.object({
-            type: schema.string()
+            type: schema.string(),
+            domain: schema.string()
           }),
           file: schema.object({
             name: schema.string(),

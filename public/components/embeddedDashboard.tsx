@@ -1,31 +1,34 @@
 import React, {useEffect, useState} from 'react';
 import {SimpleSavedObject} from "kibana/public";
 import {DashboardContainerInput, SavedObjectDashboard} from '../../../../src/plugins/dashboard/public';
-import {getAppState, getRtopsHits} from "../selectors";
+import {getAppState, getRtopsLastRefreshDate} from "../selectors";
 import {useDispatch, useSelector} from 'react-redux';
 import {savedObjectToDashboardContainerInput} from '../dashboard_helper';
 import {useKibana} from '../../../../src/plugins/kibana_react/public';
 import {ActionCreators} from "../redux/rootActions";
 import {TopNavMenuData} from '../../../../src/plugins/navigation/public';
 import {concat} from 'lodash';
+import {RedelkKibanaService} from "../types";
+
 
 export const EmbeddedDashboard = ({dashboardId, extraTopNavMenu}: { dashboardId: string, extraTopNavMenu?: TopNavMenuData[] }) => {
 
   const [dashboardDef, setDashboardDef] = useState<SimpleSavedObject<SavedObjectDashboard>>();
   const [dashboardConfig, setDashboardConfig] = useState<DashboardContainerInput>();
+  // const [dashboard, setDashboard] = useState<ReactElement>(<p>Loading dashboard</p>);
 
   const dispatch = useDispatch();
-  const kibana = useKibana();
+  const {services}: {services: RedelkKibanaService} = useKibana();
 
   const appState = useSelector(getAppState);
-  const rtops = useSelector(getRtopsHits);
+  const rtopsLastRefreshDate = useSelector(getRtopsLastRefreshDate);
 
   useEffect(() => {
     let topNav: TopNavMenuData[] = [{
       id: "go-to-dashboard",
       label: "Open in dashboard app",
       run: () => {
-        kibana.services.application?.navigateToApp('dashboards', {path: "#/view/" + dashboardId})
+        services.application?.navigateToApp('dashboards', {path: "#/view/" + dashboardId})
       }
     }];
     if (extraTopNavMenu !== undefined) {
@@ -35,28 +38,26 @@ export const EmbeddedDashboard = ({dashboardId, extraTopNavMenu}: { dashboardId:
     return () => {
       dispatch(ActionCreators.setTopNavMenu([]))
     }
-  }, [])
+  }, []);
 
-  let dashboard = (<p>Loading dashboard</p>);
-
+  let dashboard;
   useEffect(() => {
     if (dashboardDef !== undefined) {
-      setDashboardConfig(savedObjectToDashboardContainerInput(dashboardDef, appState));
+      setDashboardConfig(savedObjectToDashboardContainerInput(dashboardDef, appState, rtopsLastRefreshDate));
     }
-  }, [rtops, dashboardDef, appState]);
+  }, [dashboardDef, appState, rtopsLastRefreshDate]);
 
   if (dashboardConfig) {
     dashboard = (
-      <kibana.services.dashboard.DashboardContainerByValueRenderer input={dashboardConfig}
-                                                                   onInputUpdated={setDashboardConfig}/>
+      <services.dashboard.DashboardContainerByValueRenderer input={dashboardConfig} onInputUpdated={setDashboardConfig} />
     );
   }
 
   useEffect(() => {
-    kibana.services.savedObjects?.client?.get("dashboard", dashboardId).then(res => {
-      setDashboardDef(res);
+    services.savedObjects?.client?.get("dashboard", dashboardId).then(res => {
+      setDashboardDef(res as SimpleSavedObject<SavedObjectDashboard>);
     })
-  }, [rtops])
+  }, [])
 
   return (
     <div id="dashboardPage">

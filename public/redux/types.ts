@@ -70,11 +70,13 @@ export interface RtopsState {
   error: string | undefined | null;
   rtops: EsAnswerRtops | undefined;
   showAddIOCForm: boolean;
-  hiddenFilters?: Filter[]
+  hiddenFilters?: Filter[];
+  lastRefresh?: Date;
 }
 
 export interface CreateIOCTypeIOC {
   type: string;
+  domain: string;
 }
 
 export interface CreateIOCType {

@@ -6,7 +6,15 @@ import {EmbeddableInput, ViewMode} from '../../../src/plugins/embeddable/public'
 import {AppState} from "./redux/types";
 import {find} from "lodash";
 
-export const savedObjectToDashboardContainerInput = (savedObj: SimpleSavedObject<SavedObjectDashboard>, appState: AppState): DashboardContainerInput => {
+const uuidv4 = (): string => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
+
+export const savedObjectToDashboardContainerInput = (savedObj: SimpleSavedObject<SavedObjectDashboard>, appState: AppState, lastRefreshDate?: Date): DashboardContainerInput => {
   const initialInput: DashboardContainerInput = {
     viewMode: ViewMode.VIEW,
     panels: {
@@ -28,7 +36,7 @@ export const savedObjectToDashboardContainerInput = (savedObj: SimpleSavedObject
     isFullScreenMode: false,
     filters: [],
     useMargins: false,
-    id: 'random-id',
+    id: uuidv4(),
     timeRange: {
       to: 'now',
       from: 'now-1y',
@@ -73,7 +81,7 @@ export const savedObjectToDashboardContainerInput = (savedObj: SimpleSavedObject
       id: savedObj.id,
       timeRange: {
         from: appState.time?.from || savedObj.attributes.timeFrom || "",
-        to: appState.time?.to || savedObj.attributes.timeTo || ""
+        to: appState.time?.to || savedObj.attributes.timeTo || "",
       },
       title: savedObj.attributes.title,
       query: appState.query || {
@@ -82,9 +90,10 @@ export const savedObjectToDashboardContainerInput = (savedObj: SimpleSavedObject
       },
       isFullScreenMode: false,
       refreshConfig: {
-        pause: true,
-        value: 15,
+        pause: false,
+        value: 5,
       },
+      lastReloadRequestTime: lastRefreshDate?.getTime() || new Date().getTime()
     }
     return dashboardConfig;
   }

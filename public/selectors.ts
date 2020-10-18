@@ -41,4 +41,7 @@ export const getRtopsFilteredIOC = createSelector(
   [getRtopsHits],
   (rtops) => filter(rtops, r => r._source?.c2?.log?.type === 'ioc')
 )
+export const getRtopsLastRefreshDate = createSelector(
+  [getRtopsState], (rtopsState) => rtopsState.lastRefresh
+)
 
