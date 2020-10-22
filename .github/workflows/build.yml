@@ -21,4 +21,4 @@ jobs:
         repository: fastlorenzo/redelk-kibana-app
         path: ./kibana/plugins/redelk
     - name: Yarn bootstrap
-      run: yarn kbn bootstrap
+      run: ls -l && pwd && ls -l kibana/plugins/redelk
