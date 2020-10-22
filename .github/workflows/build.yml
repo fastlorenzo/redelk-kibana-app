@@ -42,3 +42,9 @@ jobs:
       run: cd ./kibana/plugins/redelk && yarn kbn bootstrap
     - name: Build RedELK plugin
       run: cd ./kibana/plugins/redelk && yarn build
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: plugin-zip
+        path: |
+          ./kibana/plugins/redelk/build/*.zip
