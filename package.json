@@ -1,6 +1,6 @@
 {
   "name": "redelk",
-  "version": "v0.1-alpha.4",
+  "version": "v0.1-beta.1",
   "main": "plugins/redelk",
   "kibana": {
     "version": "7.9.2",
