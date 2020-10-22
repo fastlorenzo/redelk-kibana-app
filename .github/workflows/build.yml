@@ -5,7 +5,9 @@ name: Manual workflow
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
 on:
-  workflow_dispatch:
+  push:
+    branches:
+    - main
 
 jobs:
   build:
@@ -21,4 +23,4 @@ jobs:
         repository: fastlorenzo/redelk-kibana-app
         path: ./kibana/plugins/redelk
     - name: Yarn bootstrap
-      run: ls -l && pwd && ls -l kibana/plugins/redelk
+      run: cd ./kibana/plugins/redelk && yarn kbn bootstrap
