@@ -26,5 +26,19 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 10.22.1
-    - name: Yarn bootstrap
+    - name: Cache node modules
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-node-modules
+      with:
+        # npm cache files are stored in `~/.npm` on Linux/macOS
+        path: ./kibana/node_modules
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('./kibana/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+    - name: Bootstrap Kibana
       run: cd ./kibana/plugins/redelk && yarn kbn bootstrap
+    - name: Build RedELK plugin
+      run: cd ./kibana/plugins/redelk && yarn build
