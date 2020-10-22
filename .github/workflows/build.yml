@@ -22,5 +22,9 @@ jobs:
       with:
         repository: fastlorenzo/redelk-kibana-app
         path: ./kibana/plugins/redelk
+    - name: Use Node.js 10.22.1
+      uses: actions/setup-node@v1
+      with:
+        node-version: 10.22.1
     - name: Yarn bootstrap
       run: cd ./kibana/plugins/redelk && yarn kbn bootstrap
