@@ -1,0 +1,54 @@
+name: Build Kibana app & release
+
+on:
+  push:
+    tags:
+    - 'v*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+      with:
+        repository: elastic/kibana
+        path: ./kibana
+        ref: 7.9
+    - uses: actions/checkout@master
+      with:
+        repository: fastlorenzo/redelk-kibana-app
+        path: ./kibana/plugins/redelk
+    - name: Use Node.js 10.22.1
+      uses: actions/setup-node@v1
+      with:
+        node-version: 10.22.1
+    - name: Cache node modules
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-node-modules
+      with:
+        # npm cache files are stored in `~/.npm` on Linux/macOS
+        path: ./kibana/node_modules
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles("./kibana/yarn.lock") }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+    - name: Bootstrap Kibana
+      run: cd ./kibana/plugins/redelk && yarn kbn bootstrap
+    - name: Build RedELK plugin
+      run: cd ./kibana/plugins/redelk && yarn build
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: plugin-zip
+        path: |
+          ./kibana/plugins/redelk/build/*.zip
+    - name: Upload zip to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ./kibana/plugins/redelk/build/*.zip
+        tag: ${{ github.ref }}
+        overwrite: true
+        file_glob: true
