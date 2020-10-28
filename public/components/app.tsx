@@ -55,7 +55,7 @@ import {ScreenshotsPage} from "./screenshotsPage";
 import {TasksPage} from "./tasksPage";
 import {TrafficPage} from "./trafficPage";
 import {TTPPage} from "./ttpPage";
-import {IframePage} from "./iframePage";
+import {AttackNavigatorPage} from "./attackNavigatorPage";
 import {initSettings} from "../helpers/settings_helper";
 
 interface RedelkAppDeps {
@@ -434,8 +434,7 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
       <Route path="/tasks" exact component={TasksPage}/>
       <Route path="/traffic" exact component={TrafficPage}/>
       <Route path="/ttp" exact component={TTPPage}/>
-      <Route path="/attack-navigator" exact
-             component={() => IframePage({url: "/plugins/redelk/assets/attack-navigator/"})}/>
+      <Route path="/attack-navigator" exact component={AttackNavigatorPage} />
 
       <Route path="/summary" exact
              render={() =>

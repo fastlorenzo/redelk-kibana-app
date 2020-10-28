@@ -5,7 +5,8 @@ import {
   RedelkPluginStart,
   RedelkPluginStartDependencies
 } from './types';
-import {PLUGIN_NAME} from '../common';
+import {PLUGIN_ID, PLUGIN_NAME} from '../common';
+import {routes} from "./routes";
 
 export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart> {
   initializerContext: PluginInitializerContext;
@@ -111,8 +112,23 @@ export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart
       title: 'Neo4J Browser',
       category: redelkCategory,
       async mount() {
-        window.open(window.location.protocol + '//' + window.location.host + '/neo4j', '_blank');
+        window.open(window.location.protocol + '//' + window.location.host + '/neo4jbrowser', '_blank');
         window.history.back();
+        return () => {
+        }
+      }
+    });
+
+    core.application.register({
+      id: 'redelk:attack-navigator',
+      title: 'MITRE ATT&CK Navigator',
+      category: redelkCategory,
+      async mount() {
+        const [coreStart] = await core.getStartServices();
+
+        coreStart.application.navigateToApp(PLUGIN_ID, {
+          path: routes.find(r => r.id === 'attack-navigator')!.path || "/"
+        })
         return () => {
         }
       }
@@ -120,14 +136,6 @@ export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart
 
     // Return methods that should be available to other plugins
     return {
-      // getGreeting() {
-      //   return i18n.translate('redelk.greetingText', {
-      //     defaultMessage: 'Hello from {name}!',
-      //     values: {
-      //       name: PLUGIN_NAME,
-      //     },
-      //   });
-      // },
     };
   }
 
