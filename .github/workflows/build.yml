@@ -3,7 +3,7 @@ name: Build Kibana app & release
 on:
   push:
     tags:
-    - 'v*
+    - 'v*'
 
 jobs:
   build:
