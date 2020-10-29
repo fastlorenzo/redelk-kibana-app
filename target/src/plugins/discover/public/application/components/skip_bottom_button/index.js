@@ -1,0 +1,24 @@
+"use strict";
+/*
+ * Licensed to Elasticsearch B.V. under one or more contributor
+ * license agreements. See the NOTICE file distributed with
+ * this work for additional information regarding copyright
+ * ownership. Elasticsearch B.V. licenses this file to you under
+ * the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+Object.defineProperty(exports, "__esModule", { value: true });
+var skip_bottom_button_1 = require("./skip_bottom_button");
+Object.defineProperty(exports, "SkipBottomButton", { enumerable: true, get: function () { return skip_bottom_button_1.SkipBottomButton; } });
+var skip_bottom_button_directive_1 = require("./skip_bottom_button_directive");
+Object.defineProperty(exports, "createSkipBottomButtonDirective", { enumerable: true, get: function () { return skip_bottom_button_directive_1.createSkipBottomButtonDirective; } });

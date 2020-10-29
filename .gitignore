@@ -1,5 +1,4 @@
 .idea/
-target/
 node_modules/
 build/
 server/templates/diff/
