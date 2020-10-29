@@ -36,8 +36,10 @@ jobs:
           ${{ runner.os }}-
     - name: Bootstrap Kibana
       run: cd ./kibana/plugins/redelk && yarn kbn bootstrap
+    - name: Fix redux-toolkit
+      run: sed -i 's/^const /^let /g' ./kibana/plugins/redelk/node_modules/@reduxjs/toolkit/dist/redux-toolkit.cjs.development.js
     - name: Run optimizer manually (https://github.com/elastic/kibana/issues/70426)
-      run: cd ./kibana/plugins/redelk && node ../../scripts/build_kibana_platform_plugins --verbose --no-examples
+      run: cd ./kibana/plugins/redelk && node ../../scripts/build_kibana_platform_plugins --verbose --no-examples --dist --filter redelk
     - name: Build RedELK plugin
       run: cd ./kibana/plugins/redelk && yarn build
     - name: Archive production artifacts

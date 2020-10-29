@@ -5,5 +5,5 @@
   "ui": true,
   "requiredPlugins": ["navigation", "data", "dashboard", "embeddable", "visualizations", "visualize", "share"],
   "optionalPlugins": [],
-  "requiredBundles": ["kibanaUtils", "kibanaReact"]
+  "requiredBundles": []
 }
