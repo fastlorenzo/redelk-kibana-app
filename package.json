@@ -1,6 +1,6 @@
 {
   "name": "redelk",
-  "version": "0.2.0",
+  "version": "v0.2.0",
   "private": true,
   "kibana": {
     "version": "7.10.0",
