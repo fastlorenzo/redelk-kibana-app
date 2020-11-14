@@ -291,8 +291,7 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
         text: PLUGIN_NAME
       },
       {
-        onClick: (e) => {
-        },
+        onClick: () => {},
         text: (
           <EuiPopover
             id="singlePanel"
@@ -382,6 +381,9 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
       }
       // If the state contains a filter
       if (appState.filters !== undefined || appState.time !== undefined) {
+        if (searchOpts.params.body === undefined) {
+          searchOpts.params.body = {}
+        }
         searchOpts.params.body.query = {
           bool: esQueryFilters
         }
