@@ -1,9 +1,9 @@
 {
   "id": "redelk",
-  "version": "7.9.2",
+  "version": "7.10.0",
   "server": true,
   "ui": true,
-  "requiredPlugins": ["navigation", "data", "dashboard", "embeddable", "visualizations", "visualize", "share"],
+  "requiredPlugins": ["navigation", "data", "dashboard", "embeddable", "visualizations", "visualize", "share", "kibanaReact", "kibanaUtils"],
   "optionalPlugins": [],
   "requiredBundles": []
 }

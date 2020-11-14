@@ -1,3 +1,41 @@
+/*
+ * Part of RedELK
+ *
+ * BSD 3-Clause License
+ *
+ * Copyright (c) 2020, Lorenzo Bernardi
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *
+ *     * Neither the name of the <organization> nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * Authors:
+ * - Lorenzo Bernardi
+ */
+
 import React from 'react';
 import {CoreStart} from "kibana/public";
 import {NavigationPublicPluginStart} from '../../../../src/plugins/navigation/public';
@@ -5,7 +43,6 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiIcon,
-  EuiKeyPadMenuItem,
   EuiLoadingSpinner,
   EuiPage,
   EuiPageBody,
@@ -100,59 +137,6 @@ export const SummaryPage = ({basename, notifications, http, navigation}: RedelkA
         </Chart>
       ) : (<EuiLoadingSpinner size="xl"/>);
   }
-  // const VISUALIZATIONS = [
-  //   {
-  //     name: "hosts",
-  //     id: "b19d4790-d35f-11ea-9301-a30a04251ae9"
-  //   }, {
-  //     name: "credentials",
-  //     id: "dcf86190-d319-11ea-9301-a30a04251ae9"
-  //   }, {
-  //     name: "downloads",
-  //     id: "b5beb3c0-d04b-11ea-9301-a30a04251ae9"
-  //   }, {
-  //     name: "screenshots",
-  //     id: "389dddc0-d317-11ea-9301-a30a04251ae9"
-  //   }
-  // ]
-  // console.log(kibana.services.visualizations.get("metric"));
-  // useEffect(() => {
-  //   const embFact: EmbeddableFactory = kibana.services.embeddable.getEmbeddableFactory("visualization");
-  //   VISUALIZATIONS.forEach(viz => {
-  //     embFact.createFromSavedObject(viz.id, {
-  //       id: viz.id + '-' + viz.name,
-  //       viewMode: ViewMode.VIEW,
-  //       lastReloadRequestTime: 0
-  //     }).then(res => {
-  //       console.log("embed", res);
-  //       const vizEmb = res as VisualizeEmbeddable;
-  //       const elem = window.document.getElementById("summary-embedded-viz-" + viz.name);
-  //       if (elem) {
-  //         elem.innerHTML = "";
-  //         console.log('Rendering viz: ' + viz.name);
-  //         vizEmb.render(elem);
-  //       }
-  //     })
-  //   })
-  // }, [ioc]);
-
-
-  // const embeddedViz = (
-  //   <EuiFlexGroup>
-  //     <EuiFlexItem>
-  //       <div className="summary-embedded-viz" id="summary-embedded-viz-hosts"></div>
-  //     </EuiFlexItem>
-  //     <EuiFlexItem>
-  //       <div className="summary-embedded-viz" id="summary-embedded-viz-credentials"></div>
-  //     </EuiFlexItem>
-  //     <EuiFlexItem>
-  //       <div className="summary-embedded-viz" id="summary-embedded-viz-downloads"></div>
-  //     </EuiFlexItem>
-  //     <EuiFlexItem>
-  //       <div className="summary-embedded-viz" id="summary-embedded-viz-screenshots"></div>
-  //     </EuiFlexItem>
-  //   </EuiFlexGroup>
-  // );
 
   const totalHosts = rtopsAggs?.perHostName?.buckets?.length || 0;
   const totalUsers = rtopsAggs?.perUserName?.buckets?.length || 0;
@@ -169,122 +153,68 @@ export const SummaryPage = ({basename, notifications, http, navigation}: RedelkA
 
             {/* Alarms */}
             <EuiFlexItem>
-              <EuiKeyPadMenuItem
-                label=""
-                className="redelk-stat-menu-item"
-                betaBadgeLabel="Alarms"
-                betaBadgeTooltipContent="Go to Alarms dashboard."
-                betaBadgeIconType="popout"
-                onClick={() => kibana.services.application?.navigateToApp('dashboards', {path: "#/view/53b69200-d4e3-11ea-9301-a30a04251ae9"})}
-              >
-                <EuiStat
-                  title="--"
-                  description={(<><EuiIcon type="alert"/> Alarms</>)}
-                  textAlign="left"
-                  reverse
-                  isLoading={rtopsStatus === KbnCallStatus.pending}
-                />
-              </EuiKeyPadMenuItem>
+              <EuiStat
+                title="--"
+                description={(<><EuiIcon type="alert"/> Alarms</>)}
+                textAlign="left"
+                reverse
+                isLoading={rtopsStatus === KbnCallStatus.pending}
+              />
             </EuiFlexItem>
 
             {/* Implants */}
             <EuiFlexItem>
-              <EuiKeyPadMenuItem
-                label=""
-                className="redelk-stat-menu-item"
-                betaBadgeLabel="Implants"
-                betaBadgeTooltipContent="Go to Implants dashboard."
-                betaBadgeIconType="popout"
-                onClick={() => kibana.services.application?.navigateToApp('dashboards', {path: "#/view/117dbba0-c6f5-11e8-a9c6-cd307b96b1ba"})}
-              >
-                <EuiStat
-                  title={totalImplants}
-                  description={(<><EuiIcon type="bug"/> Implants</>)}
-                  textAlign="left"
-                  reverse
-                  isLoading={rtopsStatus === KbnCallStatus.pending}
-                />
-              </EuiKeyPadMenuItem>
+              <EuiStat
+                title={totalImplants}
+                description={(<><EuiIcon type="bug"/> Implants</>)}
+                textAlign="left"
+                reverse
+                isLoading={rtopsStatus === KbnCallStatus.pending}
+              />
             </EuiFlexItem>
 
             {/* IOC */}
             <EuiFlexItem>
-              <EuiKeyPadMenuItem
-                label=""
-                className="redelk-stat-menu-item"
-                betaBadgeLabel="IOC"
-                betaBadgeTooltipContent="Go to IOC dashboard."
-                betaBadgeIconType="popout"
-                onClick={() => kibana.services.application?.navigateToApp('dashboards', {path: "#/view/86643e90-d4e4-11ea-9301-a30a04251ae9"})}
-              >
-                <EuiStat
-                  title={totalIOC}
-                  description={(<><EuiIcon type="securitySignal"/> IOC</>)}
-                  textAlign="left"
-                  reverse
-                  isLoading={rtopsStatus === KbnCallStatus.pending}
-                />
-              </EuiKeyPadMenuItem>
+              <EuiStat
+                title={totalIOC}
+                description={(<><EuiIcon type="securitySignal"/> IOC</>)}
+                textAlign="left"
+                reverse
+                isLoading={rtopsStatus === KbnCallStatus.pending}
+              />
             </EuiFlexItem>
 
             {/* Downloads */}
             <EuiFlexItem>
-              <EuiKeyPadMenuItem
-                label=""
-                className="redelk-stat-menu-item"
-                betaBadgeLabel="Downloads"
-                betaBadgeTooltipContent="Go to Downloads dashboard."
-                betaBadgeIconType="popout"
-                onClick={() => kibana.services.application?.navigateToApp('dashboards', {path: "#/view/643de010-d04c-11ea-9301-a30a04251ae9"})}
-              >
-                <EuiStat
-                  title={totalDownloads}
-                  description={(<><EuiIcon type="download"/> Downloads</>)}
-                  textAlign="left"
-                  reverse
-                  isLoading={rtopsStatus === KbnCallStatus.pending}
-                />
-              </EuiKeyPadMenuItem>
+              <EuiStat
+                title={totalDownloads}
+                description={(<><EuiIcon type="download"/> Downloads</>)}
+                textAlign="left"
+                reverse
+                isLoading={rtopsStatus === KbnCallStatus.pending}
+              />
             </EuiFlexItem>
 
             {/* Hosts */}
             <EuiFlexItem>
-              <EuiKeyPadMenuItem
-                label=""
-                className="redelk-stat-menu-item"
-                betaBadgeLabel="Red Team Operations"
-                betaBadgeTooltipContent="Go to Red Team Operations dashboard."
-                betaBadgeIconType="popout"
-                onClick={() => kibana.services.application?.navigateToApp('dashboards', {path: "#/view/04b87c50-d028-11ea-9301-a30a04251ae9"})}
-              >
-                <EuiStat
-                  title={totalHosts}
-                  description={(<><EuiIcon type="grid"/> Hosts</>)}
-                  textAlign="left"
-                  reverse
-                  isLoading={rtopsStatus === KbnCallStatus.pending}
-                />
-              </EuiKeyPadMenuItem>
+              <EuiStat
+                title={totalHosts}
+                description={(<><EuiIcon type="grid"/> Hosts</>)}
+                textAlign="left"
+                reverse
+                isLoading={rtopsStatus === KbnCallStatus.pending}
+              />
             </EuiFlexItem>
 
             {/* Users */}
             <EuiFlexItem>
-              <EuiKeyPadMenuItem
-                label=""
-                className="redelk-stat-menu-item"
-                betaBadgeLabel="Red Team Operations"
-                betaBadgeTooltipContent="Go to Red Team Operations dashboard."
-                betaBadgeIconType="popout"
-                onClick={() => kibana.services.application?.navigateToApp('dashboards', {path: "#/view/04b87c50-d028-11ea-9301-a30a04251ae9"})}
-              >
-                <EuiStat
-                  title={totalUsers}
-                  description={(<><EuiIcon type="users"/> Users</>)}
-                  textAlign="left"
-                  reverse
-                  isLoading={rtopsStatus === KbnCallStatus.pending}
-                />
-              </EuiKeyPadMenuItem>
+              <EuiStat
+                title={totalUsers}
+                description={(<><EuiIcon type="users"/> Users</>)}
+                textAlign="left"
+                reverse
+                isLoading={rtopsStatus === KbnCallStatus.pending}
+              />
             </EuiFlexItem>
 
           </EuiFlexGroup>
