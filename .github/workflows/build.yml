@@ -13,7 +13,7 @@ jobs:
       with:
         repository: elastic/kibana
         path: ./kibana
-        ref: 7.10
+        ref: v7.10.0
     - uses: actions/checkout@master
       with:
         repository: fastlorenzo/redelk-kibana-app
