@@ -39,14 +39,27 @@
 import React from 'react';
 import {useTopNav} from "../helpers/nav_header_helper";
 import {EmbeddedDashboard} from "./embeddedDashboard";
+import {useKibana} from '../../../../src/plugins/kibana_react/public';
+import {TopNavMenuData} from '../../../../src/plugins/navigation/public';
+import {RedelkKibanaService} from "../types";
 
 export const TrafficPage = () => {
 
   useTopNav(true);
 
+  const {services}: { services: RedelkKibanaService } = useKibana();
+
+  const discoverTopNav: TopNavMenuData = {
+    id: "go-to-discover",
+    label: "Open in discover app",
+    run: () => {
+      services.application?.navigateToApp('discover', {path: "#/view/0f7dcd70-b982-11e8-94dd-171ae5c1fd1a"})
+    }
+  }
+
   return (
     <>
-      <EmbeddedDashboard dashboardId="0f8626d0-c6f4-11e8-a9c6-cd307b96b1ba"/>
+      <EmbeddedDashboard dashboardId="0f8626d0-c6f4-11e8-a9c6-cd307b96b1ba" extraTopNavMenu={[discoverTopNav]}/>
     </>
   );
 };

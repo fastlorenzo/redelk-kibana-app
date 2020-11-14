@@ -38,7 +38,7 @@
 
 import React from 'react';
 import {CoreStart} from "kibana/public";
-import {NavigationPublicPluginStart} from '../../../../src/plugins/navigation/public';
+import {NavigationPublicPluginStart, TopNavMenuData} from '../../../../src/plugins/navigation/public';
 import {EuiFlyout, EuiFlyoutBody, EuiFlyoutHeader, EuiTitle} from '@elastic/eui';
 import {AddIOCForm} from "../features/rtops/addIocForm";
 import {DataPublicPluginStart} from '../../../../src/plugins/data/public';
@@ -47,7 +47,8 @@ import {useTopNav} from "../helpers/nav_header_helper";
 import {getRtopsShowAddIOCForm} from "../redux/selectors";
 import {ActionCreators} from "../redux/rootActions";
 import {EmbeddedDashboard} from "./embeddedDashboard";
-
+import {useKibana} from '../../../../src/plugins/kibana_react/public';
+import {RedelkKibanaService} from "../types";
 
 interface IOCPageDeps {
   basename: string;
@@ -83,7 +84,15 @@ export const IOCPage = ({basename, notifications, http, navigation, data}: IOCPa
       </EuiFlyout>
     );
   }
+  const {services}: { services: RedelkKibanaService } = useKibana();
 
+  const discoverTopNav: TopNavMenuData = {
+    id: "go-to-discover",
+    label: "Open in discover app",
+    run: () => {
+      services.application?.navigateToApp('discover', {path: "#/view/4c003e20-b6aa-11e8-bc1a-cf8fa3255855"})
+    }
+  }
   const addIOCNavMenu = {
     id: "add-ioc",
     label: "Add IOC",
@@ -95,7 +104,8 @@ export const IOCPage = ({basename, notifications, http, navigation, data}: IOCPa
   return (
     <>
       {addIOCFlyout}
-      <EmbeddedDashboard dashboardId="86643e90-d4e4-11ea-9301-a30a04251ae9" extraTopNavMenu={[addIOCNavMenu]}/>
+      <EmbeddedDashboard dashboardId="86643e90-d4e4-11ea-9301-a30a04251ae9"
+                         extraTopNavMenu={[discoverTopNav, addIOCNavMenu]}/>
     </>
   )
 };

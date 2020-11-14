@@ -39,14 +39,35 @@
 import React from 'react';
 import {useTopNav} from "../helpers/nav_header_helper";
 import {EmbeddedDashboard} from "./embeddedDashboard";
+import {RedelkKibanaService} from "../types";
+import {useKibana} from '../../../../src/plugins/kibana_react/public';
+import {TopNavMenuData} from '../../../../src/plugins/navigation/public';
 
 export const AlarmsPage = () => {
 
   useTopNav(true);
 
+  const {services}: { services: RedelkKibanaService } = useKibana();
+
+  const discoverIOCTopNav: TopNavMenuData = {
+    id: "go-to-discover-ioc",
+    label: "Open in discover app (Alarmed IOC)",
+    run: () => {
+      services.application?.navigateToApp('discover', {path: "#/view/10da2290-d4e2-11ea-9301-a30a04251ae9"})
+    }
+  }
+  const discoverRedirtrafficTopNav: TopNavMenuData = {
+    id: "go-to-discover-redirtraffic",
+    label: "Open in discover app (Redirector traffic IOC)",
+    run: () => {
+      services.application?.navigateToApp('discover', {path: "#/view/658d7180-d4e1-11ea-9301-a30a04251ae9"})
+    }
+  }
+
   return (
     <>
-      <EmbeddedDashboard dashboardId="53b69200-d4e3-11ea-9301-a30a04251ae9"/>
+      <EmbeddedDashboard dashboardId="53b69200-d4e3-11ea-9301-a30a04251ae9"
+                         extraTopNavMenu={[discoverIOCTopNav, discoverRedirtrafficTopNav]}/>
     </>
   );
 };

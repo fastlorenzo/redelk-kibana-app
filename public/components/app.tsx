@@ -291,7 +291,8 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
         text: PLUGIN_NAME
       },
       {
-        onClick: () => {},
+        onClick: () => {
+        },
         text: (
           <EuiPopover
             id="singlePanel"
