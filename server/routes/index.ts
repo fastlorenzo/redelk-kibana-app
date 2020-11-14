@@ -52,20 +52,8 @@ import path from 'path';
 import {IndexPattern} from 'src/plugins/data/public';
 import {merge} from 'lodash';
 
-interface Hit {
-  health: string;
-  status: string;
-  index: string;
-  uuid: string;
-  pri: string;
-  rep: string;
-  'docs.count': any;
-  'store.size': any;
-  sth: 'true' | 'false';
-  hidden: boolean;
-}
-
 const INDEX_PATTERN_REGEXP = /^redelk_kibana_index-pattern_(.*)\.ndjson/;
+const INDEX_TEMPLATE_REGEXP = /^redelk_elasticsearch_template_(.*)\.json/;
 const importSavedObject = async (filePath: string, context: RequestHandlerContext, objType: string) => {
   console.log('Importing ' + objType + ' [' + filePath + ']');
   const ds = fs.createReadStream(filePath);
@@ -85,6 +73,32 @@ const importSavedObject = async (filePath: string, context: RequestHandlerContex
     result: result
   };
 }
+const importIndexTemplate = async (filePath: string, context: RequestHandlerContext, templateName: string) => {
+  console.log('Importing Elasticsearch index template ' + templateName + ' [' + filePath + ']');
+
+  try {
+    const tmpl: Buffer = fs.readFileSync(filePath);
+    const callAsCurrentUser = context.core.elasticsearch.legacy.client.callAsCurrentUser;
+    const tmplJson: object = JSON.parse(tmpl.toString());
+    const result = await callAsCurrentUser('indices.putTemplate', {
+      name: templateName,
+      body: tmplJson
+    })
+    return {
+      type: 'index-template',
+      fileName: filePath,
+      result: result
+    }
+  } catch (e) {
+    console.error('Error import index-template: ' + templateName + ' [' + filePath + ']')
+    console.error(e);
+    return {
+      type: 'index-template',
+      fileName: filePath,
+      result: e.message
+    }
+  }
+}
 const checkRtops = async (client: Pick<SavedObjectsClient, "get" | "delete" | "errors" | "create" | "bulkCreate" | "find" | "bulkGet" | "update" | "addToNamespaces" | "deleteFromNamespaces" | "bulkUpdate">) => {
   try {
     const rtops_ip: SavedObject<IndexPattern> = await client.get("index-pattern", "rtops");
@@ -96,32 +110,6 @@ const checkRtops = async (client: Pick<SavedObjectsClient, "get" | "delete" | "e
 
 export function defineRoutes(router: IRouter) {
 
-  router.get(
-    {
-      path: '/api/redelk/indices',
-      validate: false,
-    },
-    async (context, request, response) => {
-      console.log('Called');
-      const callAsCurrentUser = context.core.elasticsearch.legacy.client.callAsCurrentUser;
-
-      const catQuery = {
-        format: 'json',
-        h: 'health,status,index,uuid,pri,rep,docs.count,sth,store.size',
-        expand_wildcards: 'hidden,all'
-      };
-      const catHits: Hit[] = await callAsCurrentUser('transport.request', {
-        method: 'GET',
-        path: '/_cat/indices',
-        query: catQuery
-      });
-      return response.ok({
-        body: {
-          response: catHits
-        },
-      });
-    }
-  );
   router.get(
     {
       path: '/api/redelk/ioc',
@@ -216,7 +204,7 @@ export function defineRoutes(router: IRouter) {
     },
     async (context, request, response) => {
       console.log('Checking RedELK initialization');
-      const results: { type: string, fileName: string, result: SavedObjectsImportResponse }[] = [];
+      const results: { type: string, fileName: string, result: SavedObjectsImportResponse | null | object }[] = [];
       try {
         const rtops_ip_exists = await checkRtops(context.core.savedObjects.client);
         // rtops-* index-pattern not found, initializing
@@ -227,6 +215,10 @@ export function defineRoutes(router: IRouter) {
             const match = tmpl.match(INDEX_PATTERN_REGEXP);
             if (match !== null) {
               results.push(await importSavedObject(path.join(templatesDir, match[0]), context, 'index-pattern'));
+            }
+            const matchIndexTemplate = tmpl.match(INDEX_TEMPLATE_REGEXP);
+            if (matchIndexTemplate !== null) {
+              results.push(await importIndexTemplate(path.join(templatesDir, matchIndexTemplate[0]), context, matchIndexTemplate[1]));
             }
           }
           results.push(await importSavedObject(path.join(templatesDir, 'redelk_kibana_search.ndjson'), context, 'search'));
