@@ -4,6 +4,7 @@
     "yarn.lock",
     "tsconfig.json",
     "{target,public,server,common}/**/*",
-    "kibana.json"
+    "kibana.json",
+    "public/assets"
   ]
 }

@@ -41,7 +41,7 @@ jobs:
 #    - name: Run optimizer manually (https://github.com/elastic/kibana/issues/70426)
 #      run: cd ./kibana/plugins/redelk && node ../../scripts/build_kibana_platform_plugins --verbose --no-examples --dist --filter redelk
     - name: Build RedELK plugin
-      run: cd ./kibana/plugins/redelk && yarn build
+      run: cd ./kibana/plugins/redelk && yarn build --skip-archive && mkdir build/kibana/redelk/public && cp -R public/assets/ build/kibana/redelk/public && cd build && zip redelk-7.10.0.zip kibana -r
     - name: Archive production artifacts
       uses: actions/upload-artifact@v2
       with:
