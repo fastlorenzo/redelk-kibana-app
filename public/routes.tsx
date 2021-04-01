@@ -139,5 +139,12 @@ export const routes: RedelkAppRoute[] = [
     path: '/attack-navigator',
     icon: 'branch'
   },
+  {
+    id: 'health',
+    name: 'Health',
+    disabled: false,
+    path: '/health',
+    icon: 'heart'
+  },
 ];
 

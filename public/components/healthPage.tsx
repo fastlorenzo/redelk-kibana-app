@@ -43,23 +43,31 @@ import {useKibana} from '../../../../src/plugins/kibana_react/public';
 import {TopNavMenuData} from '../../../../src/plugins/navigation/public';
 import {RedelkKibanaService} from "../types";
 
-export const ImplantsPage = () => {
+export const HealthPage = () => {
 
   useTopNav(true);
 
   const {services}: { services: RedelkKibanaService } = useKibana();
 
-  const discoverTopNav: TopNavMenuData = {
+  const discoverTopNavModules: TopNavMenuData = {
     id: "go-to-discover",
-    label: "Open in discover app",
+    label: "Open in discover app (Modules)",
     run: () => {
-      services.application?.navigateToApp('discover', {path: "#/view/68e8e870-b6aa-11e8-bc1a-cf8fa3255855"})
+      services.application?.navigateToApp('discover', {path: "#/view/654f76a0-9269-11eb-a753-9da683898c26"})
+    }
+  }
+
+  const discoverTopNavIPLists: TopNavMenuData = {
+    id: "go-to-discover",
+    label: "Open in discover app (IP Lists)",
+    run: () => {
+      services.application?.navigateToApp('discover', {path: "#/view/87530b40-9269-11eb-a753-9da683898c26"})
     }
   }
 
   return (
     <>
-      <EmbeddedDashboard dashboardId="117dbba0-c6f5-11e8-a9c6-cd307b96b1ba" extraTopNavMenu={[discoverTopNav]}/>
+      <EmbeddedDashboard dashboardId="509e6a80-926a-11eb-a753-9da683898c26" extraTopNavMenu={[discoverTopNavModules, discoverTopNavIPLists]}/>
     </>
   );
 };
