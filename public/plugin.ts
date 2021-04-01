@@ -173,8 +173,7 @@ export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart
     });
 
     // Return methods that should be available to other plugins
-    return {
-    };
+    return {};
   }
 
   public start(core: CoreStart, {data}: RedelkPluginStartDependencies): RedelkPluginStart {

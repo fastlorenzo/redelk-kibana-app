@@ -24,11 +24,11 @@ rm /tmp/esupcheck.txt
 #echo "Waiting 10s for Elasticsearch to be fully operational"
 #sleep 10 # just to give Elasticsearch some extra time.
 
-echo "Installing Elasticsearch index templates"
-curl -X POST "http://localhost:9200/_template/rtops" -H "Content-Type: application/json" -u $AUTH -d @./redelk_elasticsearch_template_rtops.json
+#echo "Installing Elasticsearch index templates"
+#curl -X POST "http://localhost:9200/_template/rtops" -H "Content-Type: application/json" -u $AUTH -d @./redelk_elasticsearch_template_rtops.json
 
-echo "Installing Kibana index pattern"
-curl -X POST "http://localhost:5601/api/saved_objects/_import?overwrite=true" -H 'kbn-xsrf: true' -u $AUTH -F file=@./redelk_kibana_index-pattern_rtops.ndjson
+#echo "Installing Kibana index pattern"
+#curl -X POST "http://localhost:5601/api/saved_objects/_import?overwrite=true" -H 'kbn-xsrf: true' -u $AUTH -F file=@./redelk_kibana_index-pattern_rtops.ndjson
 
 echo "Importing test data"
 elasticdump --input=rtops-2020.03.29.json --output=http://elastic:changeme@localhost:9200/rtops-2020.03.29

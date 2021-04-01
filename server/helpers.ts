@@ -42,3 +42,9 @@ const chance = new Chance();
 const CHARS_POOL = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
 
 export const getRandomString = () => `${chance.string({pool: CHARS_POOL})}-${Date.now()}`;
+
+export async function asyncForEach<T>(array: T[], callback: (item: T, index: Number, array: T[]) => void) {
+  for (let index = 0; index < array.length; index++) {
+    await callback(array[index], index, array);
+  }
+}

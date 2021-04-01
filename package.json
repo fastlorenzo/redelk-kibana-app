@@ -3,7 +3,7 @@
   "version": "v0.2.0",
   "private": true,
   "kibana": {
-    "version": "7.10.0",
+    "version": "7.10.2",
     "templateVersion": "1.0.0"
   },
   "license": "BSD-3-Clause",

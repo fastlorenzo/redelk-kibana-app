@@ -54,10 +54,12 @@
 #dashboardPage {
   min-height: calc(100vh - 250px);
 }
+
 #iframe-wrapper {
   height: calc(100vh - 49px);
   overflow: hidden;
   display: flex;
+
   iframe {
     height: 100%;
     width: 100%;

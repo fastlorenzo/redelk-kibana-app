@@ -36,8 +36,16 @@
  * - Lorenzo Bernardi
  */
 
-import * as ConfigActions from "./config/configActions";
-import * as RtopsActions from './rtops/rtopsActions';
-import * as IPListsActions from './iplists/iplistsActions';
+const IPV4_REGEX: string = '^((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))(\s?#\s?(.*))?$';
+const IPV4_CIDR_REGEX: string = '^((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([1-2][0-9]|3[0-2]|[0-9])))(\s?#\s?(.*))?$';
 
-export const ActionCreators = Object.assign({}, {...ConfigActions, ...RtopsActions, ...IPListsActions});
+export const isValidIPv4 = (input: string): boolean => {
+
+  if (input.match(IPV4_REGEX)) {
+    return true;
+  } else if (input.match(IPV4_CIDR_REGEX)) {
+    return true;
+  }
+
+  return false;
+}

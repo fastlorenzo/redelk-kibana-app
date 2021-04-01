@@ -39,10 +39,12 @@
 import {combineReducers} from 'redux';
 import {configReducer} from "./config/configReducer";
 import {rtopsReducer} from "./rtops/rtopsReducer";
+import {iplistsReducer} from "./iplists/iplistsReducer";
 
 const rootReducer = combineReducers({
   config: configReducer,
   rtops: rtopsReducer,
+  iplists: iplistsReducer,
 });
 
 export default rootReducer;

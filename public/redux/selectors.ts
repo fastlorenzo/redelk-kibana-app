@@ -42,6 +42,7 @@ import {filter} from 'lodash';
 
 export const getConfigState = (state: RedELKState) => state.config;
 export const getRtopsState = (state: RedELKState) => state.rtops;
+export const getIPListsState = (state: RedELKState) => state.iplists;
 
 export const getCurrentRoute = createSelector(
   [getConfigState], (configState) => configState.currentRoute
@@ -83,3 +84,25 @@ export const getRtopsLastRefreshDate = createSelector(
   [getRtopsState], (rtopsState) => rtopsState.lastRefresh
 )
 
+export const getIPListsEsAnswer = createSelector(
+  [getIPListsState],
+  (iplistsState) => iplistsState.iplists
+)
+export const getIPListsHits = createSelector(
+  [getIPListsEsAnswer], (iplistsEsAnswer) => iplistsEsAnswer?.hits.hits || []
+)
+export const getIPListsAggs = createSelector(
+  [getIPListsEsAnswer], (iplistsEsAnswer) => iplistsEsAnswer?.aggregations || {}
+)
+export const getIPListsStatus = createSelector(
+  [getIPListsState], (iplistsState) => iplistsState.status
+)
+export const getIPListsShowAddIPForm = createSelector(
+  [getIPListsState], (iplistsState) => iplistsState.showAddIPForm
+)
+export const getIPListsShowManageIPLists = createSelector(
+  [getIPListsState], (iplistsState) => iplistsState.showManageIPLists
+)
+export const getIPListsLastRefreshDate = createSelector(
+  [getIPListsState], (iplistsState) => iplistsState.lastRefresh
+)

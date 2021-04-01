@@ -64,6 +64,20 @@ const kbnApi = (
         notifications.toasts.addSuccess('IOC successfully created. Please wait for Elasticsearch to ingest the data then hit "Refresh".');
         return next(action);
         break;
+      case ActionType.IPLISTS_CREATE_IP_REQUEST_SUCCESS:
+        // Wait 3 seconds for the data to be ingested before fetching all IOCs again.
+        //setTimeout(() => dispatch(fetchAllIOC({http})), 3000);
+        //dispatch(fetchAllIOC({http}));
+        notifications.toasts.addSuccess('IP successfully added. Please wait for Elasticsearch to ingest the data then hit "Refresh".');
+        return next(action);
+        break;
+      case ActionType.IPLISTS_DELETE_IPS_REQUEST_SUCCESS:
+        // Wait 3 seconds for the data to be ingested before fetching all IOCs again.
+        //setTimeout(() => dispatch(fetchAllIOC({http})), 3000);
+        //dispatch(fetchAllIOC({http}));
+        notifications.toasts.addSuccess('IPs successfully deleted. Please wait for Elasticsearch to ingest the data then hit "Refresh".');
+        return next(action);
+        break;
       default:
         break;
       //console.log(action.type);

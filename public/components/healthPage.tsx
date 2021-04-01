@@ -67,7 +67,8 @@ export const HealthPage = () => {
 
   return (
     <>
-      <EmbeddedDashboard dashboardId="509e6a80-926a-11eb-a753-9da683898c26" extraTopNavMenu={[discoverTopNavModules, discoverTopNavIPLists]}/>
+      <EmbeddedDashboard dashboardId="509e6a80-926a-11eb-a753-9da683898c26"
+                         extraTopNavMenu={[discoverTopNavModules, discoverTopNavIPLists]}/>
     </>
   );
 };

@@ -36,8 +36,54 @@
  * - Lorenzo Bernardi
  */
 
-import * as ConfigActions from "./config/configActions";
-import * as RtopsActions from './rtops/rtopsActions';
-import * as IPListsActions from './iplists/iplistsActions';
+import {ActionType, CreateIPType, DeleteIPType} from "../types";
+import {CoreStart} from 'kibana/public';
+import {KbnCallStatus} from "../../types";
+import {DataPublicPluginStart, IEsSearchRequest} from '../../../../../src/plugins/data/public';
 
-export const ActionCreators = Object.assign({}, {...ConfigActions, ...RtopsActions, ...IPListsActions});
+interface ActionArgs<T> {
+  http: CoreStart['http'];
+  payload?: T;
+}
+
+export const fetchAllIPLists = (payload: { data: DataPublicPluginStart, searchOpts: IEsSearchRequest }) => {
+  return {
+    type: ActionType.IPLISTS_FETCH_ALL_REQUEST,
+    payload
+  }
+};
+
+export const createIP = (payload: ActionArgs<CreateIPType>) => {
+  return {
+    type: ActionType.IPLISTS_CREATE_IP_REQUEST,
+    payload
+  }
+};
+
+export const deleteIPs = (payload: ActionArgs<DeleteIPType[]>) => {
+  return {
+    type: ActionType.IPLISTS_DELETE_IPS_REQUEST,
+    payload
+  }
+};
+
+export const setIPListsStatus = (payload: KbnCallStatus) => {
+  return {
+    type: ActionType.IPLISTS_SET_STATUS,
+    payload
+  }
+};
+
+export const setShowAddIPForm = (payload: boolean) => {
+  return {
+    type: ActionType.IPLISTS_SHOW_ADD_IP_FORM,
+    payload
+  }
+}
+
+export const setShowManageIPLists = (payload: boolean) => {
+  return {
+    type: ActionType.IPLISTS_SHOW_MANAGE_IPLISTS,
+    payload
+  }
+}

@@ -96,6 +96,7 @@ import {TTPPage} from "./ttpPage";
 import {AttackNavigatorPage} from "./attackNavigatorPage";
 import {initSettings} from "../helpers/settings_helper";
 import {HealthPage} from "./healthPage";
+import {IPListsPage} from "./iplistsPage";
 
 interface RedelkAppDeps {
   basename: string;
@@ -324,7 +325,7 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
 
   // Build ES query and fetch data
   useEffect(() => {
-    dispatch(ActionCreators.setStatus(KbnCallStatus.pending));
+    dispatch(ActionCreators.setIOCStatus(KbnCallStatus.pending));
     let tmpFilters = appState.filters ? [...appState.filters] : [];
     if (appState.time !== undefined) {
       const trFilter = getTime(indexPattern, appState.time);
@@ -392,6 +393,30 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
       }
     }
     dispatch(ActionCreators.fetchAllRtops({data, searchOpts}));
+
+    let searchOptsIPLists: IEsSearchRequest = {
+      params: {
+        index: 'redelk-iplist-*',
+        size: 10000,
+        body: {}
+      }
+    };
+    if (searchOptsIPLists.params !== undefined) {
+      // If a query was entered
+      if (appState.query !== undefined && appState.query.query !== undefined && appState.query.query !== "") {
+        searchOptsIPLists.params.q = appState.query.query.toString();
+      }
+      // If the state contains a filter
+      if (appState.filters !== undefined || appState.time !== undefined) {
+        if (searchOptsIPLists.params.body === undefined) {
+          searchOptsIPLists.params.body = {}
+        }
+        searchOptsIPLists.params.body.query = {
+          bool: esQueryFilters
+        }
+      }
+    }
+    dispatch(ActionCreators.fetchAllIPLists({data, searchOpts: searchOptsIPLists}));
 
   }, [appState.filters, appState.query, appState.time, currentRoute]);
 
@@ -491,6 +516,16 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
       <Route path="/ioc"
              render={() =>
                <IOCPage
+                 basename={basename}
+                 notifications={notifications}
+                 http={http}
+                 navigation={navigation}
+                 data={data}
+               />}
+      />
+      <Route path="/iplists"
+             render={() =>
+               <IPListsPage
                  basename={basename}
                  notifications={notifications}
                  http={http}

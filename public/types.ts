@@ -43,7 +43,7 @@ import {DashboardStart} from '../../../src/plugins/dashboard/public';
 import {EmbeddableStart} from '../../../src/plugins/embeddable/public';
 import {VisualizationsStart} from '../../../src/plugins/visualizations/public';
 import {SharePluginSetup, SharePluginStart} from '../../../src/plugins/share/public';
-import {ConfigState, RtopsState} from "./redux/types";
+import {ConfigState, IPListsState, RtopsState} from "./redux/types";
 import {UiSettingsServiceStart} from "kibana/server";
 
 export interface RedelkPluginSetup {
@@ -187,6 +187,18 @@ export interface RtopsDoc {
   tags?: string[];
 }
 
+export interface IPListsDoc {
+  '@timestamp': string;
+  '@version': string;
+  iplist: IPListsData;
+}
+
+export interface IPListsData {
+  ip: string;
+  name: string;
+  source: string;
+}
+
 export interface EsAnswer<T> {
   _index: string;
   _type: string;
@@ -196,8 +208,9 @@ export interface EsAnswer<T> {
 }
 
 export interface RedELKState {
-  rtops: RtopsState;
   config: ConfigState;
+  rtops: RtopsState;
+  iplists: IPListsState;
 }
 
 export interface EsHitsTotal {
@@ -211,6 +224,12 @@ export interface EsHitsRtops {
   total: EsHitsTotal;
 }
 
+export interface EsHitsIPLists {
+  hits: EsAnswer<IPListsDoc>[];
+  max_score: number;
+  total: EsHitsTotal;
+}
+
 export interface EsShards {
   failed: number;
   skipped: number;
@@ -218,16 +237,16 @@ export interface EsShards {
   total: number;
 }
 
-export interface EsAnswerRtopsAggsSimple {
+export interface EsAnswerAggsSimple {
   key: string;
   doc_count: number;
 }
 
 export interface EsAnswerRtopsAggs {
-  perEventType?: { buckets: EsAnswerRtopsAggsSimple[] };
-  perHostName?: { buckets: EsAnswerRtopsAggsSimple[] };
-  perUserName?: { buckets: EsAnswerRtopsAggsSimple[] };
-  perImplant?: { buckets: EsAnswerRtopsAggsSimple[] };
+  perEventType?: { buckets: EsAnswerAggsSimple[] };
+  perHostName?: { buckets: EsAnswerAggsSimple[] };
+  perUserName?: { buckets: EsAnswerAggsSimple[] };
+  perImplant?: { buckets: EsAnswerAggsSimple[] };
 }
 
 export interface EsAnswerRtops {
@@ -236,4 +255,16 @@ export interface EsAnswerRtops {
   timed_out: boolean;
   took: number;
   aggregations?: EsAnswerRtopsAggs;
+}
+
+export interface EsAnswerIPLists {
+  hits: EsHitsIPLists;
+  _shards: EsShards;
+  timed_out: boolean;
+  took: number;
+  aggregations?: object;
+}
+
+export interface EsAnswerIPListsDelete {
+  _shards: EsShards;
 }

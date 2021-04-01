@@ -60,7 +60,7 @@ export const createIOC = (payload: ActionArgs<CreateIOCType>) => {
   }
 };
 
-export const setStatus = (payload: KbnCallStatus) => {
+export const setIOCStatus = (payload: KbnCallStatus) => {
   return {
     type: ActionType.RTOPS_SET_STATUS,
     payload

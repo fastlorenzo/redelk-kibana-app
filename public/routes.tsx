@@ -146,5 +146,12 @@ export const routes: RedelkAppRoute[] = [
     path: '/health',
     icon: 'heart'
   },
+  {
+    id: 'iplists',
+    name: 'IP Lists',
+    disabled: false,
+    path: '/iplists',
+    icon: 'list'
+  },
 ];
 

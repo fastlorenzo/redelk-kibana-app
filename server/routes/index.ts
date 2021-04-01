@@ -45,7 +45,7 @@ import {
   SavedObjectsClient,
   SavedObjectsImportResponse
 } from '../../../../src/core/server';
-import {getRandomString} from '../helpers'
+import {asyncForEach, getRandomString} from '../helpers'
 import fs from 'fs';
 import {createSavedObjectsStreamFromNdJson} from '../../../../src/core/server/saved_objects/routes/utils';
 import path from 'path';
@@ -117,7 +117,7 @@ export function defineRoutes(router: IRouter) {
     },
     async (context, request, response) => {
       console.log('Called');
-      const callAsCurrentUser = context.core.elasticsearch.legacy.client.callAsCurrentUser;
+      const asCurrentUser = context.core.elasticsearch.client.asCurrentUser;
 
       const catQuery = {
         index: 'rtops-*',
@@ -125,7 +125,7 @@ export function defineRoutes(router: IRouter) {
         format: 'json',
         size: 10000
       };
-      const catHits = await callAsCurrentUser('search', catQuery);
+      const catHits = await asCurrentUser.search(catQuery);
       return response.ok({
         body: {
           response: catHits
@@ -164,10 +164,7 @@ export function defineRoutes(router: IRouter) {
     },
     async (context, request, response) => {
       console.log('Received request to create new IOC');
-      const callAsCurrentUser = context.core.elasticsearch.legacy.client.callAsCurrentUser;
-      // return response.ok({
-      //   body: request.body
-      // })
+      const asCurrentUser = context.core.elasticsearch.client.asCurrentUser;
       let data = {
         event: {
           category: "host",
@@ -189,7 +186,7 @@ export function defineRoutes(router: IRouter) {
         body: merge(data, request.body),
         format: 'json'
       };
-      const catHits = await callAsCurrentUser('create', query);
+      const catHits = await asCurrentUser.create(query);
       return response.ok({
         body: {
           response: catHits
@@ -197,6 +194,91 @@ export function defineRoutes(router: IRouter) {
       });
     }
   );
+  router.post(
+    {
+      path: '/api/redelk/iplists',
+      validate: {
+        body: schema.object({
+          iplist: schema.object({
+            ip: schema.string(),
+            name: schema.string(),
+            source: schema.string()
+          }),
+          '@timestamp': schema.string()
+        })
+      }
+    },
+    async (context, request, response) => {
+      console.log('Received request to create new IP in IP lists');
+      const asCurrentUser = context.core.elasticsearch.client.asCurrentUser;
+      // Normalize IP (convert to CIDR if single IP)
+      const cidr: RegExp = /\/[0-9]{1,2}$/;
+      let ip: string = '';
+      if (!cidr.test(request.body['iplist']['ip'])) {
+        ip = request.body['iplist']['ip'] + '/32';
+      } else {
+        ip = request.body['iplist']['ip'];
+      }
+      const data = {
+        iplist: {
+          ip: ip,
+          name: request.body['iplist']['name'],
+          source: request.body['iplist']['source']
+        },
+        '@timestamp': request.body['@timestamp']
+      }
+      const query = {
+        index: 'redelk-iplist-' + data['iplist']['name'],
+        id: getRandomString(),
+        body: data,
+        format: 'json'
+      };
+      const catHits = await asCurrentUser.create(query);
+      return response.ok({
+        body: {
+          response: catHits
+        },
+      });
+    }
+  );
+
+  router.delete(
+    {
+      path: '/api/redelk/iplists',
+      validate: {
+        body: schema.arrayOf(
+          schema.object({
+            index: schema.string(),
+            id: schema.string()
+          })
+        )
+      }
+    },
+    async (context, request, response) => {
+      console.log('Received request to delete IPs');
+      const asCurrentUser = context.core.elasticsearch.client.asCurrentUser;
+      const shards = {
+        total: 0,
+        successful: 0,
+        failed: 0
+      };
+      await asyncForEach<Readonly<{ id: string, index: string }>>(request.body, async (doc) => {
+        const res = await asCurrentUser.delete(doc);
+        shards['total'] += res['body']['_shards']['total'];
+        shards['successful'] += res['body']['_shards']['successful'];
+        shards['failed'] += res['body']['_shards']['failed'];
+        console.log('deleted', doc, res);
+      });
+      return response.ok({
+        body: {
+          response: {
+            _shards: shards
+          }
+        },
+      });
+    }
+  );
+
   router.get(
     {
       path: '/api/redelk/init',

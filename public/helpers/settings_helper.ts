@@ -51,7 +51,7 @@ export const initSettings = async (core: CoreStart) => {
     await core.uiSettings.set("securitySolution:defaultIndex", ["apm-*-transaction*", "auditbeat-*", "endgame-*", "filebeat-*", "logs-*", "packetbeat-*", "winlogbeat-*", "rtops-*", "redirtraffic-*"]);
     await core.uiSettings.set("defaultIndex", "195a3f00-d04f-11ea-9301-a30a04251ae9");
     await core.uiSettings.set("defaultRoute", "/app/redelk/");
-    await core.uiSettings.set("query:queryString:options", {analyze_wildcard:true, default_field:"*"});
+    await core.uiSettings.set("query:queryString:options", {analyze_wildcard: true, default_field: "*"});
     window.location.reload();
   }
 }

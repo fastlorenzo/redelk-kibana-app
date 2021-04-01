@@ -38,7 +38,16 @@
 
 import {TopNavMenuData} from '../../../../src/plugins/navigation/public';
 import {Filter, Query, TimeRange} from '../../../../src/plugins/data/public';
-import {C2Data, EsAnswerRtops, FileData, HostData, KbnCallStatus, RedelkInitStatus, UserData} from '../types';
+import {
+  C2Data,
+  EsAnswerIPLists,
+  EsAnswerRtops,
+  FileData,
+  HostData,
+  KbnCallStatus,
+  RedelkInitStatus,
+  UserData
+} from '../types';
 
 export enum ActionType {
   // config
@@ -65,6 +74,22 @@ export enum ActionType {
   RTOPS_SHOW_ADD_IOC_FORM = "rtops/RTOPS_SHOW_ADD_IOC_FORM",
   RTOPS_SET_STATUS = "rtops/RTOPS_SET_STATUS",
 
+  // iplists
+  IPLISTS_FETCH_ALL_REQUEST = "iplists/IPLISTS_FETCH_ALL_REQUEST",
+  IPLISTS_FETCH_ALL_REQUEST_SUCCESS = "iplists/IPLISTS_FETCH_ALL_REQUEST_SUCCESS",
+  IPLISTS_FETCH_ALL_REQUEST_FAILURE = "iplists/IPLISTS_FETCH_ALL_REQUEST_FAILURE",
+
+  IPLISTS_CREATE_IP_REQUEST = "iplists/IPLISTS_CREATE_IP_REQUEST",
+  IPLISTS_CREATE_IP_REQUEST_SUCCESS = "iplists/IPLISTS_CREATE_IP_REQUEST_SUCCESS",
+  IPLISTS_CREATE_IP_REQUEST_FAILURE = "iplists/IPLISTS_CREATE_IP_REQUEST_FAILURE",
+
+  IPLISTS_DELETE_IPS_REQUEST = "iplists/IPLISTS_DELETE_IPS_REQUEST",
+  IPLISTS_DELETE_IPS_REQUEST_SUCCESS = "iplists/IPLISTS_DELETE_IPS_REQUEST_SUCCESS",
+  IPLISTS_DELETE_IPS_REQUEST_FAILURE = "iplists/IPLISTS_DELETE_IPS_REQUEST_FAILURE",
+
+  IPLISTS_SHOW_ADD_IP_FORM = "iplists/IPLISTS_SHOW_ADD_IP_FORM",
+  IPLISTS_SHOW_MANAGE_IPLISTS = "iplists/IPLISTS_SHOW_MANAGE_IPLISTS",
+  IPLISTS_SET_STATUS = "iplists/IPLISTS_SET_STATUS",
 }
 
 export interface Action<T> {
@@ -124,4 +149,33 @@ export interface CreateIOCType {
   c2: C2Data;
   host: HostData;
   user: UserData;
+}
+
+/**
+ * IPLists types
+ */
+export interface IPListsState {
+  status: KbnCallStatus;
+  error: string | undefined | null;
+  iplists: EsAnswerIPLists | undefined;
+  showAddIPForm: boolean;
+  showManageIPLists: boolean;
+  hiddenFilters?: Filter[];
+  lastRefresh?: Date;
+}
+
+export interface CreateIPTypeIP {
+  ip: string;
+  name: string;
+  source: string;
+}
+
+export interface CreateIPType {
+  '@timestamp': string;
+  iplist: CreateIPTypeIP;
+}
+
+export interface DeleteIPType {
+  id: string;
+  index: string;
 }
