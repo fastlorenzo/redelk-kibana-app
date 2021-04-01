@@ -13,10 +13,16 @@ This application is compatible with Elastic stack v7.10.0
 
 ## Screenshots
 
-![Summary dashboard](screenshots/redelk-summary-dark.png "Summary dashboard")
-![IOC dashboard](screenshots/redelk-ioc-dark.png "IOC dashboard")
-![IOC manual ingestion](screenshots/redelk-ioc-add-dark.png "IOC manual ingestion")
+More screenshots available in the [screenshots](screenshots/) folder.
+
 ![Navigation](screenshots/redelk-navigation.png "Navigation")
+
+![Summary dashboard](screenshots/redelk-summary-dark.png "Summary dashboard")
+
+![IOC dashboard](screenshots/redelk-ioc.png "IOC dashboard")
+
+![IOC manual ingestion](screenshots/redelk-ioc-add-file.png "IOC manual ingestion")
+
 
 ## Development
 
