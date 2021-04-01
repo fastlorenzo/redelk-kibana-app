@@ -37,38 +37,106 @@
  */
 
 import React from 'react';
-import {useTopNav} from "../helpers/nav_header_helper";
+import {CoreStart} from "kibana/public";
+import {NavigationPublicPluginStart, TopNavMenuData} from '../../../../src/plugins/navigation/public';
+import {EuiFlyout, EuiFlyoutBody, EuiFlyoutHeader, EuiTitle} from '@elastic/eui';
+import {DataPublicPluginStart} from '../../../../src/plugins/data/public';
+import {useDispatch, useSelector} from 'react-redux';
+import {useTopNav} from '../helpers/nav_header_helper';
+import {getIPListsShowAddIPForm, getIPListsShowManageIPLists} from '../redux/selectors';
+import {ActionCreators} from '../redux/rootActions';
+import {AddIPForm} from '../features/iplists/addIPForm';
+import {IplistsTable} from '../features/iplists/iplistsTable';
 import {EmbeddedDashboard} from "./embeddedDashboard";
 import {useKibana} from '../../../../src/plugins/kibana_react/public';
-import {TopNavMenuData} from '../../../../src/plugins/navigation/public';
 import {RedelkKibanaService} from "../types";
 
-export const HealthPage = () => {
+interface IPListsPageDeps {
+  basename: string;
+  notifications: CoreStart['notifications'];
+  http: CoreStart['http'];
+  navigation: NavigationPublicPluginStart;
+  data: DataPublicPluginStart;
+}
+
+export const HealthPage = ({basename, notifications, http, navigation, data}: IPListsPageDeps) => {
+
+  const showManageIPListsFlyout = useSelector(getIPListsShowManageIPLists);
+  const showAddIPForm = useSelector(getIPListsShowAddIPForm);
 
   useTopNav(true);
 
+  const dispatch = useDispatch();
+
+  let manageIPListsFlyout;
+  if (showManageIPListsFlyout) {
+    manageIPListsFlyout = (
+      <EuiFlyout
+        size="l"
+        onClose={() => dispatch(ActionCreators.setShowManageIPLists(false))}
+        aria-labelledby="flyoutTitle">
+        <EuiFlyoutHeader hasBorder>
+          <EuiTitle size="m">
+            <h2 id="flyoutLargeTitle">Manage IP lists</h2>
+          </EuiTitle>
+        </EuiFlyoutHeader>
+        <EuiFlyoutBody>
+          <IplistsTable http={http}/>
+        </EuiFlyoutBody>
+      </EuiFlyout>
+    );
+  }
+
+  let addIPFlyout;
+  if (showAddIPForm) {
+    addIPFlyout = (
+      <EuiFlyout
+        size="m"
+        onClose={() => dispatch(ActionCreators.setShowAddIPForm(false))}
+        aria-labelledby="flyoutTitle">
+        <EuiFlyoutHeader hasBorder>
+          <EuiTitle size="m">
+            <h2 id="flyoutTitle">Add an IP</h2>
+          </EuiTitle>
+        </EuiFlyoutHeader>
+        <EuiFlyoutBody>
+          <AddIPForm http={http}/>
+        </EuiFlyoutBody>
+      </EuiFlyout>
+    );
+  }
   const {services}: { services: RedelkKibanaService } = useKibana();
 
   const discoverTopNavModules: TopNavMenuData = {
     id: "go-to-discover",
-    label: "Open in discover app (Modules)",
+    label: "Open in discover app (modules)",
     run: () => {
       services.application?.navigateToApp('discover', {path: "#/view/654f76a0-9269-11eb-a753-9da683898c26"})
     }
   }
-
   const discoverTopNavIPLists: TopNavMenuData = {
     id: "go-to-discover",
-    label: "Open in discover app (IP Lists)",
+    label: "Open in discover app (IP lists)",
     run: () => {
       services.application?.navigateToApp('discover', {path: "#/view/87530b40-9269-11eb-a753-9da683898c26"})
     }
   }
 
+  const manageIPListsNavMenu = {
+    id: "manage-iplists",
+    label: "Manage IP lists",
+    run: () => {
+      dispatch(ActionCreators.setShowManageIPLists(true))
+    }
+  };
+
+
   return (
     <>
+      {manageIPListsFlyout}
+      {addIPFlyout}
       <EmbeddedDashboard dashboardId="509e6a80-926a-11eb-a753-9da683898c26"
-                         extraTopNavMenu={[discoverTopNavModules, discoverTopNavIPLists]}/>
+                         extraTopNavMenu={[discoverTopNavModules, discoverTopNavIPLists, manageIPListsNavMenu]}/>
     </>
-  );
+  )
 };

@@ -1,9 +1,9 @@
 {
   "name": "redelk",
-  "version": "v0.2.0",
+  "version": "v0.3.0",
   "private": true,
   "kibana": {
-    "version": "7.10.2",
+    "version": "7.10.0",
     "templateVersion": "1.0.0"
   },
   "license": "BSD-3-Clause",

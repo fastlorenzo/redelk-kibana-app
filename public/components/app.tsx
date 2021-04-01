@@ -96,7 +96,6 @@ import {TTPPage} from "./ttpPage";
 import {AttackNavigatorPage} from "./attackNavigatorPage";
 import {initSettings} from "../helpers/settings_helper";
 import {HealthPage} from "./healthPage";
-import {IPListsPage} from "./iplistsPage";
 
 interface RedelkAppDeps {
   basename: string;
@@ -502,7 +501,6 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
       <Route path="/traffic" exact component={TrafficPage}/>
       <Route path="/ttp" exact component={TTPPage}/>
       <Route path="/attack-navigator" exact component={AttackNavigatorPage}/>
-      <Route path="/health" exact component={HealthPage}/>
 
       <Route path="/summary" exact
              render={() =>
@@ -523,9 +521,9 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
                  data={data}
                />}
       />
-      <Route path="/iplists"
+      <Route path="/health"
              render={() =>
-               <IPListsPage
+               <HealthPage
                  basename={basename}
                  notifications={notifications}
                  http={http}

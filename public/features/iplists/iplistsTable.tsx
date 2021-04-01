@@ -72,8 +72,8 @@ export const IplistsTable = ({http}: IPListsTableDeps) => {
 
   const table_columns = [
     {
-      field: '_id',
-      name: 'ID',
+      field: '_source.@timestamp',
+      name: 'Time added/updated',
       sortable: true
     },
     {

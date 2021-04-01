@@ -6,9 +6,10 @@ The objective is to add manual actions to ingest data.
 
 Currently, working functionalities are:
 - Manual ingestion of IOC (file type only)
-- Display stats on summary page + link to RedELK dashboards
+- Management of IP lists (add/delete)
+- Display RedELK dashboards
 
-This application is compatible with Elastic stack v7.9.2+
+This application is compatible with Elastic stack v7.10.0
 
 ## Screenshots
 
