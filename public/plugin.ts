@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,15 +36,15 @@
  * - Lorenzo Bernardi
  */
 
-import {AppCategory, AppMountParameters, CoreSetup, CoreStart, Plugin} from 'kibana/public';
+import { AppCategory, AppMountParameters, CoreSetup, CoreStart, Plugin } from 'kibana/public';
 import {
   RedelkPluginSetup,
   RedelkPluginSetupDependencies,
   RedelkPluginStart,
-  RedelkPluginStartDependencies
+  RedelkPluginStartDependencies,
 } from './types';
-import {PLUGIN_ID, PLUGIN_NAME} from '../common';
-import {routes} from "./routes";
+import { PLUGIN_ID, PLUGIN_NAME } from '../common';
+import { routes } from './routes';
 
 export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart> {
   // initializerContext: PluginInitializerContext;
@@ -56,7 +56,7 @@ export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart
   //   this.initializerContext = initializerContext;
   // }
 
-  public setup(core: CoreSetup, {data}: RedelkPluginSetupDependencies): RedelkPluginSetup {
+  public setup(core: CoreSetup, { data }: RedelkPluginSetupDependencies): RedelkPluginSetup {
     // const {appMounted, appUnMounted, stop: stopUrlTracker} = createKbnUrlTracker({
     //   baseUrl: core.http.basePath.prepend('/app/timelion'),
     //   defaultSubUrl: '#/',
@@ -89,18 +89,23 @@ export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart
       id: 'redelk',
       label: PLUGIN_NAME,
       order: 1,
-      euiIconType: core.http.basePath.get() + '/plugins/redelk/assets/redelklogo' + (darkMode ? '-light' : '') + '.svg'
-    }
+      euiIconType:
+        core.http.basePath.get() +
+        '/plugins/redelk/assets/redelklogo' +
+        (darkMode ? '-light' : '') +
+        '.svg',
+    };
 
     // Register an application into the side navigation menu
     core.application.register({
       id: 'redelk',
       title: PLUGIN_NAME,
+      appRoute: '/app/redelk',
       category: redelkCategory,
       async mount(params: AppMountParameters) {
         // Get start services as specified in kibana.json
         const [coreStart, depsStart] = await core.getStartServices();
-        //this.currentHistory = params.history;
+        // this.currentHistory = params.history;
 
         // appMounted();
 
@@ -109,7 +114,7 @@ export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart
         // });
 
         // Load application bundle
-        const {renderApp} = await import('./application');
+        const { renderApp } = await import('./application');
 
         // Render the application
         const unmount = renderApp(coreStart, depsStart as RedelkPluginStartDependencies, params);
@@ -140,9 +145,8 @@ export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart
       async mount() {
         window.open(window.location.protocol + '//' + window.location.host + '/jupyter', '_blank');
         window.history.back();
-        return () => {
-        }
-      }
+        return () => {};
+      },
     });
 
     core.application.register({
@@ -150,11 +154,13 @@ export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart
       title: 'Neo4J Browser',
       category: redelkCategory,
       async mount() {
-        window.open(window.location.protocol + '//' + window.location.host + '/neo4jbrowser', '_blank');
+        window.open(
+          window.location.protocol + '//' + window.location.host + '/neo4jbrowser',
+          '_blank'
+        );
         window.history.back();
-        return () => {
-        }
-      }
+        return () => {};
+      },
     });
 
     core.application.register({
@@ -165,18 +171,17 @@ export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart
         const [coreStart] = await core.getStartServices();
 
         coreStart.application.navigateToApp(PLUGIN_ID, {
-          path: routes.find(r => r.id === 'attack-navigator')!.path || "/"
-        })
-        return () => {
-        }
-      }
+          path: routes.find((r) => r.id === 'attack-navigator')!.path || '/',
+        });
+        return () => {};
+      },
     });
 
     // Return methods that should be available to other plugins
     return {};
   }
 
-  public start(core: CoreStart, {data}: RedelkPluginStartDependencies): RedelkPluginStart {
+  public start(core: CoreStart, { data }: RedelkPluginStartDependencies): RedelkPluginStart {
     return {};
   }
 

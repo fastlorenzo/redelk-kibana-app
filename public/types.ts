@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,23 +36,22 @@
  * - Lorenzo Bernardi
  */
 
-import {NavigationPublicPluginStart} from '../../../src/plugins/navigation/public';
-import {DataPublicPluginSetup, DataPublicPluginStart} from '../../../src/plugins/data/public';
-import {CoreStart} from 'kibana/public';
-import {DashboardStart} from '../../../src/plugins/dashboard/public';
-import {EmbeddableStart} from '../../../src/plugins/embeddable/public';
-import {VisualizationsStart} from '../../../src/plugins/visualizations/public';
-import {SharePluginSetup, SharePluginStart} from '../../../src/plugins/share/public';
-import {ConfigState, IPListsState, RtopsState} from "./redux/types";
-import {UiSettingsServiceStart} from "kibana/server";
+import { CoreStart } from 'kibana/public';
+import { UiSettingsServiceStart } from 'kibana/server';
+import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
+import { DataPublicPluginSetup, DataPublicPluginStart } from '../../../src/plugins/data/public';
+import { DashboardStart } from '../../../src/plugins/dashboard/public';
+import { EmbeddableStart } from '../../../src/plugins/embeddable/public';
+import { VisualizationsStart } from '../../../src/plugins/visualizations/public';
+import { SharePluginSetup, SharePluginStart } from '../../../src/plugins/share/public';
+import { ConfigState, IPListsState, RtopsState } from './redux/types';
 
 export interface RedelkPluginSetup {
   currentHistory?: unknown;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface RedelkPluginStart {
-}
+export interface RedelkPluginStart {}
 
 export interface RedelkPluginStartDependencies {
   navigation: NavigationPublicPluginStart;
@@ -81,14 +80,14 @@ export enum KbnCallStatus {
   idle = 'idle',
   pending = 'pending',
   success = 'success',
-  failure = 'failure'
+  failure = 'failure',
 }
 
 export enum RedelkInitStatus {
   idle = 'idle',
   pending = 'pending',
   success = 'success',
-  failure = 'failure'
+  failure = 'failure',
 }
 
 export interface ECSData {
@@ -219,13 +218,13 @@ export interface EsHitsTotal {
 }
 
 export interface EsHitsRtops {
-  hits: EsAnswer<RtopsDoc>[];
+  hits: Array<EsAnswer<RtopsDoc>>;
   max_score: number;
   total: EsHitsTotal;
 }
 
 export interface EsHitsIPLists {
-  hits: EsAnswer<IPListsDoc>[];
+  hits: Array<EsAnswer<IPListsDoc>>;
   max_score: number;
   total: EsHitsTotal;
 }

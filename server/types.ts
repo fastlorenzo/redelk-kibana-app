@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,9 +37,7 @@
  */
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface RedelkPluginSetup {
-}
+export interface RedelkPluginSetup {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface RedelkPluginStart {
-}
+export interface RedelkPluginStart {}

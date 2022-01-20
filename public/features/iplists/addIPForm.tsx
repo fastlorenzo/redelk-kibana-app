@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,24 +36,23 @@
  * - Lorenzo Bernardi
  */
 
-import React, {ChangeEvent, useState} from 'react';
-import {useDispatch} from 'react-redux';
-import moment, {Moment} from 'moment';
+import React, { ChangeEvent, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import moment, { Moment } from 'moment';
 
-import {EuiButton, EuiFieldText, EuiForm, EuiFormRow, EuiSelect, EuiSpacer,} from '@elastic/eui';
+import { EuiButton, EuiFieldText, EuiForm, EuiFormRow, EuiSelect, EuiSpacer } from '@elastic/eui';
 
-import {CoreStart} from 'kibana/public';
+import { CoreStart } from 'kibana/public';
 
-import {CreateIPType} from "../../redux/types";
-import {ActionCreators} from "../../redux/rootActions";
-import {isValidIPv4} from '../../helpers/ip_helper';
+import { CreateIPType } from '../../redux/types';
+import { ActionCreators } from '../../redux/rootActions';
+import { isValidIPv4 } from '../../helpers/ip_helper';
 
 interface AddIPFormDeps {
   http: CoreStart['http'];
-};
+}
 
-export const AddIPForm = ({http}: AddIPFormDeps) => {
-
+export const AddIPForm = ({ http }: AddIPFormDeps) => {
   // const md5Regexp: RegExp = /^[a-fA-F0-9]{32}$/;
 
   const dispatch = useDispatch();
@@ -71,11 +70,11 @@ export const AddIPForm = ({http}: AddIPFormDeps) => {
       '@timestamp': timestamp.toISOString(),
       iplist: {
         name: iplistName,
-        ip: ip,
-        source: 'kibana_app'
-      }
+        ip,
+        source: 'kibana_app',
+      },
     };
-    dispatch(ActionCreators.createIP({http, payload}));
+    dispatch(ActionCreators.createIP({ http, payload }));
     e.preventDefault();
     dispatch(ActionCreators.setShowAddIPForm(false));
   };
@@ -88,27 +87,21 @@ export const AddIPForm = ({http}: AddIPFormDeps) => {
   };
 
   return (
-    <EuiForm
-      component="form"
-      onSubmit={handleFormSubmit}
-    >
-      <EuiFormRow
-        label="IP List name"
-        helpText="Select the list to add the IP to"
-      >
+    <EuiForm component="form" onSubmit={handleFormSubmit}>
+      <EuiFormRow label="IP List name" helpText="Select the list to add the IP to">
         <EuiSelect
           hasNoInitialSelection
           onChange={handleIPListNameChange}
           options={[
-            {value: 'redteam', text: 'redteam'},
-            {value: 'customer', text: 'customer'},
-            {value: 'blueteam', text: 'blueteam'},
-            {value: 'unknown', text: 'unknown'},
+            { value: 'redteam', text: 'redteam' },
+            { value: 'customer', text: 'customer' },
+            { value: 'blueteam', text: 'blueteam' },
+            { value: 'unknown', text: 'unknown' },
           ]}
         />
       </EuiFormRow>
 
-      <EuiSpacer/>
+      <EuiSpacer />
 
       <EuiFormRow
         label="IP (required)"
@@ -116,16 +109,12 @@ export const AddIPForm = ({http}: AddIPFormDeps) => {
         error={ipHasErrors}
         isInvalid={!isIPValid}
       >
-        <EuiFieldText
-          name="iplistName"
-          onChange={handleIPChange}
-          isInvalid={!isIPValid}
-        />
+        <EuiFieldText name="iplistName" onChange={handleIPChange} isInvalid={!isIPValid} />
       </EuiFormRow>
 
       <EuiButton type="submit" fill>
         Add IP
       </EuiButton>
     </EuiForm>
-  )
-}
+  );
+};

@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,42 +36,41 @@
  * - Lorenzo Bernardi
  */
 
-import {ActionType, AppState} from "../types";
-import {CoreStart} from "kibana/public";
-import {TopNavMenuData} from '../../../../../src/plugins/navigation/public';
-
+import { CoreStart } from 'kibana/public';
+import { ActionType, AppState } from '../types';
+import { TopNavMenuData } from '../../../../../src/plugins/navigation/public';
 
 export const setShowTopNav = (payload: boolean) => {
   return {
     type: ActionType.CONFIG_SHOW_TOP_NAV,
-    payload
-  }
+    payload,
+  };
 };
 
 export const setCurrentRoute = (payload: string) => {
   return {
     type: ActionType.CONFIG_SET_CURRENT_ROUTE,
-    payload
-  }
+    payload,
+  };
 };
 
-export const checkInit = (http: CoreStart["http"]) => {
+export const checkInit = (http: CoreStart['http']) => {
   return {
     type: ActionType.CONFIG_REDELK_INIT_CHECK,
-    http: http
-  }
+    http,
+  };
 };
 
 export const setAppState = (payload: AppState) => {
   return {
     type: ActionType.CONFIG_SET_APPSTATE,
-    payload
-  }
+    payload,
+  };
 };
 
 export const setTopNavMenu = (payload: TopNavMenuData[]) => {
   return {
     type: ActionType.CONFIG_SET_TOPNAVMENU,
-    payload
-  }
+    payload,
+  };
 };

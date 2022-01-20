@@ -1,10 +1,14 @@
 {
   "name": "redelk",
-  "version": "v0.3.0",
+  "version": "v0.4.0",
   "private": true,
   "kibana": {
-    "version": "7.10.0",
+    "version": "7.16.2",
     "templateVersion": "1.0.0"
+  },
+  "author": {
+    "name": "Lorenzo Bernardi",
+    "email": "git@bernardi.be"
   },
   "license": "BSD-3-Clause",
   "scripts": {

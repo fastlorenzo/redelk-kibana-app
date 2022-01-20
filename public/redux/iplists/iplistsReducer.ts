@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,10 +36,10 @@
  * - Lorenzo Bernardi
  */
 
+import { CoreStart } from 'kibana/public';
 import createReducer from '../createReducer';
-import {Action, ActionType, CreateIPType, DeleteIPType, IPListsState} from "../types";
-import {EsAnswer, EsAnswerIPLists, EsAnswerIPListsDelete, KbnCallStatus} from "../../types";
-import {CoreStart} from "kibana/public";
+import { Action, ActionType, CreateIPType, DeleteIPType, IPListsState } from '../types';
+import { EsAnswer, EsAnswerIPLists, EsAnswerIPListsDelete, KbnCallStatus } from '../../types';
 
 const initialState: IPListsState = {
   status: KbnCallStatus.idle,
@@ -47,85 +47,102 @@ const initialState: IPListsState = {
   iplists: undefined,
   showAddIPForm: false,
   showManageIPLists: false,
-  lastRefresh: undefined
+  lastRefresh: undefined,
 };
 
 export const iplistsReducer = createReducer<IPListsState>(initialState, {
-
-  [ActionType.IPLISTS_FETCH_ALL_REQUEST](state: IPListsState, action: Action<EsAnswer<EsAnswerIPLists>>) {
+  [ActionType.IPLISTS_FETCH_ALL_REQUEST](
+    state: IPListsState,
+    action: Action<EsAnswer<EsAnswerIPLists>>
+  ) {
     return {
       ...state,
       status: KbnCallStatus.pending,
     };
   },
-  [ActionType.IPLISTS_FETCH_ALL_REQUEST_SUCCESS](state: IPListsState, action: Action<EsAnswer<EsAnswerIPLists>>) {
+  [ActionType.IPLISTS_FETCH_ALL_REQUEST_SUCCESS](
+    state: IPListsState,
+    action: Action<EsAnswer<EsAnswerIPLists>>
+  ) {
     return {
       ...state,
       iplists: action.payload,
       status: KbnCallStatus.success,
       error: null,
-      lastRefresh: new Date()
+      lastRefresh: new Date(),
     };
   },
   [ActionType.IPLISTS_FETCH_ALL_REQUEST_FAILURE](state: IPListsState, action: Action<any>) {
     return {
       ...state,
       status: KbnCallStatus.failure,
-      error: action.payload
+      error: action.payload,
     };
   },
 
-  [ActionType.IPLISTS_CREATE_IP_REQUEST](state: IPListsState, action: Action<{ http: CoreStart['http'], payload: CreateIPType }>) {
+  [ActionType.IPLISTS_CREATE_IP_REQUEST](
+    state: IPListsState,
+    action: Action<{ http: CoreStart['http']; payload: CreateIPType }>
+  ) {
     return {
       ...state,
     };
   },
-  [ActionType.IPLISTS_CREATE_IP_REQUEST_SUCCESS](state: IPListsState, action: Action<EsAnswer<EsAnswerIPLists>>) {
+  [ActionType.IPLISTS_CREATE_IP_REQUEST_SUCCESS](
+    state: IPListsState,
+    action: Action<EsAnswer<EsAnswerIPLists>>
+  ) {
     return {
       ...state,
       status: KbnCallStatus.success,
-      error: null
+      error: null,
     };
   },
   [ActionType.IPLISTS_CREATE_IP_REQUEST_FAILURE](state: IPListsState, action: Action<any>) {
     return {
       ...state,
       status: KbnCallStatus.failure,
-      error: action.payload
+      error: action.payload,
     };
   },
 
-  [ActionType.IPLISTS_DELETE_IPS_REQUEST](state: IPListsState, action: Action<{ http: CoreStart['http'], payload: DeleteIPType[] }>) {
+  [ActionType.IPLISTS_DELETE_IPS_REQUEST](
+    state: IPListsState,
+    action: Action<{ http: CoreStart['http']; payload: DeleteIPType[] }>
+  ) {
     return {
       ...state,
     };
   },
-  [ActionType.IPLISTS_DELETE_IPS_REQUEST_SUCCESS](state: IPListsState, action: Action<EsAnswer<EsAnswerIPListsDelete>>) {
+  [ActionType.IPLISTS_DELETE_IPS_REQUEST_SUCCESS](
+    state: IPListsState,
+    action: Action<EsAnswer<EsAnswerIPListsDelete>>
+  ) {
     return {
       ...state,
       status: KbnCallStatus.success,
-      error: null
+      error: null,
     };
   },
   [ActionType.IPLISTS_DELETE_IPS_REQUEST_SUCCESS](state: IPListsState, action: Action<any>) {
     return {
       ...state,
       status: KbnCallStatus.failure,
-      error: action.payload
+      error: action.payload,
     };
   },
 
   [ActionType.IPLISTS_SHOW_ADD_IP_FORM](state: IPListsState, action: Action<boolean>) {
     return {
       ...state,
-      showAddIPForm: action.payload
+      showAddIPForm: action.payload,
     };
   },
 
   [ActionType.IPLISTS_SHOW_MANAGE_IPLISTS](state: IPListsState, action: Action<boolean>) {
     return {
       ...state,
-      showManageIPLists: action.payload
+      showManageIPLists: action.payload,
     };
   },
 });

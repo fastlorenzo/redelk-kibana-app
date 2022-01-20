@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,7 @@
  * - Lorenzo Bernardi
  */
 
-import {EuiIconType} from '@elastic/eui/src/components/icon/icon';
+import { EuiIconType } from '@elastic/eui/src/components/icon/icon';
 
 export interface RedelkAppRoute {
   id: string;
@@ -53,98 +53,97 @@ export const routes: RedelkAppRoute[] = [
     name: 'Home',
     disabled: false,
     path: '/home',
-    icon: "home"
+    icon: 'home',
   },
   {
     id: 'summary',
     name: 'Summary',
     disabled: false,
     path: '/summary',
-    icon: "dashboardApp"
+    icon: 'dashboardApp',
   },
   {
     id: 'alarms',
     name: 'Alarms',
     disabled: false,
     path: '/alarms',
-    icon: 'alert'
+    icon: 'alert',
   },
   {
     id: 'credentials',
     name: 'Credentials',
     disabled: false,
     path: '/credentials',
-    icon: 'lock'
+    icon: 'lock',
   },
   {
     id: 'downloads',
     name: 'Downloads',
     disabled: false,
     path: '/downloads',
-    icon: 'download'
+    icon: 'download',
   },
   {
     id: 'implants',
     name: 'Implants',
     disabled: false,
     path: '/implants',
-    icon: 'bug'
+    icon: 'bug',
   },
   {
     id: 'ioc',
     name: 'IOC',
     disabled: false,
     path: '/ioc',
-    icon: 'securitySignal'
+    icon: 'securitySignal',
   },
   {
     id: 'rtops',
     name: 'Red Team Operations',
     disabled: false,
     path: '/rtops',
-    icon: 'reporter'
+    icon: 'reporter',
   },
   {
     id: 'screenshots',
     name: 'Screenshots',
     disabled: false,
     path: '/screenshots',
-    icon: 'fullScreen'
+    icon: 'fullScreen',
   },
   {
     id: 'tasks',
     name: 'Tasks',
     disabled: false,
     path: '/tasks',
-    icon: 'list'
+    icon: 'list',
   },
   {
     id: 'traffic',
     name: 'Traffic',
     disabled: false,
     path: '/traffic',
-    icon: 'globe'
+    icon: 'globe',
   },
   {
     id: 'ttp',
     name: 'Tactics, Techniques & Procedures',
     disabled: false,
     path: '/ttp',
-    icon: 'aggregate'
+    icon: 'aggregate',
   },
   {
     id: 'attack-navigator',
     name: 'MITRE ATT&CK Navigator',
     disabled: false,
     path: '/attack-navigator',
-    icon: 'branch'
+    icon: 'branch',
   },
   {
     id: 'health',
     name: 'Health',
     disabled: false,
     path: '/health',
-    icon: 'heart'
-  }
+    icon: 'heart',
+  },
 ];
-

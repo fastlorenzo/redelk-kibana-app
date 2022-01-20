@@ -1,9 +1,27 @@
 {
   "id": "redelk",
-  "version": "7.10.0",
+  "version": "7.16.3",
   "server": true,
   "ui": true,
-  "requiredPlugins": ["navigation", "data", "dashboard", "embeddable", "visualizations", "visualize", "share", "kibanaReact", "kibanaUtils"],
+  "requiredPlugins": [
+    "navigation",
+    "data",
+    "dashboard",
+    "embeddable",
+    "visualizations",
+    "visualize",
+    "share",
+    "kibanaReact",
+    "kibanaUtils"
+  ],
   "optionalPlugins": [],
-  "requiredBundles": []
+  "requiredBundles": [
+    "kibanaReact",
+    "kibanaUtils",
+    "savedObjects",
+    "visualizations"
+  ],
+  "owner": {
+    "name": "Lorenzo Bernardi"
+  }
 }

@@ -1,9 +1,17 @@
 /*
+ * Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+ * or more contributor license agreements. Licensed under the Elastic License
+ * 2.0 and the Server Side Public License, v 1; you may not use this file except
+ * in compliance with, at your election, the Elastic License 2.0 or the Server
+ * Side Public License, v 1.
+ */
+
+/*
  * Part of RedELK
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,25 +44,29 @@
  * - Lorenzo Bernardi
  */
 
-import {schema} from '@kbn/config-schema';
+import { schema } from '@kbn/config-schema';
+import fs from 'fs';
+import path from 'path';
+import { DataView } from 'src/plugins/data_views/common';
+import { merge } from 'lodash';
 import {
-  importSavedObjectsFromStream,
   IRouter,
   RequestHandlerContext,
   SavedObject,
   SavedObjectsClient,
-  SavedObjectsImportResponse
+  SavedObjectsImportResponse,
 } from '../../../../src/core/server';
-import {asyncForEach, getRandomString} from '../helpers'
-import fs from 'fs';
-import {createSavedObjectsStreamFromNdJson} from '../../../../src/core/server/saved_objects/routes/utils';
-import path from 'path';
-import {IndexPattern} from 'src/plugins/data/public';
-import {merge} from 'lodash';
+import { importSavedObjectsFromStream } from '../../../../src/core/server/saved_objects/import/import_saved_objects';
+import { asyncForEach, getRandomString } from '../helpers';
+import { createSavedObjectsStreamFromNdJson } from '../../../../src/core/server/saved_objects/routes/utils';
 
 const INDEX_PATTERN_REGEXP = /^redelk_kibana_index-pattern_(.*)\.ndjson/;
 const INDEX_TEMPLATE_REGEXP = /^redelk_elasticsearch_template_(.*)\.json/;
-const importSavedObject = async (filePath: string, context: RequestHandlerContext, objType: string) => {
+const importSavedObject = async (
+  filePath: string,
+  context: RequestHandlerContext,
+  objType: string
+) => {
   console.log('Importing ' + objType + ' [' + filePath + ']');
   const ds = fs.createReadStream(filePath);
 
@@ -64,52 +76,78 @@ const importSavedObject = async (filePath: string, context: RequestHandlerContex
     readStream: await createSavedObjectsStreamFromNdJson(ds),
     objectLimit: 10485760,
     overwrite: true,
-    createNewCopies: false
+    createNewCopies: false,
+    importHooks: {},
   });
 
   return {
     type: objType,
     fileName: filePath,
-    result: result
+    result,
   };
-}
-const importIndexTemplate = async (filePath: string, context: RequestHandlerContext, templateName: string) => {
+};
+const importIndexTemplate = async (
+  filePath: string,
+  context: RequestHandlerContext,
+  templateName: string
+) => {
   console.log('Importing Elasticsearch index template ' + templateName + ' [' + filePath + ']');
 
   try {
     const tmpl: Buffer = fs.readFileSync(filePath);
-    const callAsCurrentUser = context.core.elasticsearch.legacy.client.callAsCurrentUser;
+    const asCurrentUser = context.core.elasticsearch.client.asCurrentUser;
     const tmplJson: object = JSON.parse(tmpl.toString());
-    const result = await callAsCurrentUser('indices.putTemplate', {
+    const result = await asCurrentUser.indices.putTemplate({
       name: templateName,
-      body: tmplJson
-    })
+      body: tmplJson,
+    });
     return {
       type: 'index-template',
       fileName: filePath,
-      result: result
-    }
+      result,
+    };
   } catch (e) {
-    console.error('Error import index-template: ' + templateName + ' [' + filePath + ']')
+    console.error('Error import index-template: ' + templateName + ' [' + filePath + ']');
     console.error(e);
     return {
       type: 'index-template',
       fileName: filePath,
-      result: e.message
-    }
+      result: e.message,
+    };
   }
-}
-const checkRtops = async (client: Pick<SavedObjectsClient, "get" | "delete" | "errors" | "create" | "bulkCreate" | "find" | "bulkGet" | "update" | "addToNamespaces" | "deleteFromNamespaces" | "bulkUpdate">) => {
+};
+const checkRtops = async (
+  client: Pick<
+    SavedObjectsClient,
+    | 'get'
+    | 'delete'
+    | 'errors'
+    | 'create'
+    | 'bulkCreate'
+    | 'find'
+    | 'bulkGet'
+    | 'update'
+    | 'bulkUpdate'
+    | 'checkConflicts'
+    | 'bulkResolve'
+    | 'resolve'
+    | 'removeReferencesTo'
+    | 'openPointInTimeForType'
+    | 'closePointInTime'
+    | 'createPointInTimeFinder'
+    | 'collectMultiNamespaceReferences'
+    | 'updateObjectsSpaces'
+  >
+) => {
   try {
-    const rtops_ip: SavedObject<IndexPattern> = await client.get("index-pattern", "rtops");
-    return rtops_ip !== undefined;
+    const rtopsIp: SavedObject<DataView> = await client.get('index-pattern', 'rtops');
+    return rtopsIp !== undefined;
   } catch (e) {
     return false;
   }
-}
+};
 
 export function defineRoutes(router: IRouter) {
-
   router.get(
     {
       path: '/api/redelk/ioc',
@@ -123,12 +161,12 @@ export function defineRoutes(router: IRouter) {
         index: 'rtops-*',
         q: 'event.type: "ioc"',
         format: 'json',
-        size: 10000
+        size: 10000,
       };
       const catHits = await asCurrentUser.search(catQuery);
       return response.ok({
         body: {
-          response: catHits
+          response: catHits,
         },
       });
     }
@@ -140,56 +178,56 @@ export function defineRoutes(router: IRouter) {
         body: schema.object({
           ioc: schema.object({
             type: schema.string(),
-            domain: schema.string()
+            domain: schema.string(),
           }),
           file: schema.object({
             name: schema.string(),
             size: schema.string(),
             hash: schema.object({
-              md5: schema.string()
-            })
+              md5: schema.string(),
+            }),
           }),
           c2: schema.object({
-            message: schema.string()
+            message: schema.string(),
           }),
           host: schema.object({
-            name: schema.string()
+            name: schema.string(),
           }),
           user: schema.object({
-            name: schema.string()
+            name: schema.string(),
           }),
-          '@timestamp': schema.string()
-        })
-      }
+          '@timestamp': schema.string(),
+        }),
+      },
     },
     async (context, request, response) => {
       console.log('Received request to create new IOC');
       const asCurrentUser = context.core.elasticsearch.client.asCurrentUser;
-      let data = {
+      const data = {
         event: {
-          category: "host",
-          kind: "event",
-          module: "redelk",
-          dataset: "c2",
-          action: "ioc",
-          type: "ioc"
+          category: 'host',
+          kind: 'event',
+          module: 'redelk',
+          dataset: 'c2',
+          action: 'ioc',
+          type: 'ioc',
         },
         c2: {
           log: {
-            type: "ioc"
-          }
-        }
-      }
+            type: 'ioc',
+          },
+        },
+      };
       const query = {
         index: 'rtops-manual',
         id: getRandomString(),
         body: merge(data, request.body),
-        format: 'json'
+        format: 'json',
       };
       const catHits = await asCurrentUser.create(query);
       return response.ok({
         body: {
-          response: catHits
+          response: catHits,
         },
       });
     }
@@ -202,11 +240,11 @@ export function defineRoutes(router: IRouter) {
           iplist: schema.object({
             ip: schema.string(),
             name: schema.string(),
-            source: schema.string()
+            source: schema.string(),
           }),
-          '@timestamp': schema.string()
-        })
-      }
+          '@timestamp': schema.string(),
+        }),
+      },
     },
     async (context, request, response) => {
       console.log('Received request to create new IP in IP lists');
@@ -214,29 +252,29 @@ export function defineRoutes(router: IRouter) {
       // Normalize IP (convert to CIDR if single IP)
       const cidr: RegExp = /\/[0-9]{1,2}$/;
       let ip: string = '';
-      if (!cidr.test(request.body['iplist']['ip'])) {
-        ip = request.body['iplist']['ip'] + '/32';
+      if (!cidr.test(request.body.iplist.ip)) {
+        ip = request.body.iplist.ip + '/32';
       } else {
-        ip = request.body['iplist']['ip'];
+        ip = request.body.iplist.ip;
       }
       const data = {
         iplist: {
-          ip: ip,
-          name: request.body['iplist']['name'],
-          source: request.body['iplist']['source']
+          ip,
+          name: request.body.iplist.name,
+          source: request.body.iplist.source,
         },
-        '@timestamp': request.body['@timestamp']
-      }
+        '@timestamp': request.body['@timestamp'],
+      };
       const query = {
-        index: 'redelk-iplist-' + data['iplist']['name'],
+        index: 'redelk-iplist-' + data.iplist.name,
         id: getRandomString(),
         body: data,
-        format: 'json'
+        format: 'json',
       };
       const catHits = await asCurrentUser.create(query);
       return response.ok({
         body: {
-          response: catHits
+          response: catHits,
         },
       });
     }
@@ -249,10 +287,10 @@ export function defineRoutes(router: IRouter) {
         body: schema.arrayOf(
           schema.object({
             index: schema.string(),
-            id: schema.string()
+            id: schema.string(),
           })
-        )
-      }
+        ),
+      },
     },
     async (context, request, response) => {
       console.log('Received request to delete IPs');
@@ -260,20 +298,20 @@ export function defineRoutes(router: IRouter) {
       const shards = {
         total: 0,
         successful: 0,
-        failed: 0
+        failed: 0,
       };
-      await asyncForEach<Readonly<{ id: string, index: string }>>(request.body, async (doc) => {
+      await asyncForEach<Readonly<{ id: string; index: string }>>(request.body, async (doc) => {
         const res = await asCurrentUser.delete(doc);
-        shards['total'] += res['body']['_shards']['total'];
-        shards['successful'] += res['body']['_shards']['successful'];
-        shards['failed'] += res['body']['_shards']['failed'];
+        shards.total += res.body._shards.total;
+        shards.successful += res.body._shards.successful;
+        shards.failed += res.body._shards.failed;
         console.log('deleted', doc, res);
       });
       return response.ok({
         body: {
           response: {
-            _shards: shards
-          }
+            _shards: shards,
+          },
         },
       });
     }
@@ -286,38 +324,69 @@ export function defineRoutes(router: IRouter) {
     },
     async (context, request, response) => {
       console.log('Checking RedELK initialization');
-      const results: { type: string, fileName: string, result: SavedObjectsImportResponse | null | object }[] = [];
+      const results: Array<{
+        type: string;
+        fileName: string;
+        result: SavedObjectsImportResponse | null | object;
+      }> = [];
       try {
-        const rtops_ip_exists = await checkRtops(context.core.savedObjects.client);
+        const rtopsIpExists = await checkRtops(context.core.savedObjects.client);
         // rtops-* index-pattern not found, initializing
-        if (!rtops_ip_exists) {
+        if (!rtopsIpExists) {
           const templatesDir = path.join(__dirname, '../templates');
           const templatesFiles = fs.readdirSync(templatesDir);
           for (const tmpl of templatesFiles) {
             const match = tmpl.match(INDEX_PATTERN_REGEXP);
             if (match !== null) {
-              results.push(await importSavedObject(path.join(templatesDir, match[0]), context, 'index-pattern'));
+              results.push(
+                await importSavedObject(path.join(templatesDir, match[0]), context, 'index-pattern')
+              );
             }
             const matchIndexTemplate = tmpl.match(INDEX_TEMPLATE_REGEXP);
             if (matchIndexTemplate !== null) {
-              results.push(await importIndexTemplate(path.join(templatesDir, matchIndexTemplate[0]), context, matchIndexTemplate[1]));
+              results.push(
+                await importIndexTemplate(
+                  path.join(templatesDir, matchIndexTemplate[0]),
+                  context,
+                  matchIndexTemplate[1]
+                )
+              );
             }
           }
-          results.push(await importSavedObject(path.join(templatesDir, 'redelk_kibana_search.ndjson'), context, 'search'));
-          results.push(await importSavedObject(path.join(templatesDir, 'redelk_kibana_visualization.ndjson'), context, 'visualization'));
-          results.push(await importSavedObject(path.join(templatesDir, 'redelk_kibana_dashboard.ndjson'), context, 'dashboard'));
+          results.push(
+            await importSavedObject(
+              path.join(templatesDir, 'redelk_kibana_search.ndjson'),
+              context,
+              'search'
+            )
+          );
+          results.push(
+            await importSavedObject(
+              path.join(templatesDir, 'redelk_kibana_visualization.ndjson'),
+              context,
+              'visualization'
+            )
+          );
+          results.push(
+            await importSavedObject(
+              path.join(templatesDir, 'redelk_kibana_dashboard.ndjson'),
+              context,
+              'dashboard'
+            )
+          );
         }
 
         return response.ok({
           body: {
-            response: results
+            response: results,
           },
         });
       } catch (e) {
         console.error(e);
-        return response.internalError({
-          body: e
-        })
+        return response.customError({
+          body: e,
+          statusCode: 503,
+        });
       }
     }
   );
