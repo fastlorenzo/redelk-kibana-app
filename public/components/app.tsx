@@ -242,6 +242,8 @@ const RedelkAppInternal = ({
   useGlobalStateSyncing(data.query, kbnUrlStateStorage);
   useAppStateSyncing(appStateContainer, data.query, kbnUrlStateStorage);
   useEffect(() => {
+    console.log('Current route', currentRoute);
+    console.log('location', location);
     if (location.pathname !== currentRoute) {
       dispatch(ActionCreators.setCurrentRoute(location.pathname));
     }
@@ -262,8 +264,7 @@ const RedelkAppInternal = ({
     setCurrentPageTitle(tmp);
   }, [currentRoute]);
   useEffect(() => {
-    let items: ReactElement[];
-    items = routes.map((r) => {
+    const items: ReactElement[] = routes.map((r) => {
       const generator = new RedelkURLGenerator({ appBasePath: r.path, useHash: false });
       const path = generator.createUrl(appState);
       // console.log('url', path, appState, appStateContainer);

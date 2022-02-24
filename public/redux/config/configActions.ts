@@ -36,9 +36,9 @@
  * - Lorenzo Bernardi
  */
 
-import { CoreStart } from 'kibana/public';
-import { ActionType, AppState } from '../types';
-import { TopNavMenuData } from '../../../../../src/plugins/navigation/public';
+import {CoreStart} from 'kibana/public';
+import {ActionType, AppState} from '../types';
+import {TopNavMenuData} from '../../../../../src/plugins/navigation/public';
 
 export const setShowTopNav = (payload: boolean) => {
   return {

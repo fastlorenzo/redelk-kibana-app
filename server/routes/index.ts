@@ -1,12 +1,4 @@
 /*
- * Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
- * or more contributor license agreements. Licensed under the Elastic License
- * 2.0 and the Server Side Public License, v 1; you may not use this file except
- * in compliance with, at your election, the Elastic License 2.0 or the Server
- * Side Public License, v 1.
- */
-
-/*
  * Part of RedELK
  *
  * BSD 3-Clause License
@@ -59,6 +51,7 @@ import {
 import { importSavedObjectsFromStream } from '../../../../src/core/server/saved_objects/import/import_saved_objects';
 import { asyncForEach, getRandomString } from '../helpers';
 import { createSavedObjectsStreamFromNdJson } from '../../../../src/core/server/saved_objects/routes/utils';
+import { PLUGIN_ID } from '../../common';
 
 const INDEX_PATTERN_REGEXP = /^redelk_kibana_index-pattern_(.*)\.ndjson/;
 const INDEX_TEMPLATE_REGEXP = /^redelk_elasticsearch_template_(.*)\.json/;
@@ -150,7 +143,24 @@ const checkRtops = async (
 export function defineRoutes(router: IRouter) {
   router.get(
     {
-      path: '/api/redelk/ioc',
+      path: `/plugins/kibanaReact/assets/solutions_${PLUGIN_ID}.svg`,
+      validate: false,
+    },
+    async (context, request, response) => {
+      console.log('Called');
+      const svgPath = path.join(__dirname, '../solutions_redelk.svg');
+      const svgContent = fs.readFileSync(svgPath);
+      return response.ok({
+        body: svgContent.toString(),
+        headers: {
+          'Content-Type': 'image/svg+xml',
+        },
+      });
+    }
+  );
+  router.get(
+    {
+      path: `/api/${PLUGIN_ID}/ioc`,
       validate: false,
     },
     async (context, request, response) => {
@@ -173,7 +183,7 @@ export function defineRoutes(router: IRouter) {
   );
   router.post(
     {
-      path: '/api/redelk/ioc',
+      path: `/api/${PLUGIN_ID}/ioc`,
       validate: {
         body: schema.object({
           ioc: schema.object({
@@ -234,7 +244,7 @@ export function defineRoutes(router: IRouter) {
   );
   router.post(
     {
-      path: '/api/redelk/iplists',
+      path: `/api/${PLUGIN_ID}/iplists`,
       validate: {
         body: schema.object({
           iplist: schema.object({
@@ -282,7 +292,7 @@ export function defineRoutes(router: IRouter) {
 
   router.delete(
     {
-      path: '/api/redelk/iplists',
+      path: `/api/${PLUGIN_ID}/iplists`,
       validate: {
         body: schema.arrayOf(
           schema.object({
@@ -319,7 +329,7 @@ export function defineRoutes(router: IRouter) {
 
   router.get(
     {
-      path: '/api/redelk/init',
+      path: `/api/${PLUGIN_ID}/init`,
       validate: false,
     },
     async (context, request, response) => {

@@ -45,6 +45,11 @@ import {
 } from './types';
 import { PLUGIN_ID, PLUGIN_NAME } from '../common';
 import { routes } from './routes';
+import {
+  FeatureCatalogueCategory,
+  FeatureCatalogueEntry,
+  FeatureCatalogueSolution,
+} from '../../../src/plugins/home/public';
 
 export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart> {
   // initializerContext: PluginInitializerContext;
@@ -56,7 +61,7 @@ export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart
   //   this.initializerContext = initializerContext;
   // }
 
-  public setup(core: CoreSetup, { data }: RedelkPluginSetupDependencies): RedelkPluginSetup {
+  public setup(core: CoreSetup, { home }: RedelkPluginSetupDependencies): RedelkPluginSetup {
     // const {appMounted, appUnMounted, stop: stopUrlTracker} = createKbnUrlTracker({
     //   baseUrl: core.http.basePath.prepend('/app/timelion'),
     //   defaultSubUrl: '#/',
@@ -85,22 +90,45 @@ export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart
     // };
 
     const darkMode: boolean = core.uiSettings.get('theme:darkMode');
+    const redelkIcon: string = `${core.http.basePath.get()}/plugins/${PLUGIN_ID}/assets/redelklogo${
+      darkMode ? '-light' : ''
+    }.svg`;
+    const redelkSolutionIcon: string = `${core.http.basePath.get()}/plugins/${PLUGIN_ID}/assets/redelklogo-solution.svg`;
+
     const redelkCategory: AppCategory = {
-      id: 'redelk',
+      id: PLUGIN_ID,
       label: PLUGIN_NAME,
       order: 1,
-      euiIconType:
-        core.http.basePath.get() +
-        '/plugins/redelk/assets/redelklogo' +
-        (darkMode ? '-light' : '') +
-        '.svg',
+      euiIconType: redelkIcon,
+    };
+
+    const redelkCatalogueSolution: FeatureCatalogueSolution = {
+      id: PLUGIN_ID,
+      title: PLUGIN_NAME,
+      description: "Your Red Team's SIEM",
+      icon: redelkSolutionIcon,
+      path: `/app/${PLUGIN_ID}`,
+      order: 10,
+    };
+
+    const redelkCatalogueEntry: FeatureCatalogueEntry = {
+      id: PLUGIN_ID,
+      title: PLUGIN_NAME,
+      subtitle: 'RedELK application',
+      description: 'Your red team SIEM catalog entry',
+      icon: redelkIcon,
+      path: `/app/${PLUGIN_ID}`,
+      showOnHomePage: true,
+      category: FeatureCatalogueCategory.OTHER,
+      solutionId: PLUGIN_ID,
+      order: 10,
     };
 
     // Register an application into the side navigation menu
     core.application.register({
-      id: 'redelk',
+      id: PLUGIN_ID,
       title: PLUGIN_NAME,
-      appRoute: '/app/redelk',
+      appRoute: `/app/${PLUGIN_ID}`,
       category: redelkCategory,
       async mount(params: AppMountParameters) {
         // Get start services as specified in kibana.json
@@ -126,6 +154,10 @@ export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart
       },
     });
 
+    if (home) {
+      home.featureCatalogue.registerSolution(redelkCatalogueSolution);
+      home.featureCatalogue.register(redelkCatalogueEntry);
+    }
     // core.application.register({
     //   id: 'redelk:attack-navigator',
     //   title: 'MITRE ATT&CK Navigator',
@@ -181,7 +213,7 @@ export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart
     return {};
   }
 
-  public start(core: CoreStart, { data }: RedelkPluginStartDependencies): RedelkPluginStart {
+  public start(core: CoreStart, { }: RedelkPluginStartDependencies): RedelkPluginStart {
     return {};
   }
 

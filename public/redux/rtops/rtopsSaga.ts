@@ -46,6 +46,7 @@ import {
   IEsSearchResponse,
   ISearchGeneric,
 } from '../../../../../src/plugins/data/public';
+import {PLUGIN_ID} from "../../../common";
 
 const callSearchPromise = ({
   fn,
@@ -78,7 +79,7 @@ function* createIoc({
 }) {
   try {
     const response = yield call(http.post, {
-      path: '/api/redelk/ioc',
+      path: `/api/${PLUGIN_ID}/ioc`,
       body: JSON.stringify(payload),
     });
     yield put({ type: ActionType.RTOPS_CREATE_IOC_REQUEST_SUCCESS, payload: response.rawResponse });

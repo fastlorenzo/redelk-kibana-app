@@ -40,14 +40,14 @@ import { EuiBreadcrumb } from '@elastic/eui';
 import { ChromeBadge, ChromeBrand, ChromeHelpExtension, CoreStart } from 'kibana/public';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { PLUGIN_NAME } from '../../common';
+import {PLUGIN_ID, PLUGIN_NAME} from '../../common';
 import { ActionCreators } from '../redux/rootActions';
 
 export const setNavHeader = (core: CoreStart, breadcrumbs: EuiBreadcrumb[]) => {
   const darkMode: boolean = core.uiSettings.get('theme:darkMode');
   const basePath: string = core.http.basePath.get();
   const iconType =
-    basePath + '/plugins/redelk/assets/redelklogo' + (darkMode ? '-light' : '') + '.svg';
+    basePath + `/plugins/${PLUGIN_ID}/assets/redelklogo` + (darkMode ? '-light' : '') + '.svg';
 
   const badge: ChromeBadge = {
     iconType,

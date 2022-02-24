@@ -37,10 +37,12 @@
  */
 
 import { CoreStart } from 'kibana/public';
+import { PLUGIN_ID } from '../../common';
 
 export const initSettings = async (core: CoreStart) => {
   const defaultRoute = await core.uiSettings.get('defaultRoute');
-  if (defaultRoute !== '/app/redelk/') {
+  if (defaultRoute !== `/app/${PLUGIN_ID}`) {
+    console.log('updating uiSettings');
     await core.uiSettings.set('theme:darkMode', true);
     await core.uiSettings.set('telemetry:optIn', false);
     await core.uiSettings.set('telemetry:enabled', false);
@@ -70,8 +72,9 @@ export const initSettings = async (core: CoreStart) => {
       'redirtraffic-*',
     ]);
     await core.uiSettings.set('defaultIndex', '195a3f00-d04f-11ea-9301-a30a04251ae9');
-    await core.uiSettings.set('defaultRoute', '/app/redelk/');
+    await core.uiSettings.set('defaultRoute', `/app/${PLUGIN_ID}`);
     // await core.uiSettings.set("query:queryString:options", {analyze_wildcard: true, default_field: "*"});
-    window.location.reload();
+    console.log('uiSettings updated');
+    // window.location.reload();
   }
 };

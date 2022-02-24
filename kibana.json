@@ -1,5 +1,5 @@
 {
-  "id": "redelk",
+  "id": "zredelk",
   "version": "7.16.3",
   "server": true,
   "ui": true,
@@ -12,15 +12,11 @@
     "visualize",
     "share",
     "kibanaReact",
-    "kibanaUtils"
-  ],
-  "optionalPlugins": [],
-  "requiredBundles": [
-    "kibanaReact",
     "kibanaUtils",
-    "savedObjects",
-    "visualizations"
+    "home"
   ],
+  "optionalPlugins": ["home"],
+  "requiredBundles": [],
   "owner": {
     "name": "Lorenzo Bernardi"
   }

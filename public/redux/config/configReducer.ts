@@ -37,9 +37,9 @@
  */
 
 import createReducer from '../createReducer';
-import { Action, ActionType, AppState, ConfigState, defaultAppState, RtopsState } from '../types';
-import { RedelkInitStatus } from '../../types';
-import { TopNavMenuData } from '../../../../../src/plugins/navigation/public';
+import {Action, ActionType, AppState, ConfigState, defaultAppState, RtopsState} from '../types';
+import {RedelkInitStatus} from '../../types';
+import {TopNavMenuData} from '../../../../../src/plugins/navigation/public';
 
 const initialState: ConfigState = {
   showTopNav: false,

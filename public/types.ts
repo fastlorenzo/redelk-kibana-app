@@ -38,6 +38,7 @@
 
 import { CoreStart } from 'kibana/public';
 import { UiSettingsServiceStart } from 'kibana/server';
+import { HomePublicPluginSetup } from 'src/plugins/home/public';
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
 import { DataPublicPluginSetup, DataPublicPluginStart } from '../../../src/plugins/data/public';
 import { DashboardStart } from '../../../src/plugins/dashboard/public';
@@ -69,6 +70,7 @@ export type RedelkKibanaService = RedelkPluginStartDependencies & CoreStart;
 export interface RedelkPluginSetupDependencies {
   data: DataPublicPluginSetup;
   share?: SharePluginSetup;
+  home?: HomePublicPluginSetup;
 }
 
 export interface KbnApiMiddlewareDeps {

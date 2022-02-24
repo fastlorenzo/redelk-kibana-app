@@ -46,6 +46,7 @@ import {
   IEsSearchResponse,
   ISearchGeneric,
 } from '../../../../../src/plugins/data/public';
+import {PLUGIN_ID} from "../../../common";
 
 const callSearchPromise = ({
   fn,
@@ -81,7 +82,7 @@ function* createIP({
 }) {
   try {
     const response = yield call(http.post, {
-      path: '/api/redelk/iplists',
+      path: `/api/${PLUGIN_ID}/iplists`,
       body: JSON.stringify(payload),
     });
     yield put({
@@ -101,7 +102,7 @@ function* deleteIPs({
 }) {
   try {
     const response = yield call(http.delete, {
-      path: '/api/redelk/iplists',
+      path: `/api/${PLUGIN_ID}/iplists`,
       body: JSON.stringify(payload),
     });
     yield put({
