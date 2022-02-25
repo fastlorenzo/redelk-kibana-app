@@ -13,7 +13,8 @@ jobs:
       with:
         repository: fastlorenzo/redelk-kibana-app
         path: ./plugin
-    - id: set_var
+    - name: Get Kibana version
+      id: set_var
       run: |
         content=`cat ./redelk/kibana.json`
         # the following lines are only required for multi line json
@@ -30,7 +31,7 @@ jobs:
     - name: Read .nvmrc
       run: NVMRC=$(cat ./kibana/.nvmrc)
       id: nvm
-    - id: set_var
+    - name: Move plugin to Kibana directory
       run: |
         mv ./plugin ./kibana/plugins/${{fromJson(steps.set_var.outputs.kibanaJson).id}}
     - name: Use Node.js (.nvmrc)
