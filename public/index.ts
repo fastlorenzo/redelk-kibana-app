@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,10 +38,10 @@
 
 import './index.scss';
 
-import {RedelkPlugin} from './plugin';
+import { RedelkPlugin } from './plugin';
 
 export const plugin = () => {
   return new RedelkPlugin();
-}
+};
 
-export {RedelkPluginSetup, RedelkPluginStart} from './types';
+export { RedelkPluginSetup, RedelkPluginStart } from './types';

@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,8 +36,15 @@
  * - Lorenzo Bernardi
  */
 
-import {setStateToKbnUrl} from '../../../../src/plugins/kibana_utils/public';
-import {esFilters, Filter, Query, QueryState, RefreshInterval, TimeRange} from '../../../../src/plugins/data/public';
+import { setStateToKbnUrl } from '../../../../src/plugins/kibana_utils/public';
+import {
+  esFilters,
+  Filter,
+  Query,
+  QueryState,
+  RefreshInterval,
+  TimeRange,
+} from '../../../../src/plugins/data/public';
 
 export const REDELK_APP_URL_GENERATOR = 'REDELK_APP_URL_GENERATOR';
 
@@ -86,21 +93,19 @@ interface Params {
 }
 
 export class RedelkURLGenerator {
-
   public readonly id = REDELK_APP_URL_GENERATOR;
 
-  constructor(private readonly params: Params) {
-  }
+  constructor(private readonly params: Params) {}
 
   public readonly createUrl = ({
-                                 filters,
-                                 indexPatternId,
-                                 query,
-                                 refreshInterval,
-                                 savedSearchId,
-                                 time,
-                                 useHash = this.params.useHash,
-                               }: RedelkUrlGeneratorState): string => {
+    filters,
+    indexPatternId,
+    query,
+    refreshInterval,
+    savedSearchId,
+    time,
+    useHash = this.params.useHash,
+  }: RedelkUrlGeneratorState): string => {
     const savedSearchPath = savedSearchId ? encodeURIComponent(savedSearchId) : '';
     const appState: {
       query?: Query;
@@ -124,11 +129,9 @@ export class RedelkURLGenerator {
     if (refreshInterval) queryState.refreshInterval = refreshInterval;
 
     let url = `${this.params.appBasePath}#/${savedSearchPath}`;
-    url = setStateToKbnUrl<QueryState>('_g', queryState, {useHash}, url);
-    url = setStateToKbnUrl('_a', appState, {useHash}, url);
+    url = setStateToKbnUrl<QueryState>('_g', queryState, { useHash }, url);
+    url = setStateToKbnUrl('_a', appState, { useHash }, url);
 
     return url;
   };
-
-
 }

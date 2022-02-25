@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,10 +36,16 @@
  * - Lorenzo Bernardi
  */
 
-import {CoreSetup, CoreStart, Logger, Plugin, PluginInitializerContext,} from '../../../src/core/server';
+import {
+  CoreSetup,
+  CoreStart,
+  Logger,
+  Plugin,
+  PluginInitializerContext,
+} from '../../../src/core/server';
 
-import {RedelkPluginSetup, RedelkPluginStart} from './types';
-import {defineRoutes} from './routes';
+import { RedelkPluginSetup, RedelkPluginStart } from './types';
+import { defineRoutes } from './routes';
 
 export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart> {
   private readonly logger: Logger;
@@ -63,6 +69,5 @@ export class RedelkPlugin implements Plugin<RedelkPluginSetup, RedelkPluginStart
     return {};
   }
 
-  public stop() {
-  }
+  public stop() {}
 }

@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,29 +37,33 @@
  */
 
 import React from 'react';
-import {useTopNav} from "../helpers/nav_header_helper";
-import {EmbeddedDashboard} from "./embeddedDashboard";
-import {useKibana} from '../../../../src/plugins/kibana_react/public';
-import {TopNavMenuData} from '../../../../src/plugins/navigation/public';
-import {RedelkKibanaService} from "../types";
+import { useTopNav } from '../helpers/nav_header_helper';
+import { EmbeddedDashboard } from './embeddedDashboard';
+import { useKibana } from '../../../../src/plugins/kibana_react/public';
+import { TopNavMenuData } from '../../../../src/plugins/navigation/public';
+import { RedelkKibanaService } from '../types';
 
 export const TasksPage = () => {
-
   useTopNav(true);
 
-  const {services}: { services: RedelkKibanaService } = useKibana();
+  const { services }: { services: RedelkKibanaService } = useKibana();
 
   const discoverTopNav: TopNavMenuData = {
-    id: "go-to-discover",
-    label: "Open in discover app",
+    id: 'go-to-discover',
+    label: 'Open in discover app',
     run: () => {
-      services.application?.navigateToApp('discover', {path: "#/view/cc523820-d021-11ea-9301-a30a04251ae9"})
-    }
-  }
+      services.application?.navigateToApp('discover', {
+        path: '#/view/cc523820-d021-11ea-9301-a30a04251ae9',
+      });
+    },
+  };
 
   return (
     <>
-      <EmbeddedDashboard dashboardId="0523c8a0-d025-11ea-9301-a30a04251ae9" extraTopNavMenu={[discoverTopNav]}/>
+      <EmbeddedDashboard
+        dashboardId="0523c8a0-d025-11ea-9301-a30a04251ae9"
+        extraTopNavMenu={[discoverTopNav]}
+      />
     </>
   );
 };

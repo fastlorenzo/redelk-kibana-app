@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,18 +37,21 @@
  */
 
 import React from 'react';
-import {CoreStart} from "kibana/public";
-import {NavigationPublicPluginStart, TopNavMenuData} from '../../../../src/plugins/navigation/public';
-import {EuiFlyout, EuiFlyoutBody, EuiFlyoutHeader, EuiTitle} from '@elastic/eui';
-import {AddIOCForm} from "../features/rtops/addIocForm";
-import {DataPublicPluginStart} from '../../../../src/plugins/data/public';
-import {useDispatch, useSelector} from 'react-redux';
-import {useTopNav} from "../helpers/nav_header_helper";
-import {getRtopsShowAddIOCForm} from "../redux/selectors";
-import {ActionCreators} from "../redux/rootActions";
-import {EmbeddedDashboard} from "./embeddedDashboard";
-import {useKibana} from '../../../../src/plugins/kibana_react/public';
-import {RedelkKibanaService} from "../types";
+import { CoreStart } from 'kibana/public';
+import { EuiFlyout, EuiFlyoutBody, EuiFlyoutHeader, EuiTitle } from '@elastic/eui';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  NavigationPublicPluginStart,
+  TopNavMenuData,
+} from '../../../../src/plugins/navigation/public';
+import { AddIOCForm } from '../features/rtops/addIocForm';
+import { DataPublicPluginStart } from '../../../../src/plugins/data/public';
+import { useTopNav } from '../helpers/nav_header_helper';
+import { getRtopsShowAddIOCForm } from '../redux/selectors';
+import { ActionCreators } from '../redux/rootActions';
+import { EmbeddedDashboard } from './embeddedDashboard';
+import { useKibana } from '../../../../src/plugins/kibana_react/public';
+import { RedelkKibanaService } from '../types';
 
 interface IOCPageDeps {
   basename: string;
@@ -58,8 +61,7 @@ interface IOCPageDeps {
   data: DataPublicPluginStart;
 }
 
-export const IOCPage = ({basename, notifications, http, navigation, data}: IOCPageDeps) => {
-
+export const IOCPage = ({ basename, notifications, http, navigation, data }: IOCPageDeps) => {
   const showAddIOCForm = useSelector(getRtopsShowAddIOCForm);
 
   useTopNav(true);
@@ -72,40 +74,45 @@ export const IOCPage = ({basename, notifications, http, navigation, data}: IOCPa
       <EuiFlyout
         size="m"
         onClose={() => dispatch(ActionCreators.setShowAddIOCForm(false))}
-        aria-labelledby="flyoutTitle">
+        aria-labelledby="flyoutTitle"
+      >
         <EuiFlyoutHeader hasBorder>
           <EuiTitle size="m">
             <h2 id="flyoutTitle">Add an IOC</h2>
           </EuiTitle>
         </EuiFlyoutHeader>
         <EuiFlyoutBody>
-          <AddIOCForm http={http}/>
+          <AddIOCForm http={http} />
         </EuiFlyoutBody>
       </EuiFlyout>
     );
   }
-  const {services}: { services: RedelkKibanaService } = useKibana();
+  const { services }: { services: RedelkKibanaService } = useKibana();
 
   const discoverTopNav: TopNavMenuData = {
-    id: "go-to-discover",
-    label: "Open in discover app",
+    id: 'go-to-discover',
+    label: 'Open in discover app',
     run: () => {
-      services.application?.navigateToApp('discover', {path: "#/view/4c003e20-b6aa-11e8-bc1a-cf8fa3255855"})
-    }
-  }
+      services.application?.navigateToApp('discover', {
+        path: '#/view/4c003e20-b6aa-11e8-bc1a-cf8fa3255855',
+      });
+    },
+  };
   const addIOCNavMenu = {
-    id: "add-ioc",
-    label: "Add IOC",
+    id: 'add-ioc',
+    label: 'Add IOC',
     run: () => {
-      dispatch(ActionCreators.setShowAddIOCForm(true))
-    }
+      dispatch(ActionCreators.setShowAddIOCForm(true));
+    },
   };
 
   return (
     <>
       {addIOCFlyout}
-      <EmbeddedDashboard dashboardId="86643e90-d4e4-11ea-9301-a30a04251ae9"
-                         extraTopNavMenu={[discoverTopNav, addIOCNavMenu]}/>
+      <EmbeddedDashboard
+        dashboardId="86643e90-d4e4-11ea-9301-a30a04251ae9"
+        extraTopNavMenu={[discoverTopNav, addIOCNavMenu]}
+      />
     </>
-  )
+  );
 };

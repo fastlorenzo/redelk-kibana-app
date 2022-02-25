@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,11 +36,12 @@
  * - Lorenzo Bernardi
  */
 
-const IPV4_REGEX: string = '^((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))(\s?#\s?(.*))?$';
-const IPV4_CIDR_REGEX: string = '^((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([1-2][0-9]|3[0-2]|[0-9])))(\s?#\s?(.*))?$';
+const IPV4_REGEX: string =
+  '^((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]).){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))(s?#s?(.*))?$';
+const IPV4_CIDR_REGEX: string =
+  '^((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]).){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(/([1-2][0-9]|3[0-2]|[0-9])))(s?#s?(.*))?$';
 
 export const isValidIPv4 = (input: string): boolean => {
-
   if (input.match(IPV4_REGEX)) {
     return true;
   } else if (input.match(IPV4_CIDR_REGEX)) {
@@ -48,4 +49,4 @@ export const isValidIPv4 = (input: string): boolean => {
   }
 
   return false;
-}
+};

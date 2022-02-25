@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,20 +36,21 @@
  * - Lorenzo Bernardi
  */
 
-import {call, fork, put, takeLatest} from 'redux-saga/effects';
+import { call, fork, put, takeLatest } from 'redux-saga/effects';
 
-import {ActionType} from '../types';
-import {CoreStart} from "kibana/public";
+import { CoreStart } from 'kibana/public';
+import { ActionType } from '../types';
+import { PLUGIN_ID } from '../../../common';
+import { initSettings } from '../../helpers/settings_helper';
 
-function* checkInit({http}: { http: CoreStart["http"] }) {
+function* checkInit({ core }: { core: CoreStart }) {
   try {
-    const response = yield call(
-      http.get, {path: '/api/redelk/init'}
-    )
-    yield put({type: ActionType.CONFIG_REDELK_INIT_CHECK_SUCCESS, payload: response.rawResponse});
+    const response = yield call(core.http.get, { path: `/api/${PLUGIN_ID}/init` });
+    initSettings(core);
+    yield put({ type: ActionType.CONFIG_REDELK_INIT_CHECK_SUCCESS, payload: response.rawResponse });
   } catch (e) {
     console.error(e);
-    yield put({type: ActionType.CONFIG_REDELK_INIT_CHECK_FAILURE, payload: e});
+    yield put({ type: ActionType.CONFIG_REDELK_INIT_CHECK_FAILURE, payload: e });
   }
 }
 
@@ -57,6 +58,4 @@ function* onCheckInitWatcher() {
   yield takeLatest(ActionType.CONFIG_REDELK_INIT_CHECK as any, checkInit);
 }
 
-export default [
-  fork(onCheckInitWatcher),
-];
+export default [fork(onCheckInitWatcher)];

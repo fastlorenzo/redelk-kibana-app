@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,8 +37,7 @@
  */
 
 import React from 'react';
-import {CoreStart} from "kibana/public";
-import {NavigationPublicPluginStart} from '../../../../src/plugins/navigation/public';
+import { CoreStart } from 'kibana/public';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -49,15 +48,16 @@ import {
   EuiPageContent,
   euiPaletteColorBlind,
   EuiStat,
-  EuiTitle
+  EuiTitle,
 } from '@elastic/eui';
-import {KbnCallStatus} from "../types";
-import {useSelector} from 'react-redux';
-import {Axis, BarSeries, Chart, Partition, Settings} from '@elastic/charts';
-import {EUI_CHARTS_THEME_DARK, EUI_CHARTS_THEME_LIGHT} from '@elastic/eui/dist/eui_charts_theme';
-import {useTopNav} from "../helpers/nav_header_helper";
-import {getRtopsAggs, getRtopsStatus} from "../redux/selectors";
-import {useKibana} from '../../../../src/plugins/kibana_react/public';
+import { useSelector } from 'react-redux';
+import { Axis, BarSeries, Chart, Partition, Settings } from '@elastic/charts';
+import { EUI_CHARTS_THEME_DARK, EUI_CHARTS_THEME_LIGHT } from '@elastic/eui/dist/eui_charts_theme';
+import { KbnCallStatus } from '../types';
+import { NavigationPublicPluginStart } from '../../../../src/plugins/navigation/public';
+import { useTopNav } from '../helpers/nav_header_helper';
+import { getRtopsAggs, getRtopsStatus } from '../redux/selectors';
+import { useKibana } from '../../../../src/plugins/kibana_react/public';
 
 interface RedelkAppDeps {
   basename: string;
@@ -66,22 +66,21 @@ interface RedelkAppDeps {
   navigation: NavigationPublicPluginStart;
 }
 
-export const SummaryPage = ({basename, notifications, http, navigation}: RedelkAppDeps) => {
-
+export const SummaryPage = ({ basename, notifications, http, navigation }: RedelkAppDeps) => {
   const rtopsStatus = useSelector(getRtopsStatus);
   const rtopsAggs = useSelector(getRtopsAggs);
   const kibana = useKibana();
-  const isDarkMode = kibana.services.uiSettings?.get("theme:darkMode") && true;
+  const isDarkMode = kibana.services.uiSettings?.get('theme:darkMode') && true;
 
   useTopNav(true);
-  let perEventTypeChart = (<h4>No data</h4>);
-  let perHostNameChart = (<h4>No data</h4>);
+  let perEventTypeChart = <h4>No data</h4>;
+  let perHostNameChart = <h4>No data</h4>;
   if (rtopsAggs.perEventType && rtopsAggs.perHostName && rtopsAggs.perUserName) {
     const perEventTypeData = rtopsAggs.perEventType.buckets;
     const perHostNameData = rtopsAggs.perHostName.buckets;
-    perEventTypeChart = (rtopsStatus !== KbnCallStatus.pending) ?
-      (
-        <Chart size={{height: 300}}>
+    perEventTypeChart =
+      rtopsStatus !== KbnCallStatus.pending ? (
+        <Chart size={{ height: 300 }}>
           <Settings
             theme={isDarkMode ? EUI_CHARTS_THEME_DARK.theme : EUI_CHARTS_THEME_LIGHT.theme}
             rotation={90}
@@ -94,22 +93,17 @@ export const SummaryPage = ({basename, notifications, http, navigation}: RedelkA
             data={perEventTypeData}
             xAccessor="key"
             yAccessors={['doc_count']}
-            color={euiPaletteColorBlind({rotations: 2, order: 'group'}).slice(1, 20)}
+            color={euiPaletteColorBlind({ rotations: 2, order: 'group' }).slice(1, 20)}
           />
-          <Axis
-            id="bottom-axis"
-            position={'left'}
-          />
-          <Axis
-            id="left-axis"
-            showGridLines
-            position={'bottom'}
-          />
+          <Axis id="bottom-axis" position={'left'} />
+          <Axis id="left-axis" showGridLines position={'bottom'} />
         </Chart>
-      ) : (<EuiLoadingSpinner size="xl"/>)
-    perHostNameChart = (rtopsStatus !== KbnCallStatus.pending) ?
-      (
-        <Chart size={{height: 300}}>
+      ) : (
+        <EuiLoadingSpinner size="xl" />
+      );
+    perHostNameChart =
+      rtopsStatus !== KbnCallStatus.pending ? (
+        <Chart size={{ height: 300 }}>
           <Settings
             theme={isDarkMode ? EUI_CHARTS_THEME_DARK.theme : EUI_CHARTS_THEME_LIGHT.theme}
             showLegend={true}
@@ -121,10 +115,9 @@ export const SummaryPage = ({basename, notifications, http, navigation}: RedelkA
             valueAccessor={(d) => Number(d.doc_count)}
             layers={[
               {
-                groupByRollup: (d: { key: string, sortIndex: number }) => d.key,
+                groupByRollup: (d: { key: string; sortIndex: number }) => d.key,
                 shape: {
-                  fillColor: d =>
-                    euiPaletteColorBlind().slice(d.sortIndex, d.sortIndex + 1)[0],
+                  fillColor: (d) => euiPaletteColorBlind().slice(d.sortIndex, d.sortIndex + 1)[0],
                 },
               },
             ]}
@@ -133,29 +126,34 @@ export const SummaryPage = ({basename, notifications, http, navigation}: RedelkA
               clockwiseSectors: false,
             }}
           />
-
         </Chart>
-      ) : (<EuiLoadingSpinner size="xl"/>);
+      ) : (
+        <EuiLoadingSpinner size="xl" />
+      );
   }
 
   const totalHosts = rtopsAggs?.perHostName?.buckets?.length || 0;
   const totalUsers = rtopsAggs?.perUserName?.buckets?.length || 0;
-  const totalIOC = rtopsAggs?.perEventType?.buckets?.filter(v => v.key === "ioc")[0]?.doc_count || 0;
-  const totalDownloads = rtopsAggs?.perEventType?.buckets?.filter(v => v.key === "downloads")[0]?.doc_count || 0;
+  const totalIOC =
+    rtopsAggs?.perEventType?.buckets?.filter((v) => v.key === 'ioc')[0]?.doc_count || 0;
+  const totalDownloads =
+    rtopsAggs?.perEventType?.buckets?.filter((v) => v.key === 'downloads')[0]?.doc_count || 0;
   const totalImplants = rtopsAggs?.perImplant?.buckets?.length || 0;
-
 
   return (
     <EuiPage>
       <EuiPageBody>
         <EuiPageContent>
           <EuiFlexGroup>
-
             {/* Alarms */}
             <EuiFlexItem>
               <EuiStat
                 title="--"
-                description={(<><EuiIcon type="alert"/> Alarms</>)}
+                description={
+                  <>
+                    <EuiIcon type="alert" /> Alarms
+                  </>
+                }
                 textAlign="left"
                 reverse
                 isLoading={rtopsStatus === KbnCallStatus.pending}
@@ -166,7 +164,11 @@ export const SummaryPage = ({basename, notifications, http, navigation}: RedelkA
             <EuiFlexItem>
               <EuiStat
                 title={totalImplants}
-                description={(<><EuiIcon type="bug"/> Implants</>)}
+                description={
+                  <>
+                    <EuiIcon type="bug" /> Implants
+                  </>
+                }
                 textAlign="left"
                 reverse
                 isLoading={rtopsStatus === KbnCallStatus.pending}
@@ -177,7 +179,11 @@ export const SummaryPage = ({basename, notifications, http, navigation}: RedelkA
             <EuiFlexItem>
               <EuiStat
                 title={totalIOC}
-                description={(<><EuiIcon type="securitySignal"/> IOC</>)}
+                description={
+                  <>
+                    <EuiIcon type="securitySignal" /> IOC
+                  </>
+                }
                 textAlign="left"
                 reverse
                 isLoading={rtopsStatus === KbnCallStatus.pending}
@@ -188,7 +194,11 @@ export const SummaryPage = ({basename, notifications, http, navigation}: RedelkA
             <EuiFlexItem>
               <EuiStat
                 title={totalDownloads}
-                description={(<><EuiIcon type="download"/> Downloads</>)}
+                description={
+                  <>
+                    <EuiIcon type="download" /> Downloads
+                  </>
+                }
                 textAlign="left"
                 reverse
                 isLoading={rtopsStatus === KbnCallStatus.pending}
@@ -199,7 +209,11 @@ export const SummaryPage = ({basename, notifications, http, navigation}: RedelkA
             <EuiFlexItem>
               <EuiStat
                 title={totalHosts}
-                description={(<><EuiIcon type="grid"/> Hosts</>)}
+                description={
+                  <>
+                    <EuiIcon type="grid" /> Hosts
+                  </>
+                }
                 textAlign="left"
                 reverse
                 isLoading={rtopsStatus === KbnCallStatus.pending}
@@ -210,21 +224,28 @@ export const SummaryPage = ({basename, notifications, http, navigation}: RedelkA
             <EuiFlexItem>
               <EuiStat
                 title={totalUsers}
-                description={(<><EuiIcon type="users"/> Users</>)}
+                description={
+                  <>
+                    <EuiIcon type="users" /> Users
+                  </>
+                }
                 textAlign="left"
                 reverse
                 isLoading={rtopsStatus === KbnCallStatus.pending}
               />
             </EuiFlexItem>
-
           </EuiFlexGroup>
           <EuiFlexGroup>
             <EuiFlexItem>
-              <EuiTitle size="s"><p>Event type</p></EuiTitle>
+              <EuiTitle size="s">
+                <p>Event type</p>
+              </EuiTitle>
               {perEventTypeChart}
             </EuiFlexItem>
             <EuiFlexItem>
-              <EuiTitle size="s"><p>Hostnames</p></EuiTitle>
+              <EuiTitle size="s">
+                <p>Hostnames</p>
+              </EuiTitle>
               {perHostNameChart}
             </EuiFlexItem>
           </EuiFlexGroup>

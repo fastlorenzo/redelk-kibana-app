@@ -1,16 +1,23 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./target",
     "skipLibCheck": true
   },
   "include": [
     "index.ts",
-    "common/**/*.ts",
-    "public/**/*.ts",
-    "public/**/*.tsx",
-    "server/**/*.ts",
-    "../../typings/**/*",
+    "common/**/*",
+    "public/**/*",
+    "server/**/*",
+    "../../typings/**/*"
   ],
-  "exclude": []
+  "exclude": [],
+  "references": [
+    { "path": "../../src/plugins/data_views/tsconfig.json" },
+    { "path": "../../src/plugins/navigation/tsconfig.json" },
+    { "path": "../../src/plugins/data/tsconfig.json" },
+    { "path": "../../src/plugins/dashboard/tsconfig.json" },
+    { "path": "../../src/plugins/embeddable/tsconfig.json" },
+    { "path": "../../src/plugins/visualizations/tsconfig.json" }
+  ]
 }

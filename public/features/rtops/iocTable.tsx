@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,9 +36,9 @@
  * - Lorenzo Bernardi
  */
 
-import React, {ReactElement, useMemo, useState} from 'react';
-import {useSelector} from 'react-redux';
-import {at} from 'lodash';
+import React, { ReactElement, useMemo, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { at } from 'lodash';
 import {
   EuiDataGrid,
   EuiDataGridCellValueElementProps,
@@ -50,11 +50,10 @@ import {
   EuiLoadingSpinner,
 } from '@elastic/eui';
 
-import {KbnCallStatus} from '../../types';
-import {getRtopsFilteredIOC, getRtopsStatus} from "../../redux/selectors";
+import { KbnCallStatus } from '../../types';
+import { getRtopsFilteredIOC, getRtopsStatus } from '../../redux/selectors';
 
 export const IOCTable = () => {
-
   const ioc = useSelector(getRtopsFilteredIOC);
   const rtopsStatus = useSelector(getRtopsStatus);
 
@@ -62,7 +61,7 @@ export const IOCTable = () => {
     showColumnSelector: true,
     showStyleSelector: true,
     showSortSelector: true,
-    showFullScreenSelector: false
+    showFullScreenSelector: false,
   };
   const gridStyle: EuiDataGridStyle = {
     border: 'all',
@@ -72,64 +71,66 @@ export const IOCTable = () => {
     rowHover: 'highlight',
     header: 'shade',
   };
-  const datagrid_columns: EuiDataGridColumn[] = [
+  const datagridColumns: EuiDataGridColumn[] = [
     {
       id: '_source.@timestamp',
       isSortable: true,
       displayAsText: 'Time',
-      display: (<>Time</>),
+      display: <>Time</>,
     },
     {
       id: '_index',
       displayAsText: 'Index',
-      display: (<>Index</>),
-      initialWidth: 110
+      display: <>Index</>,
+      initialWidth: 110,
     },
     {
       id: '_source.ioc.type',
       displayAsText: 'IOC Type',
-      display: (<>IOC Type</>),
-      initialWidth: 80
+      display: <>IOC Type</>,
+      initialWidth: 80,
     },
     {
       id: '_source.c2.message',
       displayAsText: 'C2 message',
-      display: (<>C2 message</>),
+      display: <>C2 message</>,
     },
     {
       id: '_source.file.name',
       displayAsText: 'File name',
-      display: (<>File name</>)
+      display: <>File name</>,
     },
     {
       id: '_source.file.hash.md5',
       displayAsText: 'File hash',
-      display: (<>File hash</>),
+      display: <>File hash</>,
     },
     {
       id: '_source.file.size',
       displayAsText: 'File size',
-      display: (<>File size</>),
+      display: <>File size</>,
     },
     {
       id: '_source.user.name',
       displayAsText: 'Target user',
-      display: (<>Target user</>)
+      display: <>Target user</>,
     },
     {
       id: '_source.host.name',
       displayAsText: 'Target host',
-      display: (<>Target host</>)
-    }
+      display: <>Target host</>,
+    },
   ];
 
   // Column visibility
-  const [visibleColumns, setVisibleColumns] = useState(() =>
-    datagrid_columns.map(({id}) => id)
-  );
+  const [visibleColumns, setVisibleColumns] = useState(() => datagridColumns.map(({ id }) => id));
 
   const renderCellValue = useMemo(() => {
-    return ({rowIndex, columnId, setCellProps}: EuiDataGridCellValueElementProps): ReactElement => {
+    return ({
+      rowIndex,
+      columnId,
+      setCellProps,
+    }: EuiDataGridCellValueElementProps): ReactElement => {
       // useEffect(() => {
       //   // if (columnId === 'amount') {
       //   //   if (raw_data.hasOwnProperty(rowIndex)) {
@@ -150,22 +151,21 @@ export const IOCTable = () => {
     };
   }, [ioc]);
 
-  return rtopsStatus == KbnCallStatus.pending ? (
-    <EuiLoadingSpinner size="xl"/>
+  return rtopsStatus === KbnCallStatus.pending ? (
+    <EuiLoadingSpinner size="xl" />
   ) : (
     <EuiFlexGroup>
       <EuiFlexItem>
         <EuiDataGrid
-          columns={datagrid_columns}
+          columns={datagridColumns}
           rowCount={ioc.length}
           renderCellValue={renderCellValue}
           toolbarVisibility={toolbarVisibility}
-          columnVisibility={{visibleColumns, setVisibleColumns}}
+          columnVisibility={{ visibleColumns, setVisibleColumns }}
           aria-labelledby={'ioc-grid'}
           gridStyle={gridStyle}
         />
       </EuiFlexItem>
     </EuiFlexGroup>
-
   );
-}
+};

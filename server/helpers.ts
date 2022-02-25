@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -41,9 +41,12 @@ import Chance from 'chance';
 const chance = new Chance();
 const CHARS_POOL = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
 
-export const getRandomString = () => `${chance.string({pool: CHARS_POOL})}-${Date.now()}`;
+export const getRandomString = () => `${chance.string({ pool: CHARS_POOL })}-${Date.now()}`;
 
-export async function asyncForEach<T>(array: T[], callback: (item: T, index: Number, array: T[]) => void) {
+export async function asyncForEach<T>(
+  array: T[],
+  callback: (item: T, index: number, array: T[]) => void
+) {
   for (let index = 0; index < array.length; index++) {
     await callback(array[index], index, array);
   }

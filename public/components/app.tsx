@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,24 +36,25 @@
  * - Lorenzo Bernardi
  */
 
-import React, {ReactElement, useCallback, useEffect, useRef, useState} from 'react';
-import {Redirect, Route, Router} from 'react-router-dom';
+import React, { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
+import { Redirect, Route, Router } from 'react-router-dom';
 
-import {CoreStart} from 'kibana/public';
-import {NavigationPublicPluginStart} from '../../../../src/plugins/navigation/public';
-import {IOCPage} from "./iocPage";
-import {SummaryPage} from "./summaryPage";
+import { CoreStart } from 'kibana/public';
 import {
   EuiBreadcrumb,
   EuiButtonEmpty,
   EuiContextMenuItem,
   EuiContextMenuPanel,
   EuiLoadingSpinner,
-  EuiPopover
+  EuiPopover,
 } from '@elastic/eui';
-import {setNavHeader} from "../helpers/nav_header_helper";
-import {useDispatch, useSelector} from 'react-redux';
-import {PLUGIN_ID, PLUGIN_NAME} from "../../common";
+import { useDispatch, useSelector } from 'react-redux';
+import { History } from 'history';
+import { NavigationPublicPluginStart } from '../../../../src/plugins/navigation/public';
+import { IOCPage } from './iocPage';
+import { SummaryPage } from './summaryPage';
+import { setNavHeader } from '../helpers/nav_header_helper';
+import { PLUGIN_ID, PLUGIN_NAME } from '../../common';
 import {
   connectToQueryState,
   DataPublicPluginStart,
@@ -63,7 +64,7 @@ import {
   IEsSearchRequest,
   IIndexPattern,
   QueryState,
-  syncQueryStateWithUrl
+  syncQueryStateWithUrl,
 } from '../../../../src/plugins/data/public';
 import {
   BaseState,
@@ -72,30 +73,29 @@ import {
   createStateContainerReactHelpers,
   IKbnUrlStateStorage,
   ReduxLikeStateContainer,
-  syncState
+  syncState,
 } from '../../../../src/plugins/kibana_utils/public';
-import {History} from 'history';
-import {ActionCreators} from "../redux/rootActions";
-import {DEFAULT_ROUTE_ID, routes} from "../routes";
-import {RedelkURLGenerator} from "../helpers/url_generator";
-import {KbnCallStatus, RedelkInitStatus} from "../types";
-import {getCurrentRoute, getInitStatus, getShowTopNav, getTopNavMenu} from "../redux/selectors";
-import {checkInit} from "../redux/config/configActions";
-import {AppState, defaultAppState} from '../redux/types';
-import {InitPage} from './initPage';
-import {HomePage} from './homePage';
-import {AlarmsPage} from "./alarmsPage";
-import {CredentialsPage} from "./credentialsPage";
-import {DownloadsPage} from './downloadsPage';
-import {ImplantsPage} from "./implantsPage";
-import {RtopsPage} from "./rtopsPage";
-import {ScreenshotsPage} from "./screenshotsPage";
-import {TasksPage} from "./tasksPage";
-import {TrafficPage} from "./trafficPage";
-import {TTPPage} from "./ttpPage";
-import {AttackNavigatorPage} from "./attackNavigatorPage";
-import {initSettings} from "../helpers/settings_helper";
-import {HealthPage} from "./healthPage";
+import { ActionCreators } from '../redux/rootActions';
+import { DEFAULT_ROUTE_ID, routes } from '../routes';
+import { RedelkURLGenerator } from '../helpers/url_generator';
+import { KbnCallStatus, RedelkInitStatus } from '../types';
+import { getCurrentRoute, getInitStatus, getShowTopNav, getTopNavMenu } from '../redux/selectors';
+import { checkInit } from '../redux/config/configActions';
+import { AppState, defaultAppState } from '../redux/types';
+import { InitPage } from './initPage';
+import { HomePage } from './homePage';
+import { AlarmsPage } from './alarmsPage';
+import { CredentialsPage } from './credentialsPage';
+import { DownloadsPage } from './downloadsPage';
+import { ImplantsPage } from './implantsPage';
+import { RtopsPage } from './rtopsPage';
+import { ScreenshotsPage } from './screenshotsPage';
+import { TasksPage } from './tasksPage';
+import { TrafficPage } from './trafficPage';
+import { TTPPage } from './ttpPage';
+import { AttackNavigatorPage } from './attackNavigatorPage';
+import { initSettings } from '../helpers/settings_helper';
+import { HealthPage } from './healthPage';
 
 interface RedelkAppDeps {
   basename: string;
@@ -122,12 +122,12 @@ const useIndexPattern = (data: DataPublicPluginStart) => {
           setIndexPattern(defaultIndexPattern);
         } else {
           try {
-            const rtopsIndexPattern = await data.indexPatterns.get("rtops");
+            const rtopsIndexPattern = await data.indexPatterns.get('rtops');
             if (rtopsIndexPattern) {
               setIndexPattern(rtopsIndexPattern);
             }
           } catch (e) {
-            console.log("Error getting rtops index pattern:", e);
+            console.log('Error getting rtops index pattern:', e);
           }
         }
       } catch (e) {
@@ -138,7 +138,7 @@ const useIndexPattern = (data: DataPublicPluginStart) => {
   }, [data.indexPatterns]);
 
   return indexPattern;
-}
+};
 
 const useCreateStateContainer = <State extends BaseState>(
   defaultState: State
@@ -148,7 +148,7 @@ const useCreateStateContainer = <State extends BaseState>(
     stateContainerRef.current = createStateContainer(defaultState);
   }
   return stateContainerRef.current;
-}
+};
 
 const useGlobalStateSyncing = (
   query: DataPublicPluginStart['query'],
@@ -157,7 +157,7 @@ const useGlobalStateSyncing = (
   // setup sync state utils
   useEffect(() => {
     // sync global filters, time filters, refresh interval from data.query to url '_g'
-    const {stop} = syncQueryStateWithUrl(query, kbnUrlStateStorage);
+    const { stop } = syncQueryStateWithUrl(query, kbnUrlStateStorage);
     return () => {
       stop();
     };
@@ -175,11 +175,11 @@ const useAppStateSyncing = <AppState extends QueryState>(
     const stopSyncingQueryAppStateWithStateContainer = connectToQueryState(
       query,
       appStateContainer,
-      {filters: esFilters.FilterStateStore.APP_STATE, time: true}
+      { filters: esFilters.FilterStateStore.APP_STATE, time: true }
     );
 
     // sets up syncing app state container with url
-    const {start: startSyncingAppStateWithUrl, stop: stopSyncingAppStateWithUrl} = syncState({
+    const { start: startSyncingAppStateWithUrl, stop: stopSyncingAppStateWithUrl } = syncState({
       storageKey: '_a',
       stateStorage: kbnUrlStateStorage,
       stateContainer: {
@@ -210,18 +210,26 @@ const useAppStateSyncing = <AppState extends QueryState>(
   }, [query, kbnUrlStateStorage, appStateContainer]);
 };
 
-const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlStateStorage}: RedelkAppDeps) => {
-  const {notifications, http} = core;
+const RedelkAppInternal = ({
+  basename,
+  navigation,
+  data,
+  core,
+  history,
+  kbnUrlStateStorage,
+}: RedelkAppDeps) => {
+  const { notifications, http } = core;
   const appStateContainer = useAppStateContainer();
   const appState = useAppState();
-
 
   const showTopNav = useSelector(getShowTopNav);
   const currentRoute = useSelector(getCurrentRoute);
   const initStatus = useSelector(getInitStatus);
   const topNavMenu = useSelector(getTopNavMenu);
 
-  const [currentPageTitle, setCurrentPageTitle] = useState<string>(routes.find(r => r.id === DEFAULT_ROUTE_ID)!.name);
+  const [currentPageTitle, setCurrentPageTitle] = useState<string>(
+    routes.find((r) => r.id === DEFAULT_ROUTE_ID)!.name
+  );
   const [isPopoverOpen, setPopover] = useState(false);
 
   const onButtonClick = () => {
@@ -237,17 +245,11 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
     if (location.pathname !== currentRoute) {
       dispatch(ActionCreators.setCurrentRoute(location.pathname));
     }
-    initSettings(core);
   });
 
   // BEGIN top drop-down menu
   const button = (
-    <EuiButtonEmpty
-      size="s"
-      iconType="arrowDown"
-      iconSide="right"
-      onClick={onButtonClick}
-    >
+    <EuiButtonEmpty size="s" iconType="arrowDown" iconSide="right" onClick={onButtonClick}>
       {currentPageTitle}
     </EuiButtonEmpty>
   );
@@ -255,15 +257,14 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
   // Listen to the appState and update menu links
   useEffect(() => {
     // Quick and dirty... TODO: prepend basePath to r.path
-    const tmp = routes.find(r => location.pathname.includes(r.path))?.name || "Loading";
+    const tmp = routes.find((r) => location.pathname.includes(r.path))?.name || 'Loading';
     setCurrentPageTitle(tmp);
   }, [currentRoute]);
   useEffect(() => {
-    let items: ReactElement[];
-    items = routes.map(r => {
-      const generator = new RedelkURLGenerator({appBasePath: r.path, useHash: false});
-      let path = generator.createUrl(appState);
-      //console.log('url', path, appState, appStateContainer);
+    const items: ReactElement[] = routes.map((r) => {
+      const generator = new RedelkURLGenerator({ appBasePath: r.path, useHash: false });
+      const path = generator.createUrl(appState);
+      // console.log('url', path, appState, appStateContainer);
       return (
         <EuiContextMenuItem
           key={r.id}
@@ -276,7 +277,7 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
         >
           {r.name}
         </EuiContextMenuItem>
-      )
+      );
     });
 
     const breadcrumbs: EuiBreadcrumb[] = [
@@ -284,16 +285,15 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
         href: core.application.getUrlForApp(PLUGIN_ID),
         onClick: (e) => {
           core.application.navigateToApp(PLUGIN_ID, {
-            path: routes.find(r => r.id === DEFAULT_ROUTE_ID)!.path || "/",
-            state: appState
+            path: routes.find((r) => r.id === DEFAULT_ROUTE_ID)!.path || '/',
+            state: appState,
           });
           e.preventDefault();
         },
-        text: PLUGIN_NAME
+        text: PLUGIN_NAME,
       },
       {
-        onClick: () => {
-        },
+        onClick: () => {},
         text: (
           <EuiPopover
             id="singlePanel"
@@ -303,29 +303,29 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
             panelPaddingSize="none"
             anchorPosition="downLeft"
           >
-            <EuiContextMenuPanel items={items}/>
+            <EuiContextMenuPanel items={items} />
           </EuiPopover>
-        )
-      }
+        ),
+      },
     ];
 
     setNavHeader(core, breadcrumbs);
   }, [appState.time, appState.query, appState.filters, history.location, data.query, currentRoute]);
 
-  const onQuerySubmit = useCallback(
-    ({query, dateRange}) => {
-      appStateContainer.set({...appState, query, time: dateRange});
-      dispatch(ActionCreators.setAppState({...appState, query, time: dateRange}));
-    },
-    [appStateContainer, appState]
-  );
-
   const dispatch = useDispatch();
+
+  const onQuerySubmit = useCallback(
+    ({ query, dateRange }) => {
+      appStateContainer.set({ ...appState, query, time: dateRange });
+      dispatch(ActionCreators.setAppState({ ...appState, query, time: dateRange }));
+    },
+    [appStateContainer, appState, dispatch]
+  );
 
   // Build ES query and fetch data
   useEffect(() => {
     dispatch(ActionCreators.setIOCStatus(KbnCallStatus.pending));
-    let tmpFilters = appState.filters ? [...appState.filters] : [];
+    const tmpFilters = appState.filters ? [...appState.filters] : [];
     if (appState.time !== undefined) {
       const trFilter = getTime(indexPattern, appState.time);
       if (trFilter !== undefined) {
@@ -334,7 +334,7 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
     }
 
     const esQueryFilters = esQuery.buildQueryFromFilters(tmpFilters, indexPattern);
-    let searchOpts: IEsSearchRequest = {
+    const searchOpts: IEsSearchRequest = {
       params: {
         index: 'rtops-*',
         size: 10000,
@@ -342,131 +342,127 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
           aggs: {
             perEventType: {
               terms: {
-                field: "event.type",
+                field: 'event.type',
                 order: {
-                  "_count": "desc"
-                }
-              }
+                  _count: 'desc',
+                },
+              },
             },
             perHostName: {
               terms: {
-                field: "host.name",
+                field: 'host.name',
                 order: {
-                  "_count": "desc"
-                }
-              }
+                  _count: 'desc',
+                },
+              },
             },
             perUserName: {
               terms: {
-                field: "user.name",
+                field: 'user.name',
                 order: {
-                  "_count": "desc"
-                }
-              }
+                  _count: 'desc',
+                },
+              },
             },
             perImplant: {
               terms: {
-                field: "implant.id",
+                field: 'implant.id',
                 order: {
-                  "_count": "desc"
-                }
-              }
-            }
-          }
-        }
-      }
+                  _count: 'desc',
+                },
+              },
+            },
+          },
+        },
+      },
     };
     if (searchOpts.params !== undefined) {
       // If a query was entered
-      if (appState.query !== undefined && appState.query.query !== undefined && appState.query.query !== "") {
+      if (
+        appState.query !== undefined &&
+        appState.query.query !== undefined &&
+        appState.query.query !== ''
+      ) {
         searchOpts.params.q = appState.query.query.toString();
       }
       // If the state contains a filter
       if (appState.filters !== undefined || appState.time !== undefined) {
         if (searchOpts.params.body === undefined) {
-          searchOpts.params.body = {}
+          searchOpts.params.body = {};
         }
         searchOpts.params.body.query = {
-          bool: esQueryFilters
-        }
+          bool: esQueryFilters,
+        };
       }
     }
-    dispatch(ActionCreators.fetchAllRtops({data, searchOpts}));
+    dispatch(ActionCreators.fetchAllRtops({ data, searchOpts }));
 
-    let searchOptsIPLists: IEsSearchRequest = {
+    const searchOptsIPLists: IEsSearchRequest = {
       params: {
         index: 'redelk-iplist-*',
         size: 10000,
-        body: {}
-      }
+        body: {},
+      },
     };
     if (searchOptsIPLists.params !== undefined) {
       // If a query was entered
-      if (appState.query !== undefined && appState.query.query !== undefined && appState.query.query !== "") {
+      if (
+        appState.query !== undefined &&
+        appState.query.query !== undefined &&
+        appState.query.query !== ''
+      ) {
         searchOptsIPLists.params.q = appState.query.query.toString();
       }
       // If the state contains a filter
       if (appState.filters !== undefined || appState.time !== undefined) {
         if (searchOptsIPLists.params.body === undefined) {
-          searchOptsIPLists.params.body = {}
+          searchOptsIPLists.params.body = {};
         }
         searchOptsIPLists.params.body.query = {
-          bool: esQueryFilters
-        }
+          bool: esQueryFilters,
+        };
       }
     }
-    dispatch(ActionCreators.fetchAllIPLists({data, searchOpts: searchOptsIPLists}));
-
+    dispatch(ActionCreators.fetchAllIPLists({ data, searchOpts: searchOptsIPLists }));
   }, [appState.filters, appState.query, appState.time, currentRoute]);
 
   const indexPattern = useIndexPattern(data);
 
   if (initStatus === RedelkInitStatus.idle) {
-    dispatch(checkInit(http));
+    dispatch(checkInit(core));
     return (
       <InitPage
-        title={(
-          <h2>Loading {PLUGIN_NAME}</h2>
-        )}
-        content={(
-          <p><EuiLoadingSpinner size="xl"/> Waiting for {PLUGIN_NAME} initialization to start.</p>
-        )}
+        title={<h2>Loading {PLUGIN_NAME}</h2>}
+        content={
+          <p>
+            <EuiLoadingSpinner size="xl" /> Waiting for {PLUGIN_NAME} initialization to start.
+          </p>
+        }
       />
     );
   }
   if (initStatus === RedelkInitStatus.pending) {
     return (
       <InitPage
-        title={(
-          <h2>Loading {PLUGIN_NAME}</h2>
-        )}
-        content={(
-          <p><EuiLoadingSpinner size="xl"/> Waiting for {PLUGIN_NAME} initialization to complete.</p>
-        )}
+        title={<h2>Loading {PLUGIN_NAME}</h2>}
+        content={
+          <p>
+            <EuiLoadingSpinner size="xl" /> Waiting for {PLUGIN_NAME} initialization to complete.
+          </p>
+        }
       />
     );
   }
   if (initStatus === RedelkInitStatus.failure) {
-    return (
-      <InitPage
-        title={(
-          <h2>Error loading {PLUGIN_NAME}</h2>
-        )}
-        content={(
-          <p>ERROR: --</p>
-        )}
-      />
-    );
+    return <InitPage title={<h2>Error loading {PLUGIN_NAME}</h2>} content={<p>ERROR: --</p>} />;
   }
   if (!indexPattern) {
     return (
       <InitPage
-        title={(
-          <h2>Error loading {PLUGIN_NAME}</h2>
-        )}
-        content={(
+        title={<h2>Error loading {PLUGIN_NAME}</h2>}
+        content={
           <p>No default index pattern found. Please set the default index pattern to "rtops-*".</p>
-        )}
+        }
       />
     );
   }
@@ -482,58 +478,71 @@ const RedelkAppInternal = ({basename, navigation, data, core, history, kbnUrlSta
       showSaveQuery={true}
       config={topNavMenu}
     />
-  ) : '';
+  ) : (
+    ''
+  );
 
   return (
     <Router history={history}>
       {topNav}
 
-      <Route path="/" exact
-             render={() => <Redirect to={routes.find(r => r.id === DEFAULT_ROUTE_ID)?.path || "/home"}/>}/>
-      <Route path="/home" exact component={HomePage}/>
-      <Route path="/alarms" exact component={AlarmsPage}/>
-      <Route path="/credentials" exact component={CredentialsPage}/>
-      <Route path="/downloads" exact component={DownloadsPage}/>
-      <Route path="/implants" exact component={ImplantsPage}/>
-      <Route path="/rtops" exact component={RtopsPage}/>
-      <Route path="/screenshots" exact component={ScreenshotsPage}/>
-      <Route path="/tasks" exact component={TasksPage}/>
-      <Route path="/traffic" exact component={TrafficPage}/>
-      <Route path="/ttp" exact component={TTPPage}/>
-      <Route path="/attack-navigator" exact component={AttackNavigatorPage}/>
+      <Route
+        path="/"
+        exact
+        render={() => (
+          <Redirect to={routes.find((r) => r.id === DEFAULT_ROUTE_ID)?.path || '/home'} />
+        )}
+      />
+      <Route path="/home" exact component={HomePage} />
+      <Route path="/alarms" exact component={AlarmsPage} />
+      <Route path="/credentials" exact component={CredentialsPage} />
+      <Route path="/downloads" exact component={DownloadsPage} />
+      <Route path="/implants" exact component={ImplantsPage} />
+      <Route path="/rtops" exact component={RtopsPage} />
+      <Route path="/screenshots" exact component={ScreenshotsPage} />
+      <Route path="/tasks" exact component={TasksPage} />
+      <Route path="/traffic" exact component={TrafficPage} />
+      <Route path="/ttp" exact component={TTPPage} />
+      <Route path="/attack-navigator" exact component={AttackNavigatorPage} />
 
-      <Route path="/summary" exact
-             render={() =>
-               <SummaryPage
-                 basename={basename}
-                 notifications={notifications}
-                 http={http}
-                 navigation={navigation}
-               />}
+      <Route
+        path="/summary"
+        exact
+        render={() => (
+          <SummaryPage
+            basename={basename}
+            notifications={notifications}
+            http={http}
+            navigation={navigation}
+          />
+        )}
       />
-      <Route path="/ioc"
-             render={() =>
-               <IOCPage
-                 basename={basename}
-                 notifications={notifications}
-                 http={http}
-                 navigation={navigation}
-                 data={data}
-               />}
+      <Route
+        path="/ioc"
+        render={() => (
+          <IOCPage
+            basename={basename}
+            notifications={notifications}
+            http={http}
+            navigation={navigation}
+            data={data}
+          />
+        )}
       />
-      <Route path="/health"
-             render={() =>
-               <HealthPage
-                 basename={basename}
-                 notifications={notifications}
-                 http={http}
-                 navigation={navigation}
-                 data={data}
-               />}
+      <Route
+        path="/health"
+        render={() => (
+          <HealthPage
+            basename={basename}
+            notifications={notifications}
+            http={http}
+            navigation={navigation}
+            data={data}
+          />
+        )}
       />
-
     </Router>
-  )
+  );
 };
 
 export const RedelkApp = (props: RedelkAppDeps) => {

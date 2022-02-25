@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,16 +37,15 @@
  */
 
 import React from 'react';
-import {useTopNav} from "../helpers/nav_header_helper";
-import {EmbeddedDashboard} from "./embeddedDashboard";
+import { useTopNav } from '../helpers/nav_header_helper';
+import { EmbeddedDashboard } from './embeddedDashboard';
 
 export const HomePage = () => {
-
   useTopNav(true);
 
   return (
     <>
-      <EmbeddedDashboard dashboardId="02486040-d355-11ea-9301-a30a04251ae9"/>
+      <EmbeddedDashboard dashboardId="02486040-d355-11ea-9301-a30a04251ae9" />
     </>
   );
 };

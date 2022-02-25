@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,8 +36,8 @@
  * - Lorenzo Bernardi
  */
 
-import {PluginInitializerContext} from '../../../src/core/server';
-import {RedelkPlugin} from './plugin';
+import { PluginInitializerContext } from '../../../src/core/server';
+import { RedelkPlugin } from './plugin';
 
 //  This exports static code and TypeScript types,
 //  as well as, Kibana Platform `plugin()` initializer.
@@ -46,4 +46,4 @@ export function plugin(initializerContext: PluginInitializerContext) {
   return new RedelkPlugin(initializerContext);
 }
 
-export {RedelkPluginSetup, RedelkPluginStart} from './types';
+export { RedelkPluginSetup, RedelkPluginStart } from './types';

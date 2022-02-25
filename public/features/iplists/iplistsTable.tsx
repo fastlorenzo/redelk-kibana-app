@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,65 +36,71 @@
  * - Lorenzo Bernardi
  */
 
-import React, {Fragment, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {EuiBasicTable, EuiButton, EuiFlexGroup, EuiFlexItem, EuiLoadingSpinner, EuiSpacer,} from '@elastic/eui';
+import React, { Fragment, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  EuiBasicTable,
+  EuiButton,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiLoadingSpinner,
+  EuiSpacer,
+} from '@elastic/eui';
 
-import {EsAnswer, IPListsDoc, KbnCallStatus} from '../../types';
-import {getIPListsHits, getIPListsStatus} from "../../redux/selectors";
-import {ActionCreators} from "../../redux/rootActions";
-import {CoreStart} from "kibana/public";
+import { CoreStart } from 'kibana/public';
+import { EsAnswer, IPListsDoc, KbnCallStatus } from '../../types';
+import { getIPListsHits, getIPListsStatus } from '../../redux/selectors';
+import { ActionCreators } from '../../redux/rootActions';
 
 interface IPListsTableDeps {
   http: CoreStart['http'];
-};
+}
 
-export const IplistsTable = ({http}: IPListsTableDeps) => {
-
+export const IplistsTable = ({ http }: IPListsTableDeps) => {
   const dispatch = useDispatch();
 
   const iplistsHits = useSelector(getIPListsHits);
   const iplistsStatus = useSelector(getIPListsStatus);
   // const iplistsTableData = useSelector(getIPListsTable);
 
-  const [selectedItems, setSelectedItems] = useState<EsAnswer<IPListsDoc>[]>([]);
+  const [selectedItems, setSelectedItems] = useState<Array<EsAnswer<IPListsDoc>>>([]);
 
-  const onSelectionChange = (selectedItems: EsAnswer<IPListsDoc>[]) => {
-    setSelectedItems(selectedItems);
+  const onSelectionChange = (selectedItemsArg: Array<EsAnswer<IPListsDoc>>) => {
+    setSelectedItems(selectedItemsArg);
   };
 
   const onClickDelete = () => {
-    console.log('Deleting selected items', selectedItems);
-    const payload = selectedItems.map((item) => ({id: item._id, index: item._index}));
-    dispatch(ActionCreators.deleteIPs({http, payload}));
+    console.debug('Deleting selected items', selectedItems);
+    const payload = selectedItems.map((item) => ({ id: item._id, index: item._index }));
+    dispatch(ActionCreators.deleteIPs({ http, payload }));
     setSelectedItems([]);
   };
 
-  const table_columns = [
+  const tableColumns = [
     {
       field: '_source.@timestamp',
       name: 'Time added/updated',
-      sortable: true
+      sortable: true,
     },
     {
       field: '_index',
       name: 'Index',
-      sortable: true
+      sortable: true,
     },
     {
       field: '_source.iplist.name',
       name: 'List',
-      sortable: true
+      sortable: true,
     },
     {
       field: '_source.iplist.ip',
       name: 'IP',
-      sortable: true
+      sortable: true,
     },
     {
       field: '_source.iplist.source',
       name: 'Source',
-      sortable: true
+      sortable: true,
     },
   ];
 
@@ -102,46 +108,46 @@ export const IplistsTable = ({http}: IPListsTableDeps) => {
     selectable: (select: EsAnswer<IPListsDoc>) => select._source.iplist.source !== 'config_file',
     selectableMessage: (selectable: boolean) =>
       !selectable ? 'IPs configured in config files cannot be deleted from here' : '',
-    onSelectionChange: onSelectionChange,
+    onSelectionChange,
   };
 
   const addButton = (
-    <EuiButton iconType='plusInCircle' onClick={() => dispatch(ActionCreators.setShowAddIPForm(true))}>Add
-      IP</EuiButton>
-  )
+    <EuiButton
+      iconType="plusInCircle"
+      onClick={() => dispatch(ActionCreators.setShowAddIPForm(true))}
+    >
+      Add IP
+    </EuiButton>
+  );
   const renderDeleteButton = () => {
     if (selectedItems.length === 0) {
       return;
     }
 
     return (
-      <EuiButton color='danger' iconType='trash' onClick={onClickDelete}>
+      <EuiButton color="danger" iconType="trash" onClick={onClickDelete}>
         Delete {selectedItems.length} IPs
       </EuiButton>
     );
   };
   const deleteButton = renderDeleteButton();
 
-  return iplistsStatus == KbnCallStatus.pending ? (
-    <EuiLoadingSpinner size='xl'/>
+  return iplistsStatus === KbnCallStatus.pending ? (
+    <EuiLoadingSpinner size="xl" />
   ) : (
     <Fragment>
-      <EuiFlexGroup gutterSize='s' alignItems='center'>
-        <EuiFlexItem grow={false}>
-          {addButton}
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          {deleteButton}
-        </EuiFlexItem>
+      <EuiFlexGroup gutterSize="s" alignItems="center">
+        <EuiFlexItem grow={false}>{addButton}</EuiFlexItem>
+        <EuiFlexItem grow={false}>{deleteButton}</EuiFlexItem>
       </EuiFlexGroup>
-      <EuiSpacer/>
+      <EuiSpacer />
       <EuiBasicTable
         items={iplistsHits}
-        itemId='_id'
-        columns={table_columns}
+        itemId="_id"
+        columns={tableColumns}
         isSelectable={true}
         selection={selection}
       />
     </Fragment>
   );
-}
+};
