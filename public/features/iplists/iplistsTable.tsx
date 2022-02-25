@@ -70,7 +70,7 @@ export const IplistsTable = ({ http }: IPListsTableDeps) => {
   };
 
   const onClickDelete = () => {
-    console.log('Deleting selected items', selectedItems);
+    console.debug('Deleting selected items', selectedItems);
     const payload = selectedItems.map((item) => ({ id: item._id, index: item._index }));
     dispatch(ActionCreators.deleteIPs({ http, payload }));
     setSelectedItems([]);

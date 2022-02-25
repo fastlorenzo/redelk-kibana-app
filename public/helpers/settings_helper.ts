@@ -42,7 +42,7 @@ import { PLUGIN_ID } from '../../common';
 export const initSettings = async (core: CoreStart) => {
   const defaultRoute = await core.uiSettings.get('defaultRoute');
   if (defaultRoute !== `/app/${PLUGIN_ID}`) {
-    console.log('updating uiSettings');
+    console.debug('updating uiSettings');
     await core.uiSettings.set('theme:darkMode', true);
     await core.uiSettings.set('telemetry:optIn', false);
     await core.uiSettings.set('telemetry:enabled', false);
@@ -74,7 +74,7 @@ export const initSettings = async (core: CoreStart) => {
     await core.uiSettings.set('defaultIndex', '195a3f00-d04f-11ea-9301-a30a04251ae9');
     await core.uiSettings.set('defaultRoute', `/app/${PLUGIN_ID}`);
     // await core.uiSettings.set("query:queryString:options", {analyze_wildcard: true, default_field: "*"});
-    console.log('uiSettings updated');
+    console.debug('uiSettings updated');
     // window.location.reload();
   }
 };

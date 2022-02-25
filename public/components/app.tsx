@@ -242,12 +242,9 @@ const RedelkAppInternal = ({
   useGlobalStateSyncing(data.query, kbnUrlStateStorage);
   useAppStateSyncing(appStateContainer, data.query, kbnUrlStateStorage);
   useEffect(() => {
-    console.log('Current route', currentRoute);
-    console.log('location', location);
     if (location.pathname !== currentRoute) {
       dispatch(ActionCreators.setCurrentRoute(location.pathname));
     }
-    // initSettings(core);
   });
 
   // BEGIN top drop-down menu

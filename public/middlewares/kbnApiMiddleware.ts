@@ -51,8 +51,6 @@ const kbnApi = ({ notifications, http }: KbnApiMiddlewareDeps) => {
     ({ dispatch, getState }: MiddlewareArgs) =>
     (next: Dispatch) =>
     (action) => {
-      // console.log('Called kbnApiMiddleware');
-      // console.log(http);
       switch (action.type) {
         case ActionType.RTOPS_CREATE_IOC_REQUEST_SUCCESS:
           // Wait 3 seconds for the data to be ingested before fetching all IOCs again.
