@@ -54,10 +54,10 @@ export const setCurrentRoute = (payload: string) => {
   };
 };
 
-export const checkInit = (http: CoreStart['http']) => {
+export const checkInit = (core: CoreStart) => {
   return {
     type: ActionType.CONFIG_REDELK_INIT_CHECK,
-    http,
+    core,
   };
 };
 

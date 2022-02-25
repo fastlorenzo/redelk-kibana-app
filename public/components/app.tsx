@@ -247,7 +247,7 @@ const RedelkAppInternal = ({
     if (location.pathname !== currentRoute) {
       dispatch(ActionCreators.setCurrentRoute(location.pathname));
     }
-    initSettings(core);
+    // initSettings(core);
   });
 
   // BEGIN top drop-down menu
@@ -432,7 +432,7 @@ const RedelkAppInternal = ({
   const indexPattern = useIndexPattern(data);
 
   if (initStatus === RedelkInitStatus.idle) {
-    dispatch(checkInit(http));
+    dispatch(checkInit(core));
     return (
       <InitPage
         title={<h2>Loading {PLUGIN_NAME}</h2>}
