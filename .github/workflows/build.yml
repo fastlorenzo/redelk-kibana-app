@@ -16,7 +16,7 @@ jobs:
     - name: Get Kibana version
       id: set_var
       run: |
-        content=`cat ./redelk/kibana.json`
+        content=`cat ./plugin/kibana.json`
         # the following lines are only required for multi line json
         content="${content//'%'/'%25'}"
         content="${content//$'\n'/'%0A'}"
