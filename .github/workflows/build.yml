@@ -30,28 +30,29 @@ jobs:
         repository: elastic/kibana
         path: ./kibana
         ref: "v${{fromJson(steps.set_var.outputs.kibanaJson).version}}"
-    - name: Read .nvmrc
-      run: NVMRC=$(cat ./kibana/.nvmrc)
-      id: nvm
+    # - name: Read .nvmrc
+    #   run: NVMRC=$(cat ./kibana/.nvmrc)
+    #   id: nvm
     - name: Move plugin to Kibana directory
       run: |
         mv ./plugin ./kibana/plugins/${{fromJson(steps.set_var.outputs.kibanaJson).id}}
     - name: Use Node.js (.nvmrc)
       uses: actions/setup-node@v2
       with:
-        node-version: "${{ steps.nvm.outputs.NVMRC }}"
-    - name: Cache node modules
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-node-modules
-      with:
-        # npm cache files are stored in `~/.npm` on Linux/macOS
-        path: ./kibana/node_modules
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('./kibana/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
+        node-version-file: './kibana/.nvmrc'
+        cache: 'npm'
+    # - name: Cache node modules
+    #   uses: actions/cache@v2
+    #   env:
+    #     cache-name: cache-node-modules
+    #   with:
+    #     # npm cache files are stored in `~/.npm` on Linux/macOS
+    #     path: ./kibana/node_modules
+    #     key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('./kibana/yarn.lock') }}
+    #     restore-keys: |
+    #       ${{ runner.os }}-build-${{ env.cache-name }}-
+    #       ${{ runner.os }}-build-
+    #       ${{ runner.os }}-
     - name: Bootstrap Kibana
       run: cd ./kibana/plugins/${{fromJson(steps.set_var.outputs.kibanaJson).id}} && yarn kbn bootstrap
     - name: Fix redux-toolkit
