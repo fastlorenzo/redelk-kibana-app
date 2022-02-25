@@ -56,12 +56,13 @@ jobs:
     #       ${{ runner.os }}-
     - name: Bootstrap Kibana
       run: cd ./kibana/plugins/${{fromJson(steps.set_var.outputs.kibanaJson).id}} && yarn kbn bootstrap
-    - name: Fix redux-toolkit
-      run: sed -i 's/^const /^let /g' ./kibana/plugins/${{fromJson(steps.set_var.outputs.kibanaJson).id}}/node_modules/@reduxjs/toolkit/dist/redux-toolkit.cjs.development.js
+    # - name: Fix redux-toolkit
+    #   run: sed -i 's/^const /^let /g' ./kibana/plugins/${{fromJson(steps.set_var.outputs.kibanaJson).id}}/node_modules/@reduxjs/toolkit/dist/redux-toolkit.cjs.development.js
 #    - name: Run optimizer manually (https://github.com/elastic/kibana/issues/70426)
 #      run: cd ./kibana/plugins/redelk && node ../../scripts/build_kibana_platform_plugins --verbose --no-examples --dist --filter redelk
     - name: Build RedELK plugin
-      run: cd ./kibana/plugins/${{fromJson(steps.set_var.outputs.kibanaJson).id}} && yarn build --skip-archive && mkdir build/kibana/${{fromJson(steps.set_var.outputs.kibanaJson).id}}/public && cp -R public/assets/ build/kibana/${{fromJson(steps.set_var.outputs.kibanaJson).id}}/public && cd build && zip redelk-${{fromJson(steps.set_var.outputs.kibanaJson).version}}.zip kibana -r
+      run: cd ./kibana/plugins/${{fromJson(steps.set_var.outputs.kibanaJson).id}} && yarn build
+      # --skip-archive && mkdir build/kibana/${{fromJson(steps.set_var.outputs.kibanaJson).id}}/public && cp -R public/assets/ build/kibana/${{fromJson(steps.set_var.outputs.kibanaJson).id}}/public && cd build && zip redelk-${{fromJson(steps.set_var.outputs.kibanaJson).version}}.zip kibana -r
     - name: Archive production artifacts
       uses: actions/upload-artifact@v2
       with:
