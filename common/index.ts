@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,5 +36,5 @@
  * - Lorenzo Bernardi
  */
 
-export const PLUGIN_ID = 'redelk';
+export const PLUGIN_ID = 'zredelk';
 export const PLUGIN_NAME = 'RedELK';

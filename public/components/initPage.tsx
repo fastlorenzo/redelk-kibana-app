@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,31 +43,28 @@ import {
   EuiPageContentBody,
   EuiPageContentHeader,
   EuiPageContentHeaderSection,
-  EuiTitle
+  EuiTitle,
 } from '@elastic/eui';
-import React, {ReactElement} from 'react';
+import React, { ReactElement } from 'react';
 
 interface InitPageDeps {
   title: ReactElement;
   content: ReactElement;
-
 }
 
-export const InitPage = ({title, content}: InitPageDeps) => {
+export const InitPage = ({ title, content }: InitPageDeps) => {
   return (
     <EuiPage>
       <EuiPageBody component="div">
         <EuiPageContent verticalPosition="center" horizontalPosition="center">
           <EuiPageContentHeader>
             <EuiPageContentHeaderSection>
-              <EuiTitle>
-                {title}
-              </EuiTitle>
+              <EuiTitle>{title}</EuiTitle>
             </EuiPageContentHeaderSection>
           </EuiPageContentHeader>
           <EuiPageContentBody>{content}</EuiPageContentBody>
         </EuiPageContent>
       </EuiPageBody>
     </EuiPage>
-  )
-}
+  );
+};

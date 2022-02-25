@@ -1,9 +1,23 @@
 {
-  "id": "redelk",
-  "version": "7.10.0",
+  "id": "zredelk",
+  "version": "7.16.3",
   "server": true,
   "ui": true,
-  "requiredPlugins": ["navigation", "data", "dashboard", "embeddable", "visualizations", "visualize", "share", "kibanaReact", "kibanaUtils"],
-  "optionalPlugins": [],
-  "requiredBundles": []
+  "requiredPlugins": [
+    "navigation",
+    "data",
+    "dashboard",
+    "embeddable",
+    "visualizations",
+    "visualize",
+    "share",
+    "kibanaReact",
+    "kibanaUtils",
+    "home"
+  ],
+  "optionalPlugins": ["home"],
+  "requiredBundles": [],
+  "owner": {
+    "name": "Lorenzo Bernardi"
+  }
 }

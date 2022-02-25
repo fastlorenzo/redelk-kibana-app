@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,8 +36,11 @@
  * - Lorenzo Bernardi
  */
 
-import * as ConfigActions from "./config/configActions";
+import * as ConfigActions from './config/configActions';
 import * as RtopsActions from './rtops/rtopsActions';
 import * as IPListsActions from './iplists/iplistsActions';
 
-export const ActionCreators = Object.assign({}, {...ConfigActions, ...RtopsActions, ...IPListsActions});
+export const ActionCreators = Object.assign(
+  {},
+  { ...ConfigActions, ...RtopsActions, ...IPListsActions }
+);

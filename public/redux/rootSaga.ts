@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,15 +36,11 @@
  * - Lorenzo Bernardi
  */
 
-import {all} from 'redux-saga/effects';
+import { all } from 'redux-saga/effects';
 import rtopsSaga from './rtops/rtopsSaga';
-import configSaga from "./config/configSaga";
-import iplistsSaga from "./iplists/iplistsSaga";
+import configSaga from './config/configSaga';
+import iplistsSaga from './iplists/iplistsSaga';
 
 export default function* rootSaga() {
-  yield all([
-    ...configSaga,
-    ...rtopsSaga,
-    ...iplistsSaga,
-  ]);
+  yield all([...configSaga, ...rtopsSaga, ...iplistsSaga]);
 }

@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,73 +36,83 @@
  * - Lorenzo Bernardi
  */
 
-import React, {useEffect, useState} from 'react';
-import {SimpleSavedObject} from "kibana/public";
-import {DashboardContainerInput, SavedObjectDashboard} from '../../../../src/plugins/dashboard/public';
-import {getAppState, getRtopsLastRefreshDate} from "../redux/selectors";
-import {useDispatch, useSelector} from 'react-redux';
-import {savedObjectToDashboardContainerInput} from '../helpers/dashboard_helper';
-import {useKibana} from '../../../../src/plugins/kibana_react/public';
-import {ActionCreators} from "../redux/rootActions";
-import {TopNavMenuData} from '../../../../src/plugins/navigation/public';
-import {concat} from 'lodash';
-import {RedelkKibanaService} from "../types";
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { concat } from 'lodash';
+import { EmbeddableFactory } from '../../../../src/plugins/embeddable/public';
+import {
+  DashboardContainerInput,
+  DashboardSavedObject,
+  DashboardStart,
+} from '../../../../src/plugins/dashboard/public';
+import { getAppState, getRtopsLastRefreshDate } from '../redux/selectors';
+import { useKibana } from '../../../../src/plugins/kibana_react/public';
+import { ActionCreators } from '../redux/rootActions';
+import { TopNavMenuData } from '../../../../src/plugins/navigation/public';
+import { RedelkKibanaService } from '../types';
+import { savedObjectToDashboardContainerInput } from '../helpers/dashboard_helper';
 
-
-export const EmbeddedDashboard = ({dashboardId, extraTopNavMenu}: { dashboardId: string, extraTopNavMenu?: TopNavMenuData[] }) => {
-
-  const [dashboardDef, setDashboardDef] = useState<SimpleSavedObject<SavedObjectDashboard>>();
+export const EmbeddedDashboard = ({
+  dashboardId,
+  extraTopNavMenu,
+}: {
+  dashboardId: string;
+  extraTopNavMenu?: TopNavMenuData[];
+}) => {
+  const [dashboardDef, setDashboardDef] = useState<DashboardSavedObject>();
   const [dashboardConfig, setDashboardConfig] = useState<DashboardContainerInput>();
-  // const [dashboard, setDashboard] = useState<ReactElement>(<p>Loading dashboard</p>);
 
   const dispatch = useDispatch();
-  const {services}: { services: RedelkKibanaService } = useKibana();
+  const { services }: { services: RedelkKibanaService } = useKibana();
 
   const appState = useSelector(getAppState);
   const rtopsLastRefreshDate = useSelector(getRtopsLastRefreshDate);
 
   useEffect(() => {
-    let topNav: TopNavMenuData[] = [{
-      id: "go-to-dashboard",
-      label: "Open in dashboard app",
-      run: () => {
-        services.application?.navigateToApp('dashboards', {path: "#/view/" + dashboardId})
-      }
-    }];
+    let topNav: TopNavMenuData[] = [
+      {
+        id: 'go-to-dashboard',
+        label: 'Open in dashboard app',
+        run: () => {
+          services.application?.navigateToApp('dashboards', { path: '#/view/' + dashboardId });
+        },
+      },
+    ];
     if (extraTopNavMenu !== undefined) {
       topNav = concat(topNav, extraTopNavMenu);
     }
-    dispatch(ActionCreators.setTopNavMenu(topNav))
+    dispatch(ActionCreators.setTopNavMenu(topNav));
     return () => {
-      dispatch(ActionCreators.setTopNavMenu([]))
-    }
+      dispatch(ActionCreators.setTopNavMenu([]));
+    };
   }, []);
 
   let dashboard;
   useEffect(() => {
     if (dashboardDef !== undefined) {
-      setDashboardConfig(savedObjectToDashboardContainerInput(dashboardDef, appState, rtopsLastRefreshDate));
+      setDashboardConfig(
+        savedObjectToDashboardContainerInput(dashboardDef, appState, rtopsLastRefreshDate)
+      );
     }
   }, [dashboardDef, appState, rtopsLastRefreshDate]);
 
   if (dashboardConfig) {
-    dashboard = (
-      <services.dashboard.DashboardContainerByValueRenderer input={dashboardConfig}
-                                                            onInputUpdated={setDashboardConfig}/>
-    );
+    const DashboardContainerByValueRenderer: ReturnType<
+      DashboardStart['getDashboardContainerByValueRenderer']
+    > = services.dashboard.getDashboardContainerByValueRenderer();
+    dashboard = <DashboardContainerByValueRenderer input={dashboardConfig} />;
   }
 
   useEffect(() => {
-    services.savedObjects?.client?.get("dashboard", dashboardId).then(res => {
-      setDashboardDef(res as SimpleSavedObject<SavedObjectDashboard>);
-    })
-  }, [])
+    const loader = services.dashboard.getSavedDashboardLoader();
+    loader.get(dashboardId).then((res) => {
+      setDashboardDef(res as DashboardSavedObject);
+    });
+  }, []);
 
   return (
     <div id="dashboardPage">
-      <div id="dashboardViewport">
-        {dashboard}
-      </div>
+      <div id="dashboardViewport">{dashboard}</div>
     </div>
   );
 };

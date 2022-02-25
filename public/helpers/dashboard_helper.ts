@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,23 +36,30 @@
  * - Lorenzo Bernardi
  */
 
-import {SimpleSavedObject} from "kibana/public";
-import {GridData} from '../../../../src/plugins/dashboard/common';
-import {DashboardContainerInput, SavedObjectDashboard} from '../../../../src/plugins/dashboard/public';
-import {DashboardPanelState} from '../../../../src/plugins/dashboard/public/application';
-import {EmbeddableInput, ViewMode} from '../../../../src/plugins/embeddable/public';
-import {AppState} from "../redux/types";
-import {find} from "lodash";
+import { GridData } from '../../../../src/plugins/dashboard/common';
+import {
+  DashboardContainerInput,
+  DashboardSavedObject,
+} from '../../../../src/plugins/dashboard/public';
+import { DashboardPanelState } from '../../../../src/plugins/dashboard/public/application';
+import { EmbeddableInput, ViewMode } from '../../../../src/plugins/embeddable/public';
+import { AppState } from '../redux/types';
 
 const uuidv4 = (): string => {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    // eslint-disable-next-line no-bitwise
+    const r = (Math.random() * 16) | 0;
+    // eslint-disable-next-line no-bitwise
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
-}
+};
 
-
-export const savedObjectToDashboardContainerInput = (savedObj: SimpleSavedObject<SavedObjectDashboard>, appState: AppState, lastRefreshDate?: Date): DashboardContainerInput => {
+export const savedObjectToDashboardContainerInput = (
+  savedObj: DashboardSavedObject,
+  appState: AppState,
+  lastRefreshDate?: Date
+): DashboardContainerInput => {
   const initialInput: DashboardContainerInput = {
     viewMode: ViewMode.VIEW,
     panels: {
@@ -64,10 +71,10 @@ export const savedObjectToDashboardContainerInput = (savedObj: SimpleSavedObject
           y: 0,
           i: '1',
         },
-        type: "visualization",
+        type: 'visualization',
         explicitInput: {
           id: '1',
-          savedObjectId: "b19d4790-d35f-11ea-9301-a30a04251ae9"
+          savedObjectId: 'b19d4790-d35f-11ea-9301-a30a04251ae9',
         },
       },
     },
@@ -90,50 +97,66 @@ export const savedObjectToDashboardContainerInput = (savedObj: SimpleSavedObject
     },
   };
   if (savedObj !== undefined) {
-    const panels = JSON.parse(savedObj.attributes.panelsJSON);
-    let panelsOut: {
+    const panels = JSON.parse(savedObj.panelsJSON);
+    const panelsOut: {
       [panelId: string]: DashboardPanelState<EmbeddableInput & { [k: string]: unknown }>;
     } = {};
-    panels.forEach((p: { panelRefName: string, gridData: GridData, panelIndex: string, embeddableConfig: {} }) => {
-      const pr = find(savedObj.references, r => r.name === p.panelRefName);
-      // Don't show top menu bars for embedded dashboards
-      if (pr && pr.id !== "0f82b540-d237-11ea-9301-a30a04251ae9" && pr.id !== "45491770-0886-11eb-a2d2-171dc8941414") {
-        const tmpPanel = {
-          gridData: p.gridData,
-          type: pr.type,
-          explicitInput: {
-            id: p.panelIndex,
-            savedObjectId: pr.id,
-            ...p.embeddableConfig
-          }
+    panels.forEach(
+      (p: {
+        id: string;
+        gridData: GridData;
+        panelIndex: string;
+        embeddableConfig: {};
+        type: string;
+        version: string;
+      }) => {
+        // const pr = find(savedObj, (r) => r.name === p.panelRefName);
+        // Don't show top menu bars for embedded dashboards
+        if (
+          p &&
+          p.id !== '0f82b540-d237-11ea-9301-a30a04251ae9' &&
+          p.id !== '45491770-0886-11eb-a2d2-171dc8941414'
+        ) {
+          const tmpPanel = {
+            gridData: p.gridData,
+            type: p.type,
+            explicitInput: {
+              id: p.panelIndex,
+              savedObjectId: p.id,
+              ...p.embeddableConfig,
+            },
+          };
+          panelsOut[p.panelIndex] = tmpPanel;
         }
-        panelsOut[p.panelIndex] = tmpPanel;
       }
-    });
-    const dashboardOptions = JSON.parse(savedObj.attributes.optionsJSON || "") as { useMargins: boolean, hidePanelTitles: boolean };
+    );
+    const dashboardOptions = JSON.parse(savedObj.optionsJSON || '') as {
+      useMargins: boolean;
+      hidePanelTitles: boolean;
+    };
     const dashboardConfig: DashboardContainerInput = {
       viewMode: ViewMode.VIEW,
       panels: panelsOut,
       filters: appState.filters || [],
       useMargins: dashboardOptions.useMargins,
-      id: savedObj.id,
+      id: savedObj.id ?? '',
       timeRange: {
-        from: appState.time?.from || savedObj.attributes.timeFrom || "",
-        to: appState.time?.to || savedObj.attributes.timeTo || "",
+        from: appState.time?.from || savedObj.timeFrom || '',
+        to: appState.time?.to || savedObj.timeTo || '',
       },
-      title: savedObj.attributes.title,
+      title: savedObj.title,
       query: appState.query || {
-        language: "kuery",
-        query: ""
+        language: 'kuery',
+        query: '',
       },
       isFullScreenMode: false,
       refreshConfig: {
         pause: false,
         value: 5,
       },
-      lastReloadRequestTime: lastRefreshDate?.getTime() || new Date().getTime()
-    }
+      lastReloadRequestTime: lastRefreshDate?.getTime() || new Date().getTime(),
+    };
     return dashboardConfig;
   }
   return initialInput;
-}
+};

@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,18 +36,24 @@
  * - Lorenzo Bernardi
  */
 
-import React, {memo} from 'react';
-import {useTopNav} from "../helpers/nav_header_helper";
+import React, { memo } from 'react';
+import { useTopNav } from '../helpers/nav_header_helper';
 
-const Iframe = memo(() => <iframe src='/plugins/redelk/assets/attack-navigator/' width="100%" height="100%"/>)
+const Iframe = memo(() => (
+  <iframe
+    title="attack-navigator"
+    src="/plugins/redelk/assets/attack-navigator/"
+    width="100%"
+    height="100%"
+  />
+));
 
 export const AttackNavigatorPage = () => {
-
   useTopNav(false);
 
   return (
     <div id="iframe-wrapper">
-      <Iframe/>
+      <Iframe />
     </div>
   );
 };

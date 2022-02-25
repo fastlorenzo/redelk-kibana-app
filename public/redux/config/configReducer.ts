@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,20 +37,19 @@
  */
 
 import createReducer from '../createReducer';
-import {Action, ActionType, AppState, ConfigState, defaultAppState, RtopsState} from "../types";
-import {RedelkInitStatus} from "../../types";
+import {Action, ActionType, AppState, ConfigState, defaultAppState, RtopsState} from '../types';
+import {RedelkInitStatus} from '../../types';
 import {TopNavMenuData} from '../../../../../src/plugins/navigation/public';
 
 const initialState: ConfigState = {
   showTopNav: false,
-  currentRoute: "",
+  currentRoute: '',
   initStatus: RedelkInitStatus.idle,
   appState: defaultAppState,
-  topNavMenu: []
+  topNavMenu: [],
 };
 
 export const configReducer = createReducer<ConfigState>(initialState, {
-
   [ActionType.CONFIG_REDELK_INIT_CHECK](state: RtopsState, action: Action<string>) {
     return {
       ...state,
@@ -61,7 +60,7 @@ export const configReducer = createReducer<ConfigState>(initialState, {
     return {
       ...state,
       status: RedelkInitStatus.success,
-      initStatus: null
+      initStatus: null,
     };
   },
   [ActionType.CONFIG_REDELK_INIT_CHECK_FAILURE](state: RtopsState, action: Action<string>) {
@@ -74,36 +73,35 @@ export const configReducer = createReducer<ConfigState>(initialState, {
   [ActionType.CONFIG_SHOW_TOP_NAV](state: ConfigState, action: Action<boolean>) {
     return {
       ...state,
-      showTopNav: action.payload
+      showTopNav: action.payload,
     };
   },
 
   [ActionType.CONFIG_SET_CURRENT_ROUTE](state: ConfigState, action: Action<string>) {
     return {
       ...state,
-      currentRoute: action.payload
+      currentRoute: action.payload,
     };
   },
 
   [ActionType.CONFIG_SET_IS_INITIALIZED](state: ConfigState, action: Action<boolean>) {
     return {
       ...state,
-      isInitialized: action.payload
+      isInitialized: action.payload,
     };
   },
 
   [ActionType.CONFIG_SET_APPSTATE](state: ConfigState, action: Action<AppState>) {
     return {
       ...state,
-      appState: action.payload
+      appState: action.payload,
     };
   },
 
   [ActionType.CONFIG_SET_TOPNAVMENU](state: ConfigState, action: Action<TopNavMenuData[]>) {
     return {
       ...state,
-      topNavMenu: action.payload
+      topNavMenu: action.payload,
     };
   },
 });
-

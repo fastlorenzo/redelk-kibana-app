@@ -3,7 +3,7 @@
  *
  * BSD 3-Clause License
  *
- * Copyright (c) 2020, Lorenzo Bernardi
+ * Copyright (c) Lorenzo Bernardi
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,54 +36,57 @@
  * - Lorenzo Bernardi
  */
 
-import {ActionType, CreateIPType, DeleteIPType} from "../types";
-import {CoreStart} from 'kibana/public';
-import {KbnCallStatus} from "../../types";
-import {DataPublicPluginStart, IEsSearchRequest} from '../../../../../src/plugins/data/public';
+import { CoreStart } from 'kibana/public';
+import { ActionType, CreateIPType, DeleteIPType } from '../types';
+import { KbnCallStatus } from '../../types';
+import { DataPublicPluginStart, IEsSearchRequest } from '../../../../../src/plugins/data/public';
 
 interface ActionArgs<T> {
   http: CoreStart['http'];
   payload?: T;
 }
 
-export const fetchAllIPLists = (payload: { data: DataPublicPluginStart, searchOpts: IEsSearchRequest }) => {
+export const fetchAllIPLists = (payload: {
+  data: DataPublicPluginStart;
+  searchOpts: IEsSearchRequest;
+}) => {
   return {
     type: ActionType.IPLISTS_FETCH_ALL_REQUEST,
-    payload
-  }
+    payload,
+  };
 };
 
 export const createIP = (payload: ActionArgs<CreateIPType>) => {
   return {
     type: ActionType.IPLISTS_CREATE_IP_REQUEST,
-    payload
-  }
+    payload,
+  };
 };
 
 export const deleteIPs = (payload: ActionArgs<DeleteIPType[]>) => {
   return {
     type: ActionType.IPLISTS_DELETE_IPS_REQUEST,
-    payload
-  }
+    payload,
+  };
 };
 
 export const setIPListsStatus = (payload: KbnCallStatus) => {
   return {
     type: ActionType.IPLISTS_SET_STATUS,
-    payload
-  }
+    payload,
+  };
 };
 
 export const setShowAddIPForm = (payload: boolean) => {
   return {
     type: ActionType.IPLISTS_SHOW_ADD_IP_FORM,
-    payload
-  }
-}
+    payload,
+  };
+};
 
 export const setShowManageIPLists = (payload: boolean) => {
   return {
     type: ActionType.IPLISTS_SHOW_MANAGE_IPLISTS,
-    payload
-  }
-}
+    payload,
+  };
+};
