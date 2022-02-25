@@ -36,12 +36,10 @@
  * - Lorenzo Bernardi
  */
 
-import { SimpleSavedObject } from 'kibana/public';
-import { find } from 'lodash';
 import { GridData } from '../../../../src/plugins/dashboard/common';
 import {
   DashboardContainerInput,
-  SavedObjectDashboard,
+  DashboardSavedObject,
 } from '../../../../src/plugins/dashboard/public';
 import { DashboardPanelState } from '../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput, ViewMode } from '../../../../src/plugins/embeddable/public';
@@ -49,14 +47,16 @@ import { AppState } from '../redux/types';
 
 const uuidv4 = (): string => {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    // eslint-disable-next-line no-bitwise
     const r = (Math.random() * 16) | 0;
-    const v = c == 'x' ? r : (r & 0x3) | 0x8;
+    // eslint-disable-next-line no-bitwise
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 };
 
 export const savedObjectToDashboardContainerInput = (
-  savedObj: SimpleSavedObject<SavedObjectDashboard>,
+  savedObj: DashboardSavedObject,
   appState: AppState,
   lastRefreshDate?: Date
 ): DashboardContainerInput => {
@@ -97,30 +97,32 @@ export const savedObjectToDashboardContainerInput = (
     },
   };
   if (savedObj !== undefined) {
-    const panels = JSON.parse(savedObj.attributes.panelsJSON);
+    const panels = JSON.parse(savedObj.panelsJSON);
     const panelsOut: {
       [panelId: string]: DashboardPanelState<EmbeddableInput & { [k: string]: unknown }>;
     } = {};
     panels.forEach(
       (p: {
-        panelRefName: string;
+        id: string;
         gridData: GridData;
         panelIndex: string;
         embeddableConfig: {};
+        type: string;
+        version: string;
       }) => {
-        const pr = find(savedObj.references, (r) => r.name === p.panelRefName);
+        // const pr = find(savedObj, (r) => r.name === p.panelRefName);
         // Don't show top menu bars for embedded dashboards
         if (
-          pr &&
-          pr.id !== '0f82b540-d237-11ea-9301-a30a04251ae9' &&
-          pr.id !== '45491770-0886-11eb-a2d2-171dc8941414'
+          p &&
+          p.id !== '0f82b540-d237-11ea-9301-a30a04251ae9' &&
+          p.id !== '45491770-0886-11eb-a2d2-171dc8941414'
         ) {
           const tmpPanel = {
             gridData: p.gridData,
-            type: pr.type,
+            type: p.type,
             explicitInput: {
               id: p.panelIndex,
-              savedObjectId: pr.id,
+              savedObjectId: p.id,
               ...p.embeddableConfig,
             },
           };
@@ -128,7 +130,7 @@ export const savedObjectToDashboardContainerInput = (
         }
       }
     );
-    const dashboardOptions = JSON.parse(savedObj.attributes.optionsJSON || '') as {
+    const dashboardOptions = JSON.parse(savedObj.optionsJSON || '') as {
       useMargins: boolean;
       hidePanelTitles: boolean;
     };
@@ -137,12 +139,12 @@ export const savedObjectToDashboardContainerInput = (
       panels: panelsOut,
       filters: appState.filters || [],
       useMargins: dashboardOptions.useMargins,
-      id: savedObj.id,
+      id: savedObj.id ?? '',
       timeRange: {
-        from: appState.time?.from || savedObj.attributes.timeFrom || '',
-        to: appState.time?.to || savedObj.attributes.timeTo || '',
+        from: appState.time?.from || savedObj.timeFrom || '',
+        to: appState.time?.to || savedObj.timeTo || '',
       },
-      title: savedObj.attributes.title,
+      title: savedObj.title,
       query: appState.query || {
         language: 'kuery',
         query: '',

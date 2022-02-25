@@ -36,7 +36,7 @@
  * - Lorenzo Bernardi
  */
 
-import { CoreStart } from 'kibana/public';
+import { CoreStart, PluginInitializerContext } from 'kibana/public';
 import { UiSettingsServiceStart } from 'kibana/server';
 import { HomePublicPluginSetup } from 'src/plugins/home/public';
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
@@ -63,6 +63,7 @@ export interface RedelkPluginStartDependencies {
   // savedObjects: SavedObjectsStart;
   share: SharePluginStart;
   uiSettings: UiSettingsServiceStart;
+  initializerContext: PluginInitializerContext;
 }
 
 export type RedelkKibanaService = RedelkPluginStartDependencies & CoreStart;

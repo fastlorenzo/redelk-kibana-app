@@ -37,19 +37,20 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { SimpleSavedObject } from 'kibana/public';
 import { useDispatch, useSelector } from 'react-redux';
 import { concat } from 'lodash';
+import { EmbeddableFactory } from '../../../../src/plugins/embeddable/public';
 import {
   DashboardContainerInput,
-  SavedObjectDashboard,
+  DashboardSavedObject,
+  DashboardStart,
 } from '../../../../src/plugins/dashboard/public';
 import { getAppState, getRtopsLastRefreshDate } from '../redux/selectors';
-import { savedObjectToDashboardContainerInput } from '../helpers/dashboard_helper';
 import { useKibana } from '../../../../src/plugins/kibana_react/public';
 import { ActionCreators } from '../redux/rootActions';
 import { TopNavMenuData } from '../../../../src/plugins/navigation/public';
 import { RedelkKibanaService } from '../types';
+import { savedObjectToDashboardContainerInput } from '../helpers/dashboard_helper';
 
 export const EmbeddedDashboard = ({
   dashboardId,
@@ -58,9 +59,8 @@ export const EmbeddedDashboard = ({
   dashboardId: string;
   extraTopNavMenu?: TopNavMenuData[];
 }) => {
-  const [dashboardDef, setDashboardDef] = useState<SimpleSavedObject<SavedObjectDashboard>>();
+  const [dashboardDef, setDashboardDef] = useState<DashboardSavedObject>();
   const [dashboardConfig, setDashboardConfig] = useState<DashboardContainerInput>();
-  // const [dashboard, setDashboard] = useState<ReactElement>(<p>Loading dashboard</p>);
 
   const dispatch = useDispatch();
   const { services }: { services: RedelkKibanaService } = useKibana();
@@ -97,17 +97,16 @@ export const EmbeddedDashboard = ({
   }, [dashboardDef, appState, rtopsLastRefreshDate]);
 
   if (dashboardConfig) {
-    dashboard = (
-      <services.dashboard.DashboardContainerByValueRenderer
-        input={dashboardConfig}
-        onInputUpdated={setDashboardConfig}
-      />
-    );
+    const DashboardContainerByValueRenderer: ReturnType<
+      DashboardStart['getDashboardContainerByValueRenderer']
+    > = services.dashboard.getDashboardContainerByValueRenderer();
+    dashboard = <DashboardContainerByValueRenderer input={dashboardConfig} />;
   }
 
   useEffect(() => {
-    services.savedObjects?.client?.get('dashboard', dashboardId).then((res) => {
-      setDashboardDef(res as SimpleSavedObject<SavedObjectDashboard>);
+    const loader = services.dashboard.getSavedDashboardLoader();
+    loader.get(dashboardId).then((res) => {
+      setDashboardDef(res as DashboardSavedObject);
     });
   }, []);
 
