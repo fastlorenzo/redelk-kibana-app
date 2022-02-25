@@ -9,7 +9,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - name: Checkout RedELK Kibana app
+      uses: actions/checkout@v2
       with:
         repository: fastlorenzo/redelk-kibana-app
         path: ./plugin
@@ -23,7 +24,8 @@ jobs:
         content="${content//$'\r'/'%0D'}"
         # end of optional handling for multi line json
         echo "::set-output name=kibanaJson::$content"
-    - uses: actions/checkout@master
+    - name: Checkout Kibana codebase
+      uses: actions/checkout@v2
       with:
         repository: elastic/kibana
         path: ./kibana
@@ -35,7 +37,7 @@ jobs:
       run: |
         mv ./plugin ./kibana/plugins/${{fromJson(steps.set_var.outputs.kibanaJson).id}}
     - name: Use Node.js (.nvmrc)
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2
       with:
         node-version: "${{ steps.nvm.outputs.NVMRC }}"
     - name: Cache node modules
