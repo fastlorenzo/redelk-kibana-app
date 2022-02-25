@@ -13,15 +13,15 @@ jobs:
       with:
         repository: elastic/kibana
         path: ./kibana
-        ref: v7.10.0
+        ref: v7.16.3
     - uses: actions/checkout@master
       with:
         repository: fastlorenzo/redelk-kibana-app
         path: ./kibana/plugins/redelk
-    - name: Use Node.js 10.22.1
+    - name: Use Node.js 16.3.0
       uses: actions/setup-node@v1
       with:
-        node-version: 10.22.1
+        node-version: 16.3.0
     - name: Cache node modules
       uses: actions/cache@v2
       env:
