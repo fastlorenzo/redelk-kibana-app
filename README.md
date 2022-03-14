@@ -9,7 +9,7 @@ Currently, working functionalities are:
 - Management of IP lists (add/delete)
 - Display RedELK dashboards
 
-This application is compatible with Elastic stack v7.10.0
+This application is compatible with Elastic stack v7.16.3
 
 ## Screenshots
 

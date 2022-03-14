@@ -38,11 +38,12 @@
 
 import React, { memo } from 'react';
 import { useTopNav } from '../helpers/nav_header_helper';
+import { PLUGIN_ID } from '../../common';
 
 const Iframe = memo(() => (
   <iframe
     title="attack-navigator"
-    src="/plugins/redelk/assets/attack-navigator/"
+    src={'/plugins/redelk/' + PLUGIN_ID + '/attack-navigator/'}
     width="100%"
     height="100%"
   />
