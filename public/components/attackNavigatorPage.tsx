@@ -43,7 +43,7 @@ import { PLUGIN_ID } from '../../common';
 const Iframe = memo(() => (
   <iframe
     title="attack-navigator"
-    src={'/plugins/redelk/' + PLUGIN_ID + '/attack-navigator/'}
+    src={'/plugins/' + PLUGIN_ID + '/assets/attack-navigator/'}
     width="100%"
     height="100%"
   />
